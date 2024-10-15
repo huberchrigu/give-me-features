@@ -1,0 +1,51 @@
+@startuml
+:Developer:
+:Product Owner: as PO
+:Requirements Engineer: as RE
+:Software Architect: as Architect
+:Quality Manager: as QM
+
+(Describing a feature) as NewFeature
+(Implementing feature) as FeatureImplementation
+(Creating a task) as NewTask
+(Adding progress to a task) as Progress
+(Marking a task as blocked) as Blocked
+(Fetching a feature report) as Report
+(Tackling blocking issues) as Tackling
+(Planning a feature go-live) as GoLive
+(Describing interfaces) as Interfaces
+(Collaborating on a feature) as CollabFeature
+(Collaborating on a task) as CollabTask
+(Testing a feature) as Testing
+
+RE -> NewFeature
+Architect -> NewFeature
+PO -> NewFeature
+
+Developer -> FeatureImplementation
+Developer -> NewTask
+Architect -> NewTask
+
+Developer -> Progress
+
+Developer -> Blocked
+
+PO -> Report
+
+Architect -> Tackling
+
+Architect -> GoLive
+PO -> GoLive
+
+Architect -> Interfaces
+Developer -> Interfaces
+
+RE -> CollabFeature
+Architect -> CollabFeature
+PO -> CollabFeature
+
+Architect -> CollabTask
+Developer -> CollabTask
+
+QM -> Testing
+@enduml
