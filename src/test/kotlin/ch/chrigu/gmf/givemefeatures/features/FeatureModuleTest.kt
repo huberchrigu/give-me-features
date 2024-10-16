@@ -9,14 +9,13 @@ import org.springframework.modulith.test.ApplicationModuleTest
 
 @ApplicationModuleTest
 @Import(TestcontainersConfiguration::class)
-class FeatureModuleTest(private val featureRepository: FeatureRepository) {
+class FeatureModuleTest(private val featureService: FeatureService) {
     @Test
     fun `should describe a feature`() {
         runBlocking {
-            val feature = Feature.describeNewFeature("Login", "A user should be able to login")
-            val result = featureRepository.save(feature)
-            assertThat(result.name).isEqualTo(feature.name)
-            assertThat(result.description).isEqualTo(feature.description)
+            val result = featureService.newFeature(Feature.describeNewFeature("Login", "A user should be able to login"))
+            assertThat(result.name).isEqualTo(result.name)
+            assertThat(result.description).isEqualTo(result.description)
             assertThat(result.id).isNotNull()
         }
     }

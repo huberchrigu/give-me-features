@@ -1,0 +1,26 @@
+<html lang="en">
+<head>
+    <title>Features</title>
+    <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+    <script src="https://unpkg.com/htmx-ext-response-targets@2.0.0/response-targets.js"></script>
+</head>
+<body hx-ext="response-targets">
+<h1>Features</h1>
+<ul id="features" th:fragment="features">
+    <li th:each="feature : ${features}">
+        <!--/*@thymesVar id="feature" type="ch.chrigu.gmf.givemefeatures.features.web.FeatureController.FeatureListItem"*/-->
+        <a th:href="${feature.link}"><span th:text="${feature.name}">My new feature</span></a>
+    </li>
+</ul>
+<h2>New Feature</h2>
+<form th:hx-post="@{/features}" hx-target="#features" hx-swap="outerHTML" hx-target-error="#error">
+    <label for="name">Name: </label>
+    <input type="text" name="name" id="name"/>
+    <label for="description">Description: </label>
+    <input type="text" name="description" id="description"/>
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <button type="submit">Create</button>
+</form>
+<div id="error"></div>
+</body>
+</html>
