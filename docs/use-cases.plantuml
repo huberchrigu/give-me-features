@@ -5,7 +5,9 @@
 :Software Architect: as Architect
 :Quality Manager: as QM
 
-(Describing a feature) as NewFeature
+package Features {
+(Describing a feature) as NewFeature #yellow
+}
 (Implementing feature) as FeatureImplementation
 (Creating a task) as NewTask
 (Adding progress to a task) as Progress
@@ -18,34 +20,34 @@
 (Collaborating on a task) as CollabTask
 (Testing a feature) as Testing
 
-RE -> NewFeature
-Architect -> NewFeature
-PO -> NewFeature
+RE --> NewFeature
+Architect --> NewFeature
+PO --> NewFeature
 
-Developer -> FeatureImplementation
-Developer -> NewTask
-Architect -> NewTask
+Developer --> FeatureImplementation
+Developer --> NewTask
+Architect --> NewTask
 
-Developer -> Progress
+Developer --> Progress
 
-Developer -> Blocked
+Developer --> Blocked
 
-PO -> Report
+PO --> Report
 
-Architect -> Tackling
+Architect --> Tackling
 
-Architect -> GoLive
-PO -> GoLive
+Architect --> GoLive
+PO --> GoLive
 
-Architect -> Interfaces
-Developer -> Interfaces
+Architect --> Interfaces
+Developer --> Interfaces
 
-RE -> CollabFeature
-Architect -> CollabFeature
-PO -> CollabFeature
+RE --> CollabFeature
+Architect --> CollabFeature
+PO --> CollabFeature
 
-Architect -> CollabTask
-Developer -> CollabTask
+Architect --> CollabTask
+Developer --> CollabTask
 
-QM -> Testing
+QM --> Testing
 @enduml
