@@ -3,6 +3,8 @@ package ch.chrigu.gmf.givemefeatures.features.web
 import ch.chrigu.gmf.givemefeatures.features.Feature
 import ch.chrigu.gmf.givemefeatures.features.FeatureId
 import ch.chrigu.gmf.givemefeatures.features.FeatureService
+import ch.chrigu.gmf.givemefeatures.shared.security.SecurityConfiguration
+import ch.chrigu.gmf.givemefeatures.test.TestProperties
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.options.LoadState
 import kotlinx.coroutines.flow.asFlow
@@ -21,9 +23,8 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestConstructor
-import org.springframework.web.reactive.config.EnableWebFlux
 
-@SpringBootTest(classes = [FeatureController::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = [FeatureController::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = [TestProperties.DEBUG_AUTO_CONFIGURATION])
 @Import(FeatureControllerTest.WebFluxTestConfig::class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class FeatureControllerTest(@MockBean private val featureService: FeatureService) {
@@ -67,6 +68,6 @@ class FeatureControllerTest(@MockBean private val featureService: FeatureService
 
     @TestConfiguration
     @EnableAutoConfiguration(exclude = [MongoReactiveAutoConfiguration::class])
-    @EnableWebFlux
+    @Import(SecurityConfiguration::class)
     class WebFluxTestConfig
 }
