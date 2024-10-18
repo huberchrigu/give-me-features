@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+h1, h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+#features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#features li {
+    margin-bottom: 10px;
+}
+
+#features a {
+    text-decoration: none;
+    color: #337ab7;
+}
+
+#features a.current {
+    font-weight: bold;
+    color: #23527c;
+}
+
+#features a:hover {
+    text-decoration: underline;
+}
+
+form {
+    margin-top: 20px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+form input[type="text"], form input[type="hidden"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+}
+
+form button[type="submit"] {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button[type="submit"]:hover {
+    background-color: #3e8e41;
+}
+
+#error {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+#feature {
+    margin-top: 20px;
+}
+
+#feature h2 {
+    margin-top: 0;
+}
+
+#feature ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#feature ul li {
+    margin-bottom: 10px;
+}
+
+#feature ul li a {
+    text-decoration: none;
+    color: #337ab7;
+}
+
+#feature ul li a:hover {
+    text-decoration: underline;
+}

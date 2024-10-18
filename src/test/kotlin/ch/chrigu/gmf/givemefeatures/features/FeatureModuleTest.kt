@@ -19,4 +19,19 @@ class FeatureModuleTest(private val featureService: FeatureService) {
             assertThat(result.id).isNotNull()
         }
     }
+
+    @Test
+    fun `should add a task to a feature`() {
+        TODO()
+    }
+
+    @Test
+    fun `should get a feature by id`() {
+        TODO()
+    }
+
+    @Test
+    fun `should get all features`() {
+        TODO()
+    }
 }

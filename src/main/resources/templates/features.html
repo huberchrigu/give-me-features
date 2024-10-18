@@ -3,17 +3,18 @@
     <title>Features</title>
     <script src="https://unpkg.com/htmx.org@2.0.3"></script>
     <script src="https://unpkg.com/htmx-ext-response-targets@2.0.0/response-targets.js"></script>
+    <link rel="stylesheet" href="styles.css"/>
 </head>
-<body hx-ext="response-targets">
+<body hx-ext="response-targets" hx-target-error="#error" hx-swap="none">
 <h1>Features</h1>
-<ul id="features" th:fragment="features">
+<ul id="features" th:fragment="features" hx-swap-oob="true">
     <li th:each="feature : ${features}">
         <!--/*@thymesVar id="feature" type="ch.chrigu.gmf.givemefeatures.features.web.FeatureController.FeatureListItem"*/-->
-        <a th:href="${feature.link}"><span th:text="${feature.name}">My new feature</span></a>
+        <a th:hx-get="${feature.link}" th:classappend="${feature.current} ? 'current' : ''"><span th:text="${feature.name}">My new feature</span></a>
     </li>
 </ul>
 <h2>New Feature</h2>
-<form th:hx-post="@{/features}" hx-target="#features" hx-swap="outerHTML" hx-target-error="#error">
+<form th:hx-post="@{/features}">
     <label for="name">Name: </label>
     <input type="text" name="name" id="name"/>
     <label for="description">Description: </label>
@@ -21,6 +22,28 @@
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
     <button type="submit">Create</button>
 </form>
-<div id="error"></div>
+<div id="error" th:fragment="error" hx-swap-oob="true">
+    <p th:if="${error}" th:text="${error}">Error</p>
+</div>
+
+<!--/*@thymesVar id="feature" type="ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureDetailView"*/-->
+<div th:fragment="feature" id="feature" hx-swap-oob="true">
+    <th:block th:if="${feature}">
+        <hl></hl>
+        <h2 th:text="${feature.name}">Feature</h2>
+        <p th:text="${feature.description}">Feature description</p>
+        <h3>Tasks</h3>
+        <ul>
+            <li th:each="task : ${feature.tasks}"><a th:href="@{/tasks/{id}(id=${task.id})}" th:text="${task.name}">Task</a></li>
+        </ul>
+        <h3>Add task</h3>
+        <form th:hx-post="@{/features/{id}/tasks(id=${feature.id})}">
+            <label for="taskName">Name: </label>
+            <input type="text" name="name" id="taskName"/>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit">Create</button>
+        </form>
+    </th:block>
+</div>
 </body>
 </html>

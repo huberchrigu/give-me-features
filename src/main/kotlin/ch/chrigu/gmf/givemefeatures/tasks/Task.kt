@@ -1,6 +1,12 @@
 package ch.chrigu.gmf.givemefeatures.tasks
 
-import java.util.UUID
+data class Task(val id: TaskId? = null, val name: String, val description: String = "", val status: TaskStatus = TaskStatus.OPEN) {
+    companion object {
+        fun describeNewTask(name: String) = Task(name = name)
+    }
+}
 
-data class Task(val id: UUID? = null, val name: String, val description: String = "", val status: TaskStatus = TaskStatus.OPEN)
 enum class TaskStatus { OPEN, DONE }
+
+@JvmInline
+value class TaskId(val id: String)

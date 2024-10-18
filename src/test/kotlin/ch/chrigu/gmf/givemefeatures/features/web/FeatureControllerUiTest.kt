@@ -25,9 +25,9 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestConstructor
 
 @SpringBootTest(classes = [FeatureController::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = [TestProperties.DEBUG_AUTO_CONFIGURATION])
-@Import(FeatureControllerTest.WebFluxTestConfig::class)
+@Import(FeatureControllerUiTest.WebFluxTestConfig::class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class FeatureControllerTest(@MockBean private val featureService: FeatureService) {
+class FeatureControllerUiTest(@MockBean private val featureService: FeatureService) {
     private val id = FeatureId("123")
     private val features = mutableListOf<Feature>()
 
@@ -64,6 +64,16 @@ class FeatureControllerTest(@MockBean private val featureService: FeatureService
 
             browser.close()
         }
+    }
+
+    @Test
+    fun `should select a feature`() {
+        TODO()
+    }
+
+    @Test
+    fun `should add a task`() {
+        TODO()
     }
 
     @TestConfiguration

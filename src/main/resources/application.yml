@@ -1,0 +1,6 @@
+spring:
+  webflux:
+    problemdetails:
+      enabled: true
+  application:
+    name: give-me-features

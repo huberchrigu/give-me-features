@@ -7,8 +7,8 @@
 
 package Features {
 (Describing a feature) as NewFeature #yellow
+(Implementing feature) as FeatureImplementation #orange
 }
-(Implementing feature) as FeatureImplementation
 (Creating a task) as NewTask
 (Adding progress to a task) as Progress
 (Marking a task as blocked) as Blocked
@@ -50,4 +50,10 @@ Architect --> CollabTask
 Developer --> CollabTask
 
 QM --> Testing
+
+legend
+  | <#yellow>yellow  | Use case implemented |
+  | <#orange>orange | Use case in progress |
+end legend
+
 @enduml
