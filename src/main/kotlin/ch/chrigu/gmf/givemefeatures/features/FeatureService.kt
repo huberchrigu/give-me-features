@@ -11,9 +11,9 @@ class FeatureService(private val featureRepository: FeatureRepository, private v
 
     fun getFeatures() = featureRepository.findAll()
 
-    suspend fun addTask(id: FeatureId, task: Task) = featureRepository.findById(id)
+    suspend fun addTask(id: FeatureId, task: Task) = featureRepository.findById(id.toString())
         ?.planNewTask(taskService.newTask(task))
         ?.let { featureRepository.save(it) }
 
-    suspend fun getFeature(id: FeatureId) = featureRepository.findById(id)
+    suspend fun getFeature(id: FeatureId) = featureRepository.findById(id.toString())
 }
