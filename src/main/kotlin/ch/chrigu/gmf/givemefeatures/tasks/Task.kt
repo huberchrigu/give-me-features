@@ -9,4 +9,6 @@ data class Task(val id: TaskId? = null, val name: String, val description: Strin
 enum class TaskStatus { OPEN, DONE }
 
 @JvmInline
-value class TaskId(val id: String)
+value class TaskId(private val id: String) {
+    override fun toString() = id
+}

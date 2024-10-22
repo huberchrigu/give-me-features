@@ -4,12 +4,14 @@ import ch.chrigu.gmf.givemefeatures.features.Feature
 import ch.chrigu.gmf.givemefeatures.features.FeatureId
 import ch.chrigu.gmf.givemefeatures.features.FeatureService
 import ch.chrigu.gmf.givemefeatures.shared.security.SecurityConfiguration
+import ch.chrigu.gmf.givemefeatures.tasks.Task
+import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import ch.chrigu.gmf.givemefeatures.test.TestProperties
+import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.options.LoadState
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -32,56 +34,120 @@ import org.springframework.test.context.TestConstructor
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class FeatureControllerUiTest(@MockBean private val featureService: FeatureService, @MockBean private val taskService: TaskService) {
     private val id = FeatureId("123")
+    private val taskId = TaskId("xxx")
     private val features = mutableListOf<Feature>()
+    private val tasks = mutableListOf<Task>()
 
     @LocalServerPort
     private var port: Int = 0
 
     @BeforeEach
-    fun initService() {
+    fun mockServices() {
+        features.clear()
+        tasks.clear()
         runBlocking {
             whenever(featureService.newFeature(any())) doAnswer {
                 val feature = it.arguments[0] as Feature
                 feature.copy(id = id).also { f -> features.add(f) }
             }
+            whenever(taskService.newTask(any())) doAnswer {
+                val task = it.arguments[0] as Task
+                task.copy(id = taskId).also { t -> tasks.add(t) }
+            }
             whenever(featureService.getFeatures()) doAnswer { features.asFlow() }
-            whenever(taskService.resolve(any())) doReturn emptyFlow()
+            whenever(taskService.resolve(any())) doReturn tasks.asFlow()
         }
     }
 
     @Test
     fun `should create a new feature`() {
-        Playwright.create().use { playwright ->
-            val browser = playwright.chromium().launch()
-            val page = browser.newPage()
-            page.navigate("http://localhost:$port/features")
-
-            page.querySelector("#name").fill("My new feature")
-            page.querySelector("#description").fill("Description")
-            page.locator("button[type='submit']").click()
-
-            page.waitForLoadState(LoadState.NETWORKIDLE)
-            val items = page.querySelectorAll("#features li")
-            assertThat(items).hasSize(1)
-            assertThat(items[0].querySelector("span").textContent()).isEqualTo("My new feature")
-            assertThat(items[0].querySelector("a").getAttribute("hx-get")).isEqualTo("/features/$id")
-
-            val feature = page.querySelector("#feature")
-            assertThat(feature.querySelector("h2").textContent()).isEqualTo("My new feature")
-            assertThat(feature.querySelector("p").textContent()).isEqualTo("Description")
-
-            browser.close()
+        openFeaturesPage { page ->
+            submitNewFeatureForm(page, "My new feature", "Description")
+            assertFeatureList(page, "My new feature", true)
+            assertFeatureDetails(page, "My new feature", "Description")
         }
     }
 
     @Test
     fun `should select a feature`() {
-        TODO()
+        withFeature("a", "b")
+        openFeaturesPage { page ->
+            assertFeatureList(page, "a", false)
+            clickOnFeatureListItem(page)
+            assertFeatureDetails(page, "a", "b")
+        }
     }
 
     @Test
     fun `should add a task`() {
-        TODO()
+        withFeature("a", "b")
+        openFeaturesPage { page ->
+            assertFeatureList(page, "a", false)
+            clickOnFeatureListItem(page)
+            assertFeatureDetails(page, "a", "b")
+            submitNewTaskForm(page, "New task")
+            assertTask(page, "New task")
+        }
+    }
+
+    private fun withFeature(name: String, description: String) {
+        features.add(Feature(id, name, description, emptyList()))
+    }
+
+    private fun clickOnFeatureListItem(page: Page) {
+        page.querySelector("#features li a").click()
+        page.waitForLoadState(LoadState.NETWORKIDLE)
+    }
+
+    private fun submitNewTaskForm(page: Page, name: String) {
+        val form = page.querySelector("#feature form")
+        form.querySelector("#taskName").fill(name)
+        form.querySelector("button[type='submit']").click()
+        page.waitForLoadState(LoadState.NETWORKIDLE)
+    }
+
+    private fun assertTask(page: Page, name: String) {
+        val taskElement = page.querySelector("#feature li")
+        assertThat(taskElement.innerHTML()).isEqualTo(name)
+    }
+
+    private fun openFeaturesPage(test: (Page) -> Unit) {
+        Playwright.create().use { playwright ->
+            val browser = playwright.chromium().launch()
+            val page = browser.newPage()
+            page.navigate("http://localhost:$port/features")
+
+            test(page)
+
+            browser.close()
+        }
+    }
+
+    private fun assertFeatureDetails(page: Page, name: String, description: String) {
+        val feature = page.querySelector("#feature")
+        assertThat(feature.querySelector("h2").textContent()).isEqualTo(name)
+        assertThat(feature.querySelector("p").textContent()).isEqualTo(description)
+    }
+
+    private fun assertFeatureList(page: Page, name: String, current: Boolean) {
+        val items = page.querySelectorAll("#features li")
+        assertThat(items).hasSize(1)
+        assertThat(items[0].querySelector("span").textContent()).isEqualTo(name)
+        val link = items[0].querySelector("a")
+        assertThat(link.getAttribute("hx-get")).isEqualTo("/features/$id")
+        val clazz = link.getAttribute("class")
+        if (current) {
+            assertThat(clazz).isEqualTo("current")
+        } else {
+            assertThat(clazz).isNull()
+        }
+    }
+
+    private fun submitNewFeatureForm(page: Page, name: String, description: String) {
+        page.querySelector("#name").fill(name)
+        page.querySelector("#description").fill(description)
+        page.locator("button[type='submit']").click()
+        page.waitForLoadState(LoadState.NETWORKIDLE)
     }
 
     @TestConfiguration

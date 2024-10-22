@@ -10,7 +10,7 @@
 <ul id="features" th:fragment="features" hx-swap-oob="true">
     <li th:each="feature : ${features}">
         <!--/*@thymesVar id="feature" type="ch.chrigu.gmf.givemefeatures.features.web.FeatureController.FeatureListItem"*/-->
-        <a th:hx-get="${feature.link}" th:classappend="${feature.current} ? 'current' : ''"><span th:text="${feature.name}">My new feature</span></a>
+        <a th:hx-get="${feature.link}" th:class="${feature.current} ? 'current' : ''"><span th:text="${feature.name}">My new feature</span></a>
     </li>
 </ul>
 <h2>New Feature</h2>

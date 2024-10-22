@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.result.view.Rendering
 import java.net.URI
 
-@Suppress("SpringMVCViewInspection") // Intellij does not understand fragments
 @Controller
 @RequestMapping("/features")
 class FeatureController(private val featureService: FeatureService, private val taskService: TaskService) {
@@ -26,21 +25,21 @@ class FeatureController(private val featureService: FeatureService, private val 
         .withFeatures(null)
         .build()
 
-    @PostMapping
+    @PostMapping(headers = [Hx.HEADER])
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun addFeature(@Valid newFeatureBody: NewFeatureBody): Rendering {
         val feature = featureService.newFeature(newFeatureBody.toFeature())
         return updateForFeature(feature)
     }
 
-    @PostMapping("/{id}/tasks")
+    @PostMapping("/{id}/tasks", headers = [Hx.HEADER])
     suspend fun addTaskToFeature(@PathVariable id: FeatureId, @Valid newTaskBody: NewTaskBody): ResponseEntity<Rendering> {
         val feature = featureService.addTask(id, newTaskBody.toTask()) ?: return ResponseEntity.notFound().build()
         return updateForFeature(feature)
-            .let { ResponseEntity.created(URI.create("${feature.id}/tasks/${feature.latestTask.id}")).body(it) }
+            .let { ResponseEntity.created(URI.create("${feature.id}/tasks/${feature.latestTask}")).body(it) }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}", headers = [Hx.HEADER])
     suspend fun getFeature(@PathVariable id: FeatureId): ResponseEntity<Rendering> {
         val feature = featureService.getFeature(id) ?: return ResponseEntity.notFound().build()
         return updateForFeature(feature)
