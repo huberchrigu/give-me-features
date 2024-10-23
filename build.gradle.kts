@@ -55,7 +55,8 @@ dependencies {
     testImplementation("org.testcontainers:mongodb")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    testImplementation("com.microsoft.playwright:playwright:1.32.0")
+    testImplementation("com.microsoft.playwright:playwright:1.45.1")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
 
 dependencyManagement {

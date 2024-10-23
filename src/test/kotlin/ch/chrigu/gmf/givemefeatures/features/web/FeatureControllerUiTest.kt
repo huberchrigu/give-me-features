@@ -7,91 +7,93 @@ import ch.chrigu.gmf.givemefeatures.shared.security.SecurityConfiguration
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
-import ch.chrigu.gmf.givemefeatures.test.TestProperties
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.options.LoadState
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.runBlocking
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.coEvery
+import io.mockk.every
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.whenever
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestConstructor
 
-@SpringBootTest(classes = [FeatureController::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = [TestProperties.DEBUG_AUTO_CONFIGURATION])
+@SpringBootTest(classes = [FeatureController::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(FeatureControllerUiTest.WebFluxTestConfig::class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class FeatureControllerUiTest(@MockBean private val featureService: FeatureService, @MockBean private val taskService: TaskService) {
-    private val id = FeatureId("123")
-    private val taskId = TaskId("xxx")
-    private val features = mutableListOf<Feature>()
-    private val tasks = mutableListOf<Task>()
+class FeatureControllerUiTest(@MockkBean private val featureService: FeatureService, @MockkBean private val taskService: TaskService) {
+    private val featureName = "My new feature"
+    private val featureDescription = "Description"
+    private val featureId = FeatureId("123")
+    private val taskName = "New task"
+    private val taskId = TaskId("99")
 
     @LocalServerPort
     private var port: Int = 0
 
-    @BeforeEach
-    fun mockServices() {
-        features.clear()
-        tasks.clear()
-        runBlocking {
-            whenever(featureService.newFeature(any())) doAnswer {
-                val feature = it.arguments[0] as Feature
-                feature.copy(id = id).also { f -> features.add(f) }
-            }
-            whenever(taskService.newTask(any())) doAnswer {
-                val task = it.arguments[0] as Task
-                task.copy(id = taskId).also { t -> tasks.add(t) }
-            }
-            whenever(featureService.getFeatures()) doAnswer { features.asFlow() }
-            whenever(taskService.resolve(any())) doReturn tasks.asFlow()
-        }
-    }
-
     @Test
     fun `should create a new feature`() {
+        withNewFeature()
+
         openFeaturesPage { page ->
-            submitNewFeatureForm(page, "My new feature", "Description")
-            assertFeatureList(page, "My new feature", true)
-            assertFeatureDetails(page, "My new feature", "Description")
+            submitNewFeatureForm(page)
+            assertFeatureList(page, true)
+            assertFeatureDetails(page)
         }
     }
 
     @Test
     fun `should select a feature`() {
-        withFeature("a", "b")
+        withFeature()
+
         openFeaturesPage { page ->
-            assertFeatureList(page, "a", false)
+            assertFeatureList(page, false)
             clickOnFeatureListItem(page)
-            assertFeatureDetails(page, "a", "b")
+            assertFeatureDetails(page)
         }
     }
 
     @Test
     fun `should add a task`() {
-        withFeature("a", "b")
+        val feature = withFeature()
+        withTask(feature)
         openFeaturesPage { page ->
-            assertFeatureList(page, "a", false)
+            assertFeatureList(page, false)
             clickOnFeatureListItem(page)
-            assertFeatureDetails(page, "a", "b")
-            submitNewTaskForm(page, "New task")
-            assertTask(page, "New task")
+            assertFeatureDetails(page)
+            submitNewTaskForm(page)
+            assertTask(page)
         }
     }
 
-    private fun withFeature(name: String, description: String) {
-        features.add(Feature(id, name, description, emptyList()))
+    private fun withNewFeature() {
+        val expectedFeature = Feature.describeNewFeature(featureName, featureDescription)
+        val expectedFeatureWithId = expectedFeature.copy(id = featureId)
+        every { featureService.getFeatures() }.returnsMany(emptyFlow(), flowOf(expectedFeatureWithId))
+        coEvery { featureService.newFeature(expectedFeature) } returns expectedFeatureWithId
+        every { taskService.resolve(emptyList()) } returns emptyFlow()
+    }
+
+    private fun withTask(feature: Feature) {
+        val task = Task.describeNewTask(taskName)
+        val featureWithTask = feature.copy(tasks = listOf(taskId))
+        coEvery { featureService.addTask(featureId, task) } returns featureWithTask
+        every { taskService.resolve(listOf(taskId)) } returns flowOf(task.copy(id = taskId))
+    }
+
+    private fun withFeature(): Feature {
+        val feature = Feature(featureId, featureName, featureDescription, emptyList())
+        every { featureService.getFeatures() } returns flowOf(feature)
+        coEvery { featureService.getFeature(featureId) } returns feature
+        every { taskService.resolve(emptyList()) } returns emptyFlow()
+        return feature
     }
 
     private fun clickOnFeatureListItem(page: Page) {
@@ -99,16 +101,16 @@ class FeatureControllerUiTest(@MockBean private val featureService: FeatureServi
         page.waitForLoadState(LoadState.NETWORKIDLE)
     }
 
-    private fun submitNewTaskForm(page: Page, name: String) {
+    private fun submitNewTaskForm(page: Page) {
         val form = page.querySelector("#feature form")
-        form.querySelector("#taskName").fill(name)
+        form.querySelector("#taskName").fill(taskName)
         form.querySelector("button[type='submit']").click()
         page.waitForLoadState(LoadState.NETWORKIDLE)
     }
 
-    private fun assertTask(page: Page, name: String) {
-        val taskElement = page.querySelector("#feature li")
-        assertThat(taskElement.innerHTML()).isEqualTo(name)
+    private fun assertTask(page: Page) {
+        val taskElement = page.querySelector("#feature ul li")
+        assertThat(taskElement.innerHTML()).isEqualTo(taskName)
     }
 
     private fun openFeaturesPage(test: (Page) -> Unit) {
@@ -123,18 +125,18 @@ class FeatureControllerUiTest(@MockBean private val featureService: FeatureServi
         }
     }
 
-    private fun assertFeatureDetails(page: Page, name: String, description: String) {
+    private fun assertFeatureDetails(page: Page) {
         val feature = page.querySelector("#feature")
-        assertThat(feature.querySelector("h2").textContent()).isEqualTo(name)
-        assertThat(feature.querySelector("p").textContent()).isEqualTo(description)
+        assertThat(feature.querySelector("h2").textContent()).isEqualTo(featureName)
+        assertThat(feature.querySelector("p").textContent()).isEqualTo(featureDescription)
     }
 
-    private fun assertFeatureList(page: Page, name: String, current: Boolean) {
+    private fun assertFeatureList(page: Page, current: Boolean) {
         val items = page.querySelectorAll("#features li")
         assertThat(items).hasSize(1)
-        assertThat(items[0].querySelector("span").textContent()).isEqualTo(name)
+        assertThat(items[0].querySelector("span").textContent()).isEqualTo(featureName)
         val link = items[0].querySelector("a")
-        assertThat(link.getAttribute("hx-get")).isEqualTo("/features/$id")
+        assertThat(link.getAttribute("hx-get")).isEqualTo("/features/$featureId")
         val clazz = link.getAttribute("class")
         if (current) {
             assertThat(clazz).isEqualTo("current")
@@ -143,9 +145,9 @@ class FeatureControllerUiTest(@MockBean private val featureService: FeatureServi
         }
     }
 
-    private fun submitNewFeatureForm(page: Page, name: String, description: String) {
-        page.querySelector("#name").fill(name)
-        page.querySelector("#description").fill(description)
+    private fun submitNewFeatureForm(page: Page) {
+        page.querySelector("#name").fill(featureName)
+        page.querySelector("#description").fill(featureDescription)
         page.locator("button[type='submit']").click()
         page.waitForLoadState(LoadState.NETWORKIDLE)
     }

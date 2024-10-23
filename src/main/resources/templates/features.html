@@ -29,7 +29,6 @@
 <!--/*@thymesVar id="feature" type="ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureDetailView"*/-->
 <div th:fragment="feature" id="feature" hx-swap-oob="true">
     <th:block th:if="${feature}">
-        <hl></hl>
         <h2 th:text="${feature.name}">Feature</h2>
         <p th:text="${feature.description}">Feature description</p>
         <h3>Tasks</h3>

@@ -11,11 +11,10 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import kotlinx.coroutines.flow.map
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.result.view.Rendering
-import java.net.URI
+import org.springframework.web.server.ResponseStatusException
 
 @Controller
 @RequestMapping("/features")
@@ -33,17 +32,16 @@ class FeatureController(private val featureService: FeatureService, private val 
     }
 
     @PostMapping("/{id}/tasks", headers = [Hx.HEADER])
-    suspend fun addTaskToFeature(@PathVariable id: FeatureId, @Valid newTaskBody: NewTaskBody): ResponseEntity<Rendering> {
-        val feature = featureService.addTask(id, newTaskBody.toTask()) ?: return ResponseEntity.notFound().build()
+    @ResponseStatus(HttpStatus.CREATED)
+    suspend fun addTaskToFeature(@PathVariable id: FeatureId, @Valid newTaskBody: NewTaskBody): Rendering {
+        val feature = featureService.addTask(id, newTaskBody.toTask()) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         return updateForFeature(feature)
-            .let { ResponseEntity.created(URI.create("${feature.id}/tasks/${feature.latestTask}")).body(it) }
     }
 
     @GetMapping("/{id}", headers = [Hx.HEADER])
-    suspend fun getFeature(@PathVariable id: FeatureId): ResponseEntity<Rendering> {
-        val feature = featureService.getFeature(id) ?: return ResponseEntity.notFound().build()
+    suspend fun getFeature(@PathVariable id: FeatureId): Rendering {
+        val feature = featureService.getFeature(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         return updateForFeature(feature)
-            .let { ResponseEntity.ok(it) }
     }
 
     private suspend fun updateForFeature(feature: Feature) = Rendering.view("update-feature")
