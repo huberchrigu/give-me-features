@@ -60,6 +60,11 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         }
     }
 
+    /**
+     * Fails because mocked invocation
+     * `FeatureService(ch.chrigu.gmf.givemefeatures.features.FeatureService#0 bean#1).addTask-WFusim8(123, Task(id=null, name=New task, description=, status=OPEN), continuation {})`
+     * does not work.
+     */
     @Test
     fun `should add a task`() {
         val feature = withFeature()
