@@ -13,6 +13,16 @@ import org.springframework.modulith.test.ApplicationModuleTest
 @Import(TestcontainersConfiguration::class)
 class TaskModuleTest(private val taskService: TaskService, private val taskRepository: TaskRepository) {
     @Test
+    fun `should update description`() {
+        runBlocking {
+            val id = taskRepository.save(Task.describeNewTask("task")).id!!
+            val newDescription = "new description"
+            taskService.update(id, Task.TaskUpdate("task", newDescription))
+            assertThat(taskRepository.findById(id.toString())?.description).isEqualTo(newDescription)
+        }
+    }
+
+    @Test
     fun `should describe a new task`() {
         runBlocking {
             taskService.newTask(Task.describeNewTask("new task"))

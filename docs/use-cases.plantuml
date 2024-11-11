@@ -7,9 +7,11 @@
 
 package Features {
 (Describing a feature) as NewFeature #yellow
-(Implementing feature) as FeatureImplementation #orange
+(Implementing feature) as FeatureImplementation #yellow
 }
-(Creating a task) as NewTask
+package Tasks {
+(Creating a task) as NewTask #orange
+}
 (Adding progress to a task) as Progress
 (Marking a task as blocked) as Blocked
 (Fetching a feature report) as Report
