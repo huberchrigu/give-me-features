@@ -66,30 +66,3 @@ form button[type="submit"]:hover {
     font-size: 14px;
     margin-top: 10px;
 }
-
-#feature {
-    margin-top: 20px;
-}
-
-#feature h2 {
-    margin-top: 0;
-}
-
-#feature ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#feature ul li {
-    margin-bottom: 10px;
-}
-
-#feature ul li a {
-    text-decoration: none;
-    color: #337ab7;
-}
-
-#feature ul li a:hover {
-    text-decoration: underline;
-}

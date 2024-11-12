@@ -4,6 +4,7 @@
     <script src="https://unpkg.com/htmx.org@2.0.3"></script>
     <script src="https://unpkg.com/htmx-ext-response-targets@2.0.0/response-targets.js"></script>
     <link rel="stylesheet" href="styles.css"/>
+    <script type="module" src="custom.js"></script>
 </head>
 <body hx-ext="response-targets" hx-target-error="#error" hx-swap="none">
 <h1>Features</h1>
@@ -29,8 +30,7 @@
 <!--/*@thymesVar id="feature" type="ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureDetailView"*/-->
 <div th:fragment="feature" id="feature" hx-swap-oob="true">
     <th:block th:if="${feature}">
-        <h2 th:text="${feature.name}">Feature</h2>
-        <p th:text="${feature.description}">Feature description</p>
+        <gmf-feature th:name="${feature.name}" th:description="${feature.description}"></gmf-feature>
         <h3>Tasks</h3>
         <ul>
             <li th:each="task : ${feature.tasks}"><a th:href="@{/tasks/{id}(id=${task.id})}" th:text="${task.name}">Task</a></li>
