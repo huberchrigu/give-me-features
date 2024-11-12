@@ -3,7 +3,7 @@ package ch.chrigu.gmf.givemefeatures.features.web
 import ch.chrigu.gmf.givemefeatures.features.Feature
 import ch.chrigu.gmf.givemefeatures.features.FeatureId
 import ch.chrigu.gmf.givemefeatures.features.FeatureService
-import ch.chrigu.gmf.givemefeatures.shared.security.SecurityConfiguration
+import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
@@ -17,17 +17,9 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.context.annotation.Import
-import org.springframework.test.context.TestConstructor
 
-@SpringBootTest(classes = [FeatureController::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(FeatureControllerUiTest.WebFluxTestConfig::class)
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@UiTest(FeatureController::class)
 class FeatureControllerUiTest(@MockkBean private val featureService: FeatureService, @MockkBean private val taskService: TaskService) {
     private val featureName = "My new feature"
     private val featureDescription = "Description"
@@ -42,10 +34,20 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     fun `should create a new feature`() {
         withNewFeature()
 
-        openFeaturesPage { page ->
-            submitNewFeatureForm(page)
-            assertFeatureList(page, true)
-            assertFeatureDetails(page)
+        openFeaturesPage {
+            submitNewFeatureForm()
+            assertFeatureList(true)
+            assertFeatureDetails()
+        }
+    }
+
+    @Test
+    fun `should throw error`() {
+        coEvery { featureService.getFeatures() } returns emptyFlow()
+
+        openFeaturesPage {
+            submitNewFeatureForm("")
+            assertError("Validation failed")
         }
     }
 
@@ -53,10 +55,10 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     fun `should select a feature`() {
         withFeature()
 
-        openFeaturesPage { page ->
-            assertFeatureList(page, false)
-            clickOnFeatureListItem(page)
-            assertFeatureDetails(page)
+        openFeaturesPage {
+            assertFeatureList(false)
+            clickOnFeatureListItem()
+            assertFeatureDetails()
         }
     }
 
@@ -69,12 +71,12 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     fun `should add a task`() {
         val feature = withFeature()
         withTask(feature)
-        openFeaturesPage { page ->
-            assertFeatureList(page, false)
-            clickOnFeatureListItem(page)
-            assertFeatureDetails(page)
-            submitNewTaskForm(page)
-            assertTask(page)
+        openFeaturesPage {
+            assertFeatureList(false)
+            clickOnFeatureListItem()
+            assertFeatureDetails()
+            submitNewTaskForm()
+            assertTask()
         }
     }
 
@@ -101,24 +103,24 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         return feature
     }
 
-    private fun clickOnFeatureListItem(page: Page) {
-        page.querySelector("#features li a").click()
-        page.waitForLoadState(LoadState.NETWORKIDLE)
+    private fun Page.clickOnFeatureListItem() {
+        querySelector("#features li a").click()
+        waitForLoadState(LoadState.NETWORKIDLE)
     }
 
-    private fun submitNewTaskForm(page: Page) {
-        val form = page.querySelector("#feature form")
+    private fun Page.submitNewTaskForm() {
+        val form = querySelector("#feature form")
         form.querySelector("#taskName").fill(taskName)
         form.querySelector("button[type='submit']").click()
-        page.waitForLoadState(LoadState.NETWORKIDLE)
+        waitForLoadState(LoadState.NETWORKIDLE)
     }
 
-    private fun assertTask(page: Page) {
-        val taskElement = page.querySelector("#feature ul li")
+    private fun Page.assertTask() {
+        val taskElement = querySelector("#feature ul li")
         assertThat(taskElement.innerHTML()).isEqualTo(taskName)
     }
 
-    private fun openFeaturesPage(test: (Page) -> Unit) {
+    private fun openFeaturesPage(test: Page.() -> Unit) {
         Playwright.create().use { playwright ->
             val browser = playwright.chromium().launch()
             val page = browser.newPage()
@@ -130,14 +132,14 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         }
     }
 
-    private fun assertFeatureDetails(page: Page) {
-        val feature = page.querySelector("#feature")
+    private fun Page.assertFeatureDetails() {
+        val feature = querySelector("#feature")
         assertThat(feature.querySelector("h2").textContent()).isEqualTo(featureName)
         assertThat(feature.querySelector("p").textContent()).isEqualTo(featureDescription)
     }
 
-    private fun assertFeatureList(page: Page, current: Boolean) {
-        val items = page.querySelectorAll("#features li")
+    private fun Page.assertFeatureList(current: Boolean) {
+        val items = querySelectorAll("#features li")
         assertThat(items).hasSize(1)
         assertThat(items[0].querySelector("span").textContent()).isEqualTo(featureName)
         val link = items[0].querySelector("a")
@@ -150,15 +152,16 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         }
     }
 
-    private fun submitNewFeatureForm(page: Page) {
-        page.querySelector("#name").fill(featureName)
-        page.querySelector("#description").fill(featureDescription)
-        page.locator("button[type='submit']").click()
-        page.waitForLoadState(LoadState.NETWORKIDLE)
+    private fun Page.assertError(prefix: String) {
+        val error = querySelector("#error p")
+        assertThat(error.textContent()).startsWith(prefix)
     }
 
-    @TestConfiguration
-    @EnableAutoConfiguration(exclude = [MongoReactiveAutoConfiguration::class])
-    @Import(SecurityConfiguration::class)
-    class WebFluxTestConfig
+    private fun Page.submitNewFeatureForm(name: String = featureName) {
+        querySelector("#name").fill(name)
+        querySelector("#description").fill(featureDescription)
+        locator("button[type='submit']").click()
+        waitForLoadState(LoadState.NETWORKIDLE)
+    }
+
 }
