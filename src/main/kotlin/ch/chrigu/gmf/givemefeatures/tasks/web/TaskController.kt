@@ -16,7 +16,7 @@ import org.springframework.web.reactive.result.view.Rendering
 
 @Controller
 @RequestMapping("/tasks")
-class TaskController(private val taskService: TaskService) { // TODO: UI Test, link to features
+class TaskController(private val taskService: TaskService) { // TODO: UI Test (incl. error handling), link to features
     @GetMapping("/{taskId}")
     suspend fun getTask(@PathVariable taskId: TaskId) = Rendering.view("task")
         .modelAttribute("task", taskService.getTask(taskId))
