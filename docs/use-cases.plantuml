@@ -1,4 +1,6 @@
 @startuml
+left to right direction
+
 :Developer:
 :Product Owner: as PO
 :Requirements Engineer: as RE
@@ -8,19 +10,22 @@
 package Features {
 (Describing a feature) as NewFeature #yellow
 (Implementing feature) as FeatureImplementation #yellow
+(Fetching a feature report) as Report
+(Planning a feature go-live) as GoLive
+(Collaborating on a feature) as CollabFeature
+(Testing a feature) as Testing
 }
+
 package Tasks {
 (Creating a task) as NewTask #orange
-}
 (Adding progress to a task) as Progress
 (Marking a task as blocked) as Blocked
-(Fetching a feature report) as Report
 (Tackling blocking issues) as Tackling
-(Planning a feature go-live) as GoLive
-(Describing interfaces) as Interfaces
-(Collaborating on a feature) as CollabFeature
 (Collaborating on a task) as CollabTask
-(Testing a feature) as Testing
+}
+package Interfaces {
+(Describing interfaces) as NewInterface
+}
 
 RE --> NewFeature
 Architect --> NewFeature
@@ -41,8 +46,8 @@ Architect --> Tackling
 Architect --> GoLive
 PO --> GoLive
 
-Architect --> Interfaces
-Developer --> Interfaces
+Architect --> NewInterface
+Developer --> NewInterface
 
 RE --> CollabFeature
 Architect --> CollabFeature
