@@ -1,95 +1,114 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f5f5f5;
 }
 
-h1, h2 {
+h1, h2, h3 {
     color: #333;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #4CAF50;
+    padding-bottom: 5px;
 }
 
-#features {
+/* Card */
+.card {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+/* List */
+.list {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-#features li {
-    margin-bottom: 10px;
+.list-item {
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
 }
 
-#features a {
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.list-link {
     text-decoration: none;
     color: #337ab7;
+    display: block;
+    padding: 10px 15px;
+    transition: background-color 0.3s;
 }
 
-#features a.current {
+.list-link:hover {
+    background-color: #f5f5f5;
+}
+
+.list-link.current {
     font-weight: bold;
     color: #23527c;
+    background-color: #e7f3ff;
 }
 
-#features a:hover {
-    text-decoration: underline;
+/* Task List (extends list) */
+.task-list {
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    margin-bottom: 20px;
 }
 
-form {
-    margin-top: 20px;
+.task-list .list-link:hover {
+    background-color: #f0f0f0;
 }
 
+/* Forms */
 form label {
     display: block;
     margin-bottom: 5px;
+    font-weight: bold;
 }
 
-form input[type="text"], form input[type="hidden"] {
+.form-input {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
+    border-radius: 3px;
 }
 
-form button[type="submit"] {
-    background-color: #4CAF50;
-    color: #fff;
+.btn {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-form button[type="submit"]:hover {
+.btn-primary {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+.btn-primary:hover {
     background-color: #3e8e41;
 }
 
-#error {
-    color: red;
+/* Error Message */
+.error {
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+    color: #b71c1c;
     font-size: 14px;
-    margin-top: 10px;
-}
-
-#feature {
-    margin-top: 20px;
-}
-
-#feature h2 {
-    margin-top: 0;
-}
-
-#feature ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#feature ul li {
-    margin-bottom: 10px;
-}
-
-#feature ul li a {
-    text-decoration: none;
-    color: #337ab7;
-}
-
-#feature ul li a:hover {
-    text-decoration: underline;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
 }

@@ -144,11 +144,11 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         assertThat(items[0].querySelector("span").textContent()).isEqualTo(featureName)
         val link = items[0].querySelector("a")
         assertThat(link.getAttribute("hx-get")).isEqualTo("/features/$featureId")
-        val clazz = link.getAttribute("class")
+        val clazz = link.getAttribute("class").split(" ")
         if (current) {
-            assertThat(clazz).isEqualTo("current")
+            assertThat(clazz).contains("current")
         } else {
-            assertThat(clazz).isNull()
+            assertThat(clazz).doesNotContain("current")
         }
     }
 

@@ -16,7 +16,7 @@ class GlobalExceptionHandler {
         val status = if (e is ResponseStatusException) e.statusCode else HttpStatus.INTERNAL_SERVER_ERROR
         val view = if (exchange.request.headers[Hx.HEADER_NAME]?.get(0) == "true") {
             @Suppress("SpringMVCViewInspection")
-            Rendering.view("features :: error")
+            Rendering.view("error :: error")
         } else
             Rendering.view("error")
         return view.modelAttribute("error", message)
