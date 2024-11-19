@@ -1,7 +1,9 @@
 package ch.chrigu.gmf.givemefeatures.shared.web
 
 import ch.chrigu.gmf.givemefeatures.features.web.Hx
+import ch.chrigu.gmf.givemefeatures.shared.AggregateNotFoundException
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.reactive.result.view.Rendering
@@ -11,9 +13,16 @@ import org.springframework.web.server.ServerWebExchange
 @ControllerAdvice
 class GlobalExceptionHandler {
     @ExceptionHandler
-    fun renderHtml(e: Exception, exchange: ServerWebExchange): Rendering {
+    fun handleNotFound(e: AggregateNotFoundException, exchange: ServerWebExchange) = renderError(e, exchange, HttpStatus.NOT_FOUND)
+
+    @ExceptionHandler
+    fun handleResponseStatusException(e: ResponseStatusException, exchange: ServerWebExchange) = renderError(e, exchange, e.statusCode)
+
+    @ExceptionHandler
+    fun handleFallback(e: Exception, exchange: ServerWebExchange) = renderError(e, exchange, HttpStatus.INTERNAL_SERVER_ERROR)
+
+    private fun renderError(e: Exception, exchange: ServerWebExchange, status: HttpStatusCode): Rendering {
         val message = e.message ?: "Unknown error happened"
-        val status = if (e is ResponseStatusException) e.statusCode else HttpStatus.INTERNAL_SERVER_ERROR
         val view = if (exchange.request.headers[Hx.HEADER_NAME]?.get(0) == "true") {
             @Suppress("SpringMVCViewInspection")
             Rendering.view("error :: error")

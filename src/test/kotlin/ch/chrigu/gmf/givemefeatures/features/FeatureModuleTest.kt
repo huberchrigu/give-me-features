@@ -4,6 +4,7 @@ import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
 import ch.chrigu.gmf.givemefeatures.features.repository.FeatureRepository
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
+import ch.chrigu.gmf.givemefeatures.tasks.TaskLinkedItem
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -67,6 +68,15 @@ class FeatureModuleTest(private val featureService: FeatureService, private val 
     fun `should get all features`() {
         runBlocking {
             assertThat(featureService.getFeatures().toList()).hasSize(1)
+        }
+    }
+
+    @Test
+    fun `should find linked items`() {
+        runBlocking {
+            val taskId = TaskId("123")
+            featureService.newFeature(Feature(id, name, description, listOf(taskId)))
+            assertThat(featureService.getFor(taskId).toList()).containsExactly(TaskLinkedItem(id, name))
         }
     }
 }

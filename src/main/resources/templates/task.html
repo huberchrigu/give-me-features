@@ -11,6 +11,15 @@
     <p th:text="${task.description}">Description</p>
     <button class="btn" th:hx-get="@{/tasks/{id}/edit(id=${task.id})}">Edit</button>
 </div>
+<div class="card">
+    <h2>Linked Features</h2>
+    <ul class="list">
+        <li class="list-item" th:each="item : ${items}">
+            <!--/*@thymesVar id="item" type="ch.chrigu.gmf.givemefeatures.tasks.TaskLinkedItem"*/-->
+            <a class="list-link" th:href="@{/features(id=${item.id})}" th:text="${item.name}">Feature</a>
+        </li>
+    </ul>
+</div>
 <div th:replace="error :: error"></div>
 </body>
 </html>

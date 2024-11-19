@@ -4,8 +4,6 @@ import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 
 data class Feature(val id: FeatureId?, val name: String, val description: String, val tasks: List<TaskId>) {
-    val latestTask get() = tasks.last()
-
     fun planNewTask(task: Task) = copy(tasks = tasks + task.id!!)
 
     companion object {

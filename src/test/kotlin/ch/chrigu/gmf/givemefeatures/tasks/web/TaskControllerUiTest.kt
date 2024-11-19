@@ -1,15 +1,14 @@
 package ch.chrigu.gmf.givemefeatures.tasks.web
 
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
-import ch.chrigu.gmf.givemefeatures.tasks.Task
-import ch.chrigu.gmf.givemefeatures.tasks.TaskId
-import ch.chrigu.gmf.givemefeatures.tasks.TaskNotFoundException
-import ch.chrigu.gmf.givemefeatures.tasks.TaskService
+import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.options.LoadState
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
+import io.mockk.every
+import kotlinx.coroutines.flow.flowOf
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -21,6 +20,8 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private val description = "desc"
     private val newName = "Updated task"
     private val newDescription = "Updated desc"
+    private val featureName = "Feature"
+    private val featureId = "featureId"
 
     @LocalServerPort
     private var port: Int = 0
@@ -54,6 +55,17 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
             assertTask()
             clickEdit()
             cancelTaskForm()
+        }
+    }
+
+    @Test
+    fun `should display feature page`() {
+        withTask()
+
+        openTaskPage {
+            assertTask()
+            clickFeature()
+            assertFeature()
         }
     }
 
@@ -104,6 +116,19 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         val description = querySelector("#task p").textContent()
         assertThat(title).isEqualTo(expectedName)
         assertThat(description).isEqualTo(expectedDescription)
+        val links = querySelectorAll("ul li a")
+        assertThat(links).hasSize(1)
+        assertThat(links[0].textContent()).isEqualTo(featureName)
+    }
+
+    private fun Page.assertFeature() {
+        val title = querySelector("#feature h2").textContent()
+        assertThat(title).isEqualTo(featureName)
+    }
+
+    private fun Page.clickFeature() {
+        querySelector("ul li a").click()
+        waitForLoadState(LoadState.NETWORKIDLE)
     }
 
     private fun withUpdate() {
@@ -112,6 +137,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
 
     private fun withTask() {
         coEvery { taskService.getTask(taskId) } returns Task(taskId, name, description)
+        every { taskService.getLinkedItems(taskId) } returns flowOf(TaskLinkedItem(featureId, featureName))
     }
 
     private fun withNoTask() {

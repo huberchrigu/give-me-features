@@ -20,8 +20,8 @@ import org.springframework.web.server.ResponseStatusException
 @RequestMapping("/features")
 class FeatureController(private val featureService: FeatureService, private val taskService: TaskService) {
     @GetMapping
-    fun listFeatures() = Rendering.view("features")
-        .withFeatures(null)
+    fun listFeatures(@RequestParam id: FeatureId?) = Rendering.view("features")
+        .withFeatures(id)
         .build()
 
     @PostMapping(headers = [Hx.HEADER])
@@ -45,11 +45,11 @@ class FeatureController(private val featureService: FeatureService, private val 
     }
 
     private suspend fun updateForFeature(feature: Feature) = Rendering.view("update-feature")
-        .withFeatures(feature)
+        .withFeatures(feature.id)
         .modelAttribute("feature", feature.asDetailView(taskService))
         .build()
 
-    private fun Rendering.Builder<*>.withFeatures(current: Feature?) = modelAttribute("features", featureService.getFeatures()
+    private fun Rendering.Builder<*>.withFeatures(current: FeatureId?) = modelAttribute("features", featureService.getFeatures()
         .map { it.asListItem(current) })
 
     class NewFeatureBody(@field:NotEmpty private val name: String?, @field:NotEmpty private val description: String?) {
