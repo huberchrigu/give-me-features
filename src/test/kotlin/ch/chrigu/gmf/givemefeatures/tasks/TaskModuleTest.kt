@@ -2,6 +2,7 @@ package ch.chrigu.gmf.givemefeatures.tasks
 
 import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
 import ch.chrigu.gmf.givemefeatures.tasks.repository.TaskRepository
+import com.ninjasquad.springmockk.MockkBean
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -11,7 +12,7 @@ import org.springframework.modulith.test.ApplicationModuleTest
 
 @ApplicationModuleTest
 @Import(TestcontainersConfiguration::class)
-class TaskModuleTest(private val taskService: TaskService, private val taskRepository: TaskRepository) {
+class TaskModuleTest(private val taskService: TaskService, private val taskRepository: TaskRepository, @MockkBean private val linkedItemProvider: LinkedItemProvider) {
     @Test
     fun `should update description`() {
         runBlocking {
