@@ -16,7 +16,7 @@
     <ul class="list">
         <li class="list-item" th:each="item : ${items}">
             <!--/*@thymesVar id="item" type="ch.chrigu.gmf.givemefeatures.tasks.TaskLinkedItem"*/-->
-            <a class="list-link" th:href="@{/features(id=${item.id})}" th:text="${item.name}">Feature</a>
+            <a class="list-link" th:href="@{/features/{id}(id=${item.id})}" th:text="${item.name}">Feature</a>
         </li>
     </ul>
 </div>

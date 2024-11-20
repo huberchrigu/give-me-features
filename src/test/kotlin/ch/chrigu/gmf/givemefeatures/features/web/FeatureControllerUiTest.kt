@@ -62,6 +62,16 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         }
     }
 
+    @Test
+    fun `should open feature directly`() {
+        withFeature()
+
+        openFeaturesPage(featureId) {
+            assertFeatureList(true)
+            assertFeatureDetails()
+        }
+    }
+
     /**
      * Fails because mocked invocation
      * `FeatureService(ch.chrigu.gmf.givemefeatures.features.FeatureService#0 bean#1).addTask-WFusim8(123, Task(id=null, name=New task, description=, status=OPEN), continuation {})`
@@ -120,11 +130,12 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         assertThat(taskElement.innerHTML()).isEqualTo(taskName)
     }
 
-    private fun openFeaturesPage(test: Page.() -> Unit) {
+    private fun openFeaturesPage(selectFeature: FeatureId? = null, test: Page.() -> Unit) {
         Playwright.create().use { playwright ->
             val browser = playwright.chromium().launch()
             val page = browser.newPage()
-            page.navigate("http://localhost:$port/features")
+            val append = selectFeature?.let { "/$selectFeature" } ?: ""
+            page.navigate("http://localhost:$port/features$append")
 
             test(page)
 

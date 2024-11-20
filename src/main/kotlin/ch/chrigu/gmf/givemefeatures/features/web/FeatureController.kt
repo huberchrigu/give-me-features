@@ -20,8 +20,8 @@ import org.springframework.web.server.ResponseStatusException
 @RequestMapping("/features")
 class FeatureController(private val featureService: FeatureService, private val taskService: TaskService) {
     @GetMapping
-    fun listFeatures(@RequestParam id: FeatureId?) = Rendering.view("features")
-        .withFeatures(id)
+    fun listFeatures() = Rendering.view("features")
+        .withFeatures(null)
         .build()
 
     @PostMapping(headers = [Hx.HEADER])
@@ -42,6 +42,15 @@ class FeatureController(private val featureService: FeatureService, private val 
     suspend fun getFeature(@PathVariable id: FeatureId): Rendering {
         val feature = featureService.getFeature(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         return updateForFeature(feature)
+    }
+
+    @GetMapping("/{id}")
+    suspend fun getFeaturePage(@PathVariable id: FeatureId): Rendering {
+        val feature = featureService.getFeature(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        return Rendering.view("features")
+            .withFeatures(feature.id)
+            .modelAttribute("feature", feature.asDetailView(taskService))
+            .build()
     }
 
     private suspend fun updateForFeature(feature: Feature) = Rendering.view("update-feature")
