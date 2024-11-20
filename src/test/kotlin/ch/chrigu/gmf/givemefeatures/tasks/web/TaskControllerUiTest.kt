@@ -122,8 +122,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun Page.assertFeature() {
-        val title = querySelector("#feature h2").textContent()
-        assertThat(title).isEqualTo(featureName)
+        assertThat(url()).isEqualTo("http://localhost:$port/features/$featureId")
     }
 
     private fun Page.clickFeature() {
