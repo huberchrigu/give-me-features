@@ -72,11 +72,6 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         }
     }
 
-    /**
-     * Fails because mocked invocation
-     * `FeatureService(ch.chrigu.gmf.givemefeatures.features.FeatureService#0 bean#1).addTask-WFusim8(123, Task(id=null, name=New task, description=, status=OPEN), continuation {})`
-     * does not work.
-     */
     @Test
     fun `should add a task`() {
         val feature = withFeature()
@@ -123,11 +118,12 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         form.querySelector("#taskName").fill(taskName)
         form.querySelector("button[type='submit']").click()
         waitForLoadState(LoadState.NETWORKIDLE)
+        waitForCondition { querySelector("#feature ul li") != null }
     }
 
     private fun Page.assertTask() {
-        val taskElement = querySelector("#feature ul li")
-        assertThat(taskElement.innerHTML()).isEqualTo(taskName)
+        val taskElement = querySelector("#feature ul li a")
+        assertThat(taskElement.textContent()).isEqualTo(taskName)
     }
 
     private fun openFeaturesPage(selectFeature: FeatureId? = null, test: Page.() -> Unit) {

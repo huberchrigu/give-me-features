@@ -26,13 +26,6 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     @LocalServerPort
     private var port: Int = 0
 
-    /**
-     * Fails because:
-     * ```
-     * no answer found for: TaskService(ch.chrigu.gmf.givemefeatures.tasks.TaskService#0 bean#1).update-gBXuGgk(1, TaskUpdate(name=Updated task, description=Updated desc), continuation {})
-     * ```
-     * This seems to be a mockk issue.
-     */
     @Test
     fun `should show and update task`() {
         withTask()
@@ -109,6 +102,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         querySelector("#description").fill(newDescription)
         querySelector("#task button").click()
         waitForLoadState(LoadState.NETWORKIDLE)
+        waitForCondition { querySelector("#task h1") != null }
     }
 
     private fun Page.assertTask(expectedName: String = name, expectedDescription: String = description) {
