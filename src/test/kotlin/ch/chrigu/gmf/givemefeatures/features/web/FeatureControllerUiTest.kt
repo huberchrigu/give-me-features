@@ -3,6 +3,7 @@ package ch.chrigu.gmf.givemefeatures.features.web
 import ch.chrigu.gmf.givemefeatures.features.Feature
 import ch.chrigu.gmf.givemefeatures.features.FeatureId
 import ch.chrigu.gmf.givemefeatures.features.FeatureService
+import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
@@ -22,7 +23,7 @@ import org.springframework.boot.test.web.server.LocalServerPort
 @UiTest(FeatureController::class)
 class FeatureControllerUiTest(@MockkBean private val featureService: FeatureService, @MockkBean private val taskService: TaskService) {
     private val featureName = "My new feature"
-    private val featureDescription = "Description"
+    private val featureDescription = Html("Description")
     private val featureId = FeatureId("123")
     private val taskName = "New task"
     private val taskId = TaskId("99")
@@ -142,7 +143,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     private fun Page.assertFeatureDetails() {
         val feature = querySelector("#feature")
         assertThat(feature.querySelector("h2").textContent()).isEqualTo(featureName)
-        assertThat(feature.querySelector("p").textContent()).isEqualTo(featureDescription)
+        assertThat(feature.querySelector("p").textContent()).isEqualTo(featureDescription.toString())
     }
 
     private fun Page.assertFeatureList(current: Boolean) {
@@ -166,7 +167,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
 
     private fun Page.submitNewFeatureForm(name: String = featureName) {
         querySelector("#name").fill(name)
-        querySelector("#description").fill(featureDescription)
+        querySelector("#description").fill(featureDescription.toString())
         locator("button[type='submit']").click()
         waitForLoadState(LoadState.NETWORKIDLE)
     }

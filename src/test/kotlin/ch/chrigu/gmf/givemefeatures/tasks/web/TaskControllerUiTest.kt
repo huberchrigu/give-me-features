@@ -1,5 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.tasks.web
 
+import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.microsoft.playwright.Page
@@ -17,9 +18,9 @@ import org.springframework.boot.test.web.server.LocalServerPort
 class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private val taskId = TaskId("1")
     private val name = "My task"
-    private val description = "desc"
+    private val description = Html("desc")
     private val newName = "Updated task"
-    private val newDescription = "Updated desc"
+    private val newDescription = Html("Updated desc")
     private val featureName = "Feature"
     private val featureId = "featureId"
 
@@ -91,7 +92,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         val descriptionInput = querySelector("#description")
         val buttons = querySelectorAll("#task button")
         assertThat(nameInput.inputValue()).isEqualTo(name)
-        assertThat(descriptionInput.inputValue()).isEqualTo(description)
+        assertThat(descriptionInput.inputValue()).isEqualTo(description.toString())
         assertThat(buttons).hasSize(2)
         assertThat(buttons[0].textContent()).isEqualTo("Submit")
         assertThat(buttons[1].textContent()).isEqualTo("Cancel")
@@ -99,17 +100,17 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
 
     private fun Page.submitTaskForm() {
         querySelector("#name").fill(newName)
-        querySelector("#description").fill(newDescription)
+        querySelector("#description").fill(newDescription.toString())
         querySelector("#task button").click()
         waitForLoadState(LoadState.NETWORKIDLE)
         waitForCondition { querySelector("#task h1") != null }
     }
 
-    private fun Page.assertTask(expectedName: String = name, expectedDescription: String = description) {
+    private fun Page.assertTask(expectedName: String = name, expectedDescription: Html = description) {
         val title = querySelector("#task h1").textContent()
         val description = querySelector("#task p").textContent()
         assertThat(title).isEqualTo(expectedName)
-        assertThat(description).isEqualTo(expectedDescription)
+        assertThat(description).isEqualTo(expectedDescription.toString())
         val links = querySelectorAll("ul li a")
         assertThat(links).hasSize(1)
         assertThat(links[0].textContent()).isEqualTo(featureName)

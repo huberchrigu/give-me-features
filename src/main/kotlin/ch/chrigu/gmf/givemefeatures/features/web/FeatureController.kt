@@ -5,6 +5,7 @@ import ch.chrigu.gmf.givemefeatures.features.FeatureId
 import ch.chrigu.gmf.givemefeatures.features.FeatureService
 import ch.chrigu.gmf.givemefeatures.features.web.ui.asDetailView
 import ch.chrigu.gmf.givemefeatures.features.web.ui.asListItem
+import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import jakarta.validation.Valid
@@ -62,7 +63,7 @@ class FeatureController(private val featureService: FeatureService, private val 
         .map { it.asListItem(current) })
 
     class NewFeatureBody(@field:NotEmpty private val name: String?, @field:NotEmpty private val description: String?) {
-        fun toFeature() = Feature.describeNewFeature(name!!, description!!)
+        fun toFeature() = Feature.describeNewFeature(name!!, Html(description!!))
     }
 
     class NewTaskBody(@field:NotEmpty private val name: String?) {

@@ -1,6 +1,7 @@
 package ch.chrigu.gmf.givemefeatures.tasks.web
 
 import ch.chrigu.gmf.givemefeatures.features.web.Hx
+import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
@@ -42,6 +43,6 @@ class TaskController(private val taskService: TaskService) {
         .build()
 
     data class UpdateTaskDto(@field:NotEmpty val name: String?, @field:NotNull val description: String?) {
-        fun toChange() = Task.TaskUpdate(name!!, description!!)
+        fun toChange() = Task.TaskUpdate(name!!, Html(description!!))
     }
 }

@@ -2,6 +2,7 @@ package ch.chrigu.gmf.givemefeatures.features
 
 import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
 import ch.chrigu.gmf.givemefeatures.features.repository.FeatureRepository
+import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 import ch.chrigu.gmf.givemefeatures.tasks.TaskLinkedItem
@@ -25,7 +26,7 @@ class FeatureModuleTest(
 ) {
     private val id = FeatureId("1")
     private val name = "name"
-    private val description = "description"
+    private val description = Html("description")
 
     @BeforeEach
     fun resetDb() {
@@ -38,7 +39,7 @@ class FeatureModuleTest(
     @Test
     fun `should describe a feature`() {
         runBlocking {
-            val result = featureService.newFeature(Feature.describeNewFeature("Login", "A user should be able to login"))
+            val result = featureService.newFeature(Feature.describeNewFeature("Login", Html("A user should be able to login")))
             assertThat(result.name).isEqualTo(result.name)
             assertThat(result.description).isEqualTo(result.description)
             assertThat(result.id).isNotNull()

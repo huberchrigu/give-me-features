@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
-	id("org.springframework.boot") version "3.3.5"
+    id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
 }
 
@@ -56,6 +56,8 @@ dependencies {
 
     // Misc
     implementation("org.webjars.npm:htmx.org:2.0.3")
+    implementation("org.webjars.npm:tinymce:7.5.1")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     testImplementation("com.microsoft.playwright:playwright:1.45.1")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
 }

@@ -1,14 +1,17 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Task</title>
     <script src="/webjars/htmx.org/2.0.3/dist/htmx.min.js"></script>
     <script src="/webjars/htmx.org/2.0.3/dist/ext/response-targets.js"></script>
+    <script src="/webjars/tinymce/7.5.1/tinymce.min.js"></script>
+    <script src="/script.js"></script>
     <link rel="stylesheet" href="/styles.css"/>
 </head>
 <body hx-ext="response-targets" hx-target-error="#error" hx-swap="none">
 <div id="task" class="card" th:fragment="task" hx-swap-oob="true">
     <h1 th:text="${task.name}">Task</h1>
-    <p th:text="${task.description}">Description</p>
+    <p th:utext="${task.description}">Description</p>
     <button class="btn" th:hx-get="@{/tasks/{id}/edit(id=${task.id})}">Edit</button>
 </div>
 <div class="card">
@@ -20,6 +23,6 @@
         </li>
     </ul>
 </div>
-<div th:replace="error :: error"></div>
+<div th:replace="~{error :: error}"></div>
 </body>
 </html>

@@ -5,5 +5,3 @@
 ![Use cases](https://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/huberchrigu/give-me-features/refs/heads/master/docs/use-cases.plantuml)
 
 # Known issues
-
-* Ui Tests failures due to mockk issues

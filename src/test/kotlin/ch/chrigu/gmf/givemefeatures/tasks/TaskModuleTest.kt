@@ -1,6 +1,7 @@
 package ch.chrigu.gmf.givemefeatures.tasks
 
 import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
+import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.tasks.repository.TaskRepository
 import com.ninjasquad.springmockk.MockkBean
 import kotlinx.coroutines.flow.toList
@@ -17,7 +18,7 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
     fun `should update description`() {
         runBlocking {
             val id = taskRepository.save(Task.describeNewTask("task")).id!!
-            val newDescription = "new description"
+            val newDescription = Html("new description")
             taskService.update(id, Task.TaskUpdate("task", newDescription))
             assertThat(taskRepository.findById(id.toString())?.description).isEqualTo(newDescription)
         }
