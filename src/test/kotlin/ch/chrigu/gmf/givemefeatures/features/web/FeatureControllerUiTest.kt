@@ -23,7 +23,7 @@ import org.springframework.boot.test.web.server.LocalServerPort
 @UiTest(FeatureController::class)
 class FeatureControllerUiTest(@MockkBean private val featureService: FeatureService, @MockkBean private val taskService: TaskService) {
     private val featureName = "My new feature"
-    private val featureDescription = Html("Description")
+    private val featureDescription = Html("<p>Description</p>")
     private val featureId = FeatureId("123")
     private val taskName = "New task"
     private val taskId = TaskId("99")
@@ -143,7 +143,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     private fun Page.assertFeatureDetails() {
         val feature = querySelector("#feature")
         assertThat(feature.querySelector("h2").textContent()).isEqualTo(featureName)
-        assertThat(feature.querySelector("p").textContent()).isEqualTo(featureDescription.toString())
+        assertThat(feature.querySelector("p").textContent()).isEqualTo("Description")
     }
 
     private fun Page.assertFeatureList(current: Boolean) {
@@ -167,7 +167,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
 
     private fun Page.submitNewFeatureForm(name: String = featureName) {
         querySelector("#name").fill(name)
-        querySelector("#description").fill(featureDescription.toString())
+        frames()[1].querySelector("body#tinymce").fill("Description")
         locator("button[type='submit']").click()
         waitForLoadState(LoadState.NETWORKIDLE)
     }

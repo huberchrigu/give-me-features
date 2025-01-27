@@ -60,6 +60,7 @@ dependencies {
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     testImplementation("com.microsoft.playwright:playwright:1.45.1")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
+    implementation("org.jsoup:jsoup:1.18.3")
 }
 
 dependencyManagement {

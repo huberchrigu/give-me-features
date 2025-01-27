@@ -18,9 +18,11 @@ import org.springframework.boot.test.web.server.LocalServerPort
 class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private val taskId = TaskId("1")
     private val name = "My task"
-    private val description = Html("desc")
+    private val description = "desc"
+    private val descriptionHtml = Html("<p>$description</p>")
     private val newName = "Updated task"
-    private val newDescription = Html("Updated desc")
+    private val newDescription = "Updated desc"
+    private val newDescriptionHtml = Html("<p>$newDescription</p>")
     private val featureName = "Feature"
     private val featureId = "featureId"
 
@@ -90,9 +92,9 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private fun Page.assertForm() {
         val nameInput = querySelector("#name")
         val descriptionInput = querySelector("#description")
-        val buttons = querySelectorAll("#task button")
+        val buttons = querySelectorAll("#task button.btn")
         assertThat(nameInput.inputValue()).isEqualTo(name)
-        assertThat(descriptionInput.inputValue()).isEqualTo(description.toString())
+        assertThat(descriptionInput.inputValue()).isEqualTo(descriptionHtml.toString())
         assertThat(buttons).hasSize(2)
         assertThat(buttons[0].textContent()).isEqualTo("Submit")
         assertThat(buttons[1].textContent()).isEqualTo("Cancel")
@@ -100,17 +102,17 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
 
     private fun Page.submitTaskForm() {
         querySelector("#name").fill(newName)
-        querySelector("#description").fill(newDescription.toString())
-        querySelector("#task button").click()
+        frames()[1].querySelector("body#tinymce").fill(newDescription)
+        querySelector("#task button.btn").click()
         waitForLoadState(LoadState.NETWORKIDLE)
         waitForCondition { querySelector("#task h1") != null }
     }
 
-    private fun Page.assertTask(expectedName: String = name, expectedDescription: Html = description) {
+    private fun Page.assertTask(expectedName: String = name, expectedDescription: String = description) {
         val title = querySelector("#task h1").textContent()
         val description = querySelector("#task p").textContent()
         assertThat(title).isEqualTo(expectedName)
-        assertThat(description).isEqualTo(expectedDescription.toString())
+        assertThat(description).isEqualTo(expectedDescription)
         val links = querySelectorAll("ul li a")
         assertThat(links).hasSize(1)
         assertThat(links[0].textContent()).isEqualTo(featureName)
@@ -126,11 +128,11 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun withUpdate() {
-        coEvery { taskService.update(taskId, Task.TaskUpdate(newName, newDescription)) } returns Task(taskId, newName, newDescription)
+        coEvery { taskService.update(taskId, Task.TaskUpdate(newName, newDescriptionHtml)) } returns Task(taskId, newName, newDescriptionHtml)
     }
 
     private fun withTask() {
-        coEvery { taskService.getTask(taskId) } returns Task(taskId, name, description)
+        coEvery { taskService.getTask(taskId) } returns Task(taskId, name, descriptionHtml)
         every { taskService.getLinkedItems(taskId) } returns flowOf(TaskLinkedItem(featureId, featureName))
     }
 

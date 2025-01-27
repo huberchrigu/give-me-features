@@ -34,7 +34,7 @@
 <div th:fragment="feature" id="feature" hx-swap-oob="true">
     <div class="card" th:if="${feature}">
         <h2 th:text="${feature.name}">Feature</h2>
-        <p th:utext="${feature.description}">Feature description</p>
+        <th:block th:utext="${feature.description}">Feature description</th:block>
         <h3>Tasks</h3>
         <ul class="list task-list">
             <li class="list-item" th:each="task : ${feature.tasks}"><a class="list-link" th:href="@{/tasks/{id}(id=${task.id})}" th:text="${task.name}">Task</a></li>
