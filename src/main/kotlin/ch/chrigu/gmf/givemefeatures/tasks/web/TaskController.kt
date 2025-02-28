@@ -26,19 +26,19 @@ class TaskController(private val taskService: TaskService) {
         .build()
 
     @GetMapping("/{taskId}/edit", headers = [Hx.HEADER])
-    suspend fun getTaskEditForm(@PathVariable taskId: TaskId) = Rendering.view("task-edit")
+    suspend fun getTaskEditForm(@PathVariable taskId: TaskId) = Rendering.view("blocks/task-edit")
         .modelAttribute("task", taskService.getTask(taskId))
         .build()
 
     @Suppress("SpringMVCViewInspection")
     @GetMapping("/{taskId}", headers = [Hx.HEADER])
-    suspend fun getTaskSnippet(@PathVariable taskId: TaskId) = Rendering.view("task :: task")
+    suspend fun getTaskSnippet(@PathVariable taskId: TaskId) = Rendering.view("blocks/task")
         .modelAttribute("task", taskService.getTask(taskId))
         .build()
 
     @Suppress("SpringMVCViewInspection")
     @PatchMapping("/{taskId}", headers = [Hx.HEADER])
-    suspend fun updateTask(@PathVariable taskId: TaskId, @Valid updateTask: UpdateTaskDto) = Rendering.view("task :: task")
+    suspend fun updateTask(@PathVariable taskId: TaskId, @Valid updateTask: UpdateTaskDto) = Rendering.view("blocks/task")
         .modelAttribute("task", taskService.update(taskId, updateTask.toChange()))
         .build()
 

@@ -1,0 +1,14 @@
+@import ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureListItem
+
+@param features: List<FeatureListItem>
+
+<div id="features" class="card" hx-swap-oob="true">
+    <h1>Features</h1>
+    <ul class="list">
+        @for(featureListItem in features)
+            <li class="list-item">
+                <a class="list-link ${if (featureListItem.current)  "current" else ""}" hx-get="${featureListItem.link}"><span>${featureListItem.name}</span></a>
+            </li>
+        @endfor
+    </ul>
+</div>

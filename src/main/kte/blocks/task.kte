@@ -1,0 +1,9 @@
+@import ch.chrigu.gmf.givemefeatures.tasks.Task
+
+@param task: Task
+
+<div id="task" class="card" hx-swap-oob="true">
+    <h1>${task.name}</h1>
+    $unsafe{task.description.toString()}
+    <button class="btn" hx-get="/tasks/${task.id?.toString()}/edit">Edit</button>
+</div>

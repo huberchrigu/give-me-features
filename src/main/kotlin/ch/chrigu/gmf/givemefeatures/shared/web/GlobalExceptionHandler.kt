@@ -29,7 +29,7 @@ class GlobalExceptionHandler {
         val message = e.message ?: "Unknown error happened"
         val view = if (exchange.request.headers[Hx.HEADER_NAME]?.get(0) == "true") {
             @Suppress("SpringMVCViewInspection")
-            Rendering.view("error :: error")
+            Rendering.view("blocks/error")
         } else
             Rendering.view("error")
         return view.modelAttribute("error", message)

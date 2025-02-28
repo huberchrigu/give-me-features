@@ -1,0 +1,16 @@
+@import ch.chrigu.gmf.givemefeatures.tasks.Task
+@import org.springframework.security.web.server.csrf.CsrfToken
+
+@param csrf: CsrfToken
+@param task: Task
+
+<form class="card" id="task" hx-swap-oob="true">
+    <label for="name">Name: </label>
+    <input class="form-input" id="name" name="name" value="${task.name}">
+    <label for="description">Description: </label>
+    <textarea class="form-input" id="description" name="description">$unsafe{task.description.toString()}</textarea>
+    <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
+    <button class="btn btn-primary" hx-patch="/tasks/${task.id!!.toString()}">Submit</button>
+    <button class="btn" hx-get="/tasks/${task.id!!.toString()}">Cancel</button>
+    <script>initRichtext('#description');</script>
+</form>

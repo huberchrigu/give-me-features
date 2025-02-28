@@ -1,0 +1,10 @@
+@param error: String?
+
+<div id="error" hx-swap-oob="true">
+    @if(error != null)
+        <div class="error">
+            <p>${error}</p>
+            <button class="btn" onclick="htmx.find('#error .error').remove();">Close</button>
+        </div>
+    @endif
+</div>

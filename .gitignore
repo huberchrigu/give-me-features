@@ -36,5 +36,8 @@ out/
 ### VS Code ###
 .vscode/
 
+### JTE ###
+/jte-classes/
+
 ### Kotlin ###
 .kotlin

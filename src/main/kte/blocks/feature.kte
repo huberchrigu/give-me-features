@@ -1,0 +1,27 @@
+@import ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureDetailView
+@import org.springframework.security.web.server.csrf.CsrfToken
+
+@param feature: FeatureDetailView?
+@param csrf: CsrfToken
+
+<div id="feature" hx-swap-oob="true">
+    @if(feature != null)
+        <div class="card">
+            <h2>${feature.name}</h2>
+            $unsafe{feature.description}
+            <h3>Tasks</h3>
+            <ul class="list task-list">
+                @for(task in feature.tasks)
+                    <li class="list-item"><a class="list-link" href="/tasks/${task.id?.toString()}">${task.name}</a></li>
+                @endfor
+            </ul>
+            <h3>Add task</h3>
+            <form hx-post="/features/${feature.id?.toString()}/tasks">
+                <label for="taskName">Name: </label>
+                <input class="form-input" type="text" name="name" id="taskName"/>
+                <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
+                <button class="btn btn-primary" type="submit">Create</button>
+            </form>
+        </div>
+    @endif
+</div>

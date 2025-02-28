@@ -54,7 +54,7 @@ class FeatureController(private val featureService: FeatureService, private val 
             .build()
     }
 
-    private suspend fun updateForFeature(feature: Feature) = Rendering.view("update-feature")
+    private suspend fun updateForFeature(feature: Feature) = Rendering.view("blocks/update-feature")
         .withFeatures(feature.id)
         .modelAttribute("feature", feature.asDetailView(taskService))
         .build()

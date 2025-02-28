@@ -8,5 +8,5 @@ import org.springframework.context.annotation.Import
 
 @TestConfiguration
 @EnableAutoConfiguration(exclude = [MongoReactiveAutoConfiguration::class])
-@Import(SecurityConfiguration::class, GlobalExceptionHandler::class)
+@Import(SecurityConfiguration::class, GlobalExceptionHandler::class, GlobalControllerAdvice::class)
 class WebFluxTestConfig
