@@ -8,6 +8,7 @@ import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.PositiveOrZero
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
@@ -39,10 +40,12 @@ class TaskController(private val taskService: TaskService) {
     @Suppress("SpringMVCViewInspection")
     @PatchMapping("/{taskId}", headers = [Hx.HEADER])
     suspend fun updateTask(@PathVariable taskId: TaskId, @Valid updateTask: UpdateTaskDto) = Rendering.view("blocks/task")
-        .modelAttribute("task", taskService.update(taskId, updateTask.toChange()))
+        .modelAttribute("task", taskService.updateTask(taskId, updateTask.version!!, updateTask.toChange()))
         .build()
 
-    data class UpdateTaskDto(@field:NotEmpty val name: String?, @field:NotNull val description: String?) {
+    // TODO: Block, reopen, close
+
+    data class UpdateTaskDto(@field:NotEmpty val name: String?, @field:NotNull val description: String?, @field:PositiveOrZero val version: Int?) {
         fun toChange() = Task.TaskUpdate(name!!, Html(description!!))
     }
 }
