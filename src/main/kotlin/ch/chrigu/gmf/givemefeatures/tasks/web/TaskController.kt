@@ -39,8 +39,10 @@ class TaskController(private val taskService: TaskService) {
     @Suppress("SpringMVCViewInspection")
     @PatchMapping("/{taskId}", headers = [Hx.HEADER])
     suspend fun updateTask(@PathVariable taskId: TaskId, @Valid updateTask: UpdateTaskDto) = Rendering.view("blocks/task")
-        .modelAttribute("task", taskService.update(taskId, updateTask.toChange()))
+        .modelAttribute("task", taskService.updateTask(taskId, updateTask.toChange()))
         .build()
+
+    // TODO: Block, reopen, close
 
     data class UpdateTaskDto(@field:NotEmpty val name: String?, @field:NotNull val description: String?) {
         fun toChange() = Task.TaskUpdate(name!!, Html(description!!))

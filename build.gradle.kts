@@ -65,6 +65,7 @@ dependencies {
     testImplementation("com.microsoft.playwright:playwright:1.45.1")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     implementation("org.jsoup:jsoup:1.18.3")
+    testImplementation("io.projectreactor:reactor-test")
 }
 
 dependencyManagement {

@@ -4,9 +4,12 @@ import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
 import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.tasks.repository.TaskRepository
 import com.ninjasquad.springmockk.MockkBean
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.context.annotation.Import
 import org.springframework.modulith.test.ApplicationModuleTest
@@ -14,34 +17,53 @@ import org.springframework.modulith.test.ApplicationModuleTest
 @ApplicationModuleTest
 @Import(TestcontainersConfiguration::class)
 class TaskModuleTest(private val taskService: TaskService, private val taskRepository: TaskRepository, @MockkBean private val linkedItemProvider: LinkedItemProvider) {
-    @Test
-    fun `should update description`() {
-        runBlocking {
-            val id = taskRepository.save(Task.describeNewTask("task")).id!!
-            val newDescription = Html("new description")
-            taskService.update(id, Task.TaskUpdate("task", newDescription))
-            assertThat(taskRepository.findById(id.toString())?.description).isEqualTo(newDescription)
-        }
+    @BeforeEach
+    fun reset() = runTest {
+        taskRepository.deleteAll()
     }
 
     @Test
-    fun `should describe a new task`() {
-        runBlocking {
-            taskService.newTask(Task.describeNewTask("new task"))
-            val tasks = taskRepository.findAll().toList()
-            assertThat(tasks).hasSize(1)
-            assertThat(tasks[0].name).isEqualTo("new task")
-            assertThat(tasks[0].id).isNotNull
-        }
+    fun `should update description`() = runTest {
+        val task = taskRepository.save(Task.describeNewTask("task"))
+        val id = task.id!!
+        val newDescription = Html("new description")
+        taskService.updateTask(id, Task.TaskUpdate("task", newDescription))
+        assertThat(taskRepository.findById(id.toString())?.description).isEqualTo(newDescription)
     }
 
     @Test
-    fun `should resolve tasks`() {
-        runBlocking {
-            val task = taskRepository.save(Task.describeNewTask("test"))
-            val result = taskService.resolve(listOf(task.id!!)).toList()
-            assertThat(result).hasSize(1)
-            assertThat(result[0].name).isEqualTo("test")
-        }
+    fun `should describe a new task`() = runTest {
+        taskService.newTask(Task.describeNewTask("new task"))
+        val tasks = taskRepository.findAll().toList()
+        assertThat(tasks).hasSize(1)
+        assertThat(tasks[0].name).isEqualTo("new task")
+        assertThat(tasks[0].id).isNotNull
+    }
+
+    @Test
+    fun `should resolve tasks`() = runTest {
+        val task = taskRepository.save(Task.describeNewTask("test"))
+        val result = taskService.resolve(listOf(task.id!!)).toList()
+        assertThat(result).hasSize(1)
+        assertThat(result[0].name).isEqualTo("test")
+    }
+
+    @Test
+    fun `should merge tasks`() = runTest {
+        val task = taskRepository.save(Task.describeNewTask("test"))
+        val askUpdate1 = async { taskService.updateTask(task.id!!, Task.TaskUpdate("new task", Html("new description"))) }
+        val askUpdate2 = async { taskService.blockTask(task.id!!) }
+        awaitAll(askUpdate1, askUpdate2)
+        assertThat(taskRepository.findById(task.id!!.toString())).isEqualTo(Task(task.id, "new task", Html("new description"), TaskStatus.BLOCKED, 2))
+    }
+
+    @Test
+    fun `should block, reopen and close task`() = runTest {
+        val task = taskRepository.save(Task.describeNewTask("test"))
+        val blocked = taskService.blockTask(task.id!!)
+        assertThat(blocked.status).isEqualTo(TaskStatus.BLOCKED)
+        val reopened = taskService.reopenTask(task.id!!)
+        assertThat(reopened.status).isEqualTo(TaskStatus.OPEN)
+        assertThat(taskService.closeTask(task.id!!).status).isEqualTo(TaskStatus.DONE)
     }
 }

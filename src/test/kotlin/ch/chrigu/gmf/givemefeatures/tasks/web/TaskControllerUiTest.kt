@@ -128,7 +128,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun withUpdate() {
-        coEvery { taskService.update(taskId, Task.TaskUpdate(newName, newDescriptionHtml)) } returns Task(taskId, newName, newDescriptionHtml)
+        coEvery { taskService.updateTask(taskId, Task.TaskUpdate(newName, newDescriptionHtml)) } returns Task(taskId, newName, newDescriptionHtml)
     }
 
     private fun withTask() {
