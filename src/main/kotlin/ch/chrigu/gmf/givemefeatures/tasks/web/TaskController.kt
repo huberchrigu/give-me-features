@@ -5,6 +5,7 @@ import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
+import ch.chrigu.gmf.givemefeatures.tasks.TaskStatus
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.reactive.result.view.Rendering
 
@@ -42,7 +44,12 @@ class TaskController(private val taskService: TaskService) {
         .modelAttribute("task", taskService.updateTask(taskId, updateTask.toChange()))
         .build()
 
-    // TODO: Block, reopen, close
+    @PutMapping("/{taskId}/status")
+    fun updateStatus(@PathVariable taskId: TaskId, @Valid updateTaskStatus: UpdateTaskStatus) = Rendering.view("blocks/task")
+        .modelAttribute("task", TODO("Implement service invocation"))
+        .build()
+
+    data class UpdateTaskStatus(@field:NotNull val status: TaskStatus?)
 
     data class UpdateTaskDto(@field:NotEmpty val name: String?, @field:NotNull val description: String?) {
         fun toChange() = Task.TaskUpdate(name!!, Html(description!!))
