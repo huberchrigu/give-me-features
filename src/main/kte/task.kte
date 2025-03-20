@@ -1,8 +1,9 @@
+@import ch.chrigu.gmf.givemefeatures.features.FeatureId
 @import ch.chrigu.gmf.givemefeatures.tasks.TaskLinkedItem
 @import ch.chrigu.gmf.givemefeatures.tasks.Task
 
 @param task: Task
-@param items : List<TaskLinkedItem<String>>
+@param items : List<TaskLinkedItem<FeatureId>>
 @param error: String?
 
 <!DOCTYPE html>
@@ -22,7 +23,7 @@
     <ul class="list">
         @for(item in items)
             <li class="list-item">
-                <a class="list-link" href="/features/${item.id}">${item.name}</a>
+                <a class="list-link" href="/features/${item.id.toString()}">${item.name}</a>
             </li>
         @endfor
     </ul>
@@ -33,6 +34,6 @@
 
     </ul>
 </div>
-@template(error = error)
+@template.blocks.error(error = error)
 </body>
 </html>
