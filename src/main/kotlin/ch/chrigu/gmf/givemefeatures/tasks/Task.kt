@@ -55,7 +55,22 @@ data class Task(
     }
 }
 
-enum class TaskStatus { OPEN, BLOCKED, DONE }
+enum class TaskStatus {
+    /**
+     * The task is ready to be worked on. There are no blockers and it is not done yet.
+     */
+    OPEN,
+
+    /**
+     * The task progress is blocked by a blocker.
+     */
+    BLOCKED,
+
+    /**
+     * Task is completed.
+     */
+    DONE
+}
 
 @JvmInline
 value class TaskId(private val id: String) {

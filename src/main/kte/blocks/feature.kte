@@ -12,7 +12,7 @@
             <h3>Tasks</h3>
             <ul class="list task-list">
                 @for(task in feature.tasks)
-                    <li class="list-item"><a class="list-link" href="/tasks/${task.id?.toString()}">${task.name}</a></li>
+                    <li class="list-item"><a class="list-link" href="/tasks/${task.id?.toString()}">${task.name} <span class="status-${task.status}">${task.status}</span></a></li>
                 @endfor
             </ul>
             <h3>Add task</h3>

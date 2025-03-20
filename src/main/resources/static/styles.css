@@ -67,6 +67,37 @@ h1, h2, h3 {
     background-color: #f0f0f0;
 }
 
+/* Status Tags */
+.status-OPEN,
+.status-BLOCKED,
+.status-DONE {
+    display: inline-block;
+    font-size: 0.9em;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    margin-left: 10px;
+}
+
+/* Open Status */
+.status-OPEN {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Blocked Status */
+.status-BLOCKED {
+    background-color: #ff9800;
+    color: white;
+}
+
+/* Done Status */
+.status-DONE {
+    background-color: #2196F3;
+    color: white;
+}
+
 /* Forms */
 form label {
     display: block;

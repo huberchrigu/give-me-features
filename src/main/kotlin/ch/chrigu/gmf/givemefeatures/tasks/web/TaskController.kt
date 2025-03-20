@@ -45,11 +45,17 @@ class TaskController(private val taskService: TaskService) {
         .build()
 
     @PutMapping("/{taskId}/status")
-    fun updateStatus(@PathVariable taskId: TaskId, @Valid updateTaskStatus: UpdateTaskStatus) = Rendering.view("blocks/task")
-        .modelAttribute("task", TODO("Implement service invocation"))
+    suspend fun updateStatus(@PathVariable taskId: TaskId, @Valid updateTaskStatus: UpdateTaskStatus) = Rendering.view("blocks/task")
+        .modelAttribute("task", updateTaskStatus.applyOn(taskService, taskId)) // TODO: UI call, UI test (show status and action buttons)
         .build()
 
-    data class UpdateTaskStatus(@field:NotNull val status: TaskStatus?)
+    data class UpdateTaskStatus(@field:NotNull val status: TaskStatus?) {
+        suspend fun applyOn(taskService: TaskService, id: TaskId) = when (status!!) {
+            TaskStatus.BLOCKED -> taskService.blockTask(id)
+            TaskStatus.DONE -> taskService.closeTask(id)
+            TaskStatus.OPEN -> taskService.reopenTask(id)
+        }
+    }
 
     data class UpdateTaskDto(@field:NotEmpty val name: String?, @field:NotNull val description: String?) {
         fun toChange() = Task.TaskUpdate(name!!, Html(description!!))
