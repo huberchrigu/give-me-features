@@ -44,7 +44,7 @@ class TaskController(private val taskService: TaskService) {
         .modelAttribute("task", taskService.updateTask(taskId, updateTask.toChange()))
         .build()
 
-    @PutMapping("/{taskId}/status")
+    @PutMapping("/{taskId}/status", headers = [Hx.HEADER])
     suspend fun updateStatus(@PathVariable taskId: TaskId, @Valid updateTaskStatus: UpdateTaskStatus) = Rendering.view("blocks/task")
         .modelAttribute("task", updateTaskStatus.applyOn(taskService, taskId)) // TODO: UI call, UI test (show status and action buttons)
         .build()

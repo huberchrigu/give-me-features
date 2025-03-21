@@ -1,5 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.tasks.web
 
+import ch.chrigu.gmf.givemefeatures.features.web.Hx
 import ch.chrigu.gmf.givemefeatures.shared.security.SecurityConfiguration
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import gg.jte.springframework.boot.autoconfigure.ReactiveJteAutoConfiguration
@@ -27,6 +28,7 @@ class TaskControllerWebTest(private val webTestClient: WebTestClient, @MockitoBe
             .put().uri("/tasks/123/status")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .header(HttpHeaders.ACCEPT_LANGUAGE, "en")
+            .header(Hx.HEADER_NAME, "true")
             .body(BodyInserters.empty<String>())
             .exchange()
             .expectStatus().isBadRequest
