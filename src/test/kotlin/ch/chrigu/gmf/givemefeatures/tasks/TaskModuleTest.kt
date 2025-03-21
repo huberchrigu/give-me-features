@@ -12,6 +12,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.context.annotation.Import
+import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.modulith.test.ApplicationModuleTest
 
 @ApplicationModuleTest
@@ -48,13 +49,27 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
         assertThat(result[0].name).isEqualTo("test")
     }
 
+    /**
+     * There are three possible results:
+     * 1. Updates are done one after the other -> both changes there
+     * 2. [OptimisticLockingException] for one update -> other change worked
+     * 3. Other way around
+     */
     @Test
-    fun `should merge tasks`() = runTest {
+    fun `should not merge tasks`() = runTest {
         val task = taskRepository.save(Task.describeNewTask("test"))
         val askUpdate1 = async { taskService.updateTask(task.id!!, Task.TaskUpdate("new task", Html("new description"))) }
         val askUpdate2 = async { taskService.blockTask(task.id!!) }
-        awaitAll(askUpdate1, askUpdate2)
-        assertThat(taskRepository.findById(task.id!!.toString())).isEqualTo(Task(task.id, "new task", Html("new description"), TaskStatus.BLOCKED, 2))
+        try {
+            awaitAll(askUpdate1, askUpdate2)
+            assertThat(taskRepository.findById(task.id!!.toString())).isEqualTo(Task(task.id, "new task", Html("new description"), TaskStatus.BLOCKED, 2))
+        } catch (e: OptimisticLockingFailureException) {
+            assertThat(taskRepository.findById(task.id!!.toString()))
+                .satisfiesAnyOf(
+                    { assertThat(it).isEqualTo(Task(task.id, "new task", Html("new description"), version = 2)) },
+                    { assertThat(it).isEqualTo(Task(task.id, "test", status = TaskStatus.BLOCKED, version = 2)) }
+                )
+        }
     }
 
     @Test
