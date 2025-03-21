@@ -44,10 +44,14 @@ class TaskController(private val taskService: TaskService) {
         .modelAttribute("task", taskService.updateTask(taskId, updateTask.toChange()))
         .build()
 
-    @PutMapping("/{taskId}/status")
-    suspend fun updateStatus(@PathVariable taskId: TaskId, @Valid updateTaskStatus: UpdateTaskStatus) = Rendering.view("blocks/task")
-        .modelAttribute("task", updateTaskStatus.applyOn(taskService, taskId)) // TODO: UI call, UI test (show status and action buttons)
-        .build()
+    @PutMapping("/{taskId}/status", headers = [Hx.HEADER])
+    suspend fun updateStatus(@PathVariable taskId: TaskId, @Valid updateTaskStatus: UpdateTaskStatus) =
+        Rendering.view("blocks/task")
+            .modelAttribute(
+                "task",
+                updateTaskStatus.applyOn(taskService, taskId)
+            ) // TODO: UI call, UI test (show status and action buttons)
+            .build()
 
     data class UpdateTaskStatus(@field:NotNull val status: TaskStatus?) {
         suspend fun applyOn(taskService: TaskService, id: TaskId) = when (status!!) {

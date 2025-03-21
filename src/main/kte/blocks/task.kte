@@ -1,9 +1,14 @@
 @import ch.chrigu.gmf.givemefeatures.tasks.Task
+import ch.chrigu.gmf.givemefeatures.tasks.TaskStatus
+import ch.chrigu.gmf.givemefeatures.tasks.TaskStatus
 
 @param task: Task
 
 <div id="task" class="card" hx-swap-oob="true">
     <h1>${task.name} <span class="status-${task.status}">${task.status}</span></h1>
     $unsafe{task.description.toString()}
+    <button class="btn" hx-put="/tasks/${task.id?.toString()}/status" name="status" value="${TaskStatus.BLOCKED}">Block</button>
+    <button class="btn" hx-put="/tasks/${task.id?.toString()}/status" status="${TaskStatus.OPEN.toString()}">Unlock</button>
+    <button class="btn" hx-put="/tasks/${task.id?.toString()}/status" status="${TaskStatus.DONE.toString()}">Close</button>
     <button class="btn" hx-get="/tasks/${task.id?.toString()}/edit">Edit</button>
 </div>
