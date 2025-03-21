@@ -1,5 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.tasks.web
 
+import ch.chrigu.gmf.givemefeatures.features.FeatureId
 import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.*
@@ -24,7 +25,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private val newDescription = "Updated desc"
     private val newDescriptionHtml = Html("<p>$newDescription</p>")
     private val featureName = "Feature"
-    private val featureId = "featureId"
+    private val featureId = FeatureId("featureId")
 
     @LocalServerPort
     private var port: Int = 0

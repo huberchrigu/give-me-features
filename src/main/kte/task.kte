@@ -1,9 +1,8 @@
-@import ch.chrigu.gmf.givemefeatures.features.FeatureId
 @import ch.chrigu.gmf.givemefeatures.tasks.TaskLinkedItem
 @import ch.chrigu.gmf.givemefeatures.tasks.Task
 
 @param task: Task
-@param items : List<TaskLinkedItem<FeatureId>>
+@param items : List<TaskLinkedItem<*>>
 @param error: String?
 
 <!DOCTYPE html>
