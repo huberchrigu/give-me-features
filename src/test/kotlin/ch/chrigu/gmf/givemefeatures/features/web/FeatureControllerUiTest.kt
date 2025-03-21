@@ -124,7 +124,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
 
     private fun Page.assertTask() {
         val taskElement = querySelector("#feature ul li a")
-        assertThat(taskElement.textContent()).isEqualTo(taskName)
+        assertThat(taskElement.textContent()).isEqualTo("$taskName OPEN")
     }
 
     private fun openFeaturesPage(selectFeature: FeatureId? = null, test: Page.() -> Unit) {

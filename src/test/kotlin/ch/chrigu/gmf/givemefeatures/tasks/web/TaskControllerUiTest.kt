@@ -111,7 +111,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private fun Page.assertTask(expectedName: String = name, expectedDescription: String = description) {
         val title = querySelector("#task h1").textContent()
         val description = querySelector("#task p").textContent()
-        assertThat(title).isEqualTo(expectedName)
+        assertThat(title).isEqualTo("$expectedName OPEN")
         assertThat(description).isEqualTo(expectedDescription)
         val links = querySelectorAll("ul li a")
         assertThat(links).hasSize(1)
