@@ -47,7 +47,7 @@ class TaskController(private val taskService: TaskService) {
 
     @PutMapping("/{taskId}/status", headers = [Hx.HEADER])
     suspend fun updateStatus(@PathVariable taskId: TaskId, @Valid updateTaskStatus: UpdateTaskStatus) = Rendering.view("blocks/task")
-        .modelAttribute("task", updateTaskStatus.applyOn(taskService, taskId).toDetails()) // TODO: Frontend refactoring
+        .modelAttribute("task", updateTaskStatus.applyOn(taskService, taskId).toDetails())
         .build()
 
     data class UpdateTaskStatus(@field:NotNull val status: TaskStatus?) {

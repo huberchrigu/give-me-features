@@ -15,6 +15,7 @@
     <script src="/webjars/htmx.org/2.0.3/dist/ext/response-targets.js"></script>
     <script src="/webjars/tinymce/7.5.1/tinymce.min.js"></script>
     <script src="/script.js"></script>
+    <script src="/status-update.js"></script>
     <link rel="stylesheet" href="/styles.css"/>
 </head>
 <body hx-ext="response-targets" hx-target-error="#error" hx-swap="none">
