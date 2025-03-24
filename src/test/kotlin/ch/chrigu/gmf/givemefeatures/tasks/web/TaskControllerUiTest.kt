@@ -127,11 +127,11 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         val statusElement = querySelector(".status-${status.name}")
         statusElement.click()
         val statusActions = querySelector("#status-actions")
-        waitForCondition { !statusActions.getAttribute("style").contains("display: none") }
+        waitForCondition { statusActions.getAttribute("class").contains("show") }
         val newStatusElement = statusActions.querySelectorAll("button").first { it.textContent() == newStatus.name }
         newStatusElement.click()
         waitForLoadState(LoadState.NETWORKIDLE)
-        waitForCondition { querySelector(".status-${newStatus.name}") != null }
+        waitForCondition { querySelector("h1 .status-${newStatus.name}") != null }
     }
 
     private fun Page.assertTask(expectedName: String = name, expectedDescription: String = description, status: TaskStatus = TaskStatus.OPEN) {
@@ -141,7 +141,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun Page.assertStatus(status: TaskStatus) {
-        val statusElement = querySelector(".status-${status.name}")
+        val statusElement = querySelector("h1 .status-${status.name}")
         assertThat(statusElement.textContent()).isEqualTo(status.name)
     }
 

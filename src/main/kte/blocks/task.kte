@@ -5,13 +5,26 @@
 @param csrf: CsrfToken
 
 <div id="task" class="card" hx-swap-oob="true">
-    <h1>${task.name} <span class="status-${task.status}" onclick="htmx.find('#status-actions').style='display: block'" style="cursor: pointer">${task.status}</span></h1>
-    <div id="status-actions" style="display: none">
+    <h1>${task.name} <span class="status-${task.status} status-actions-trigger" onclick="showStatusAction()">${task.status}</span></h1>
+    <div id="status-overlay" onclick="hideStatusAction()"></div>
+    <div id="status-actions">
         @for(action in task.availableStatusActions)
-            <button hx-put="/tasks/${task.id}/status" hx-vals='{"status": "${action.status}", "${csrf.parameterName}": "${csrf.token}"}'>${action.label}</button>
+            <button class="status-${action.status}" hx-put="/tasks/${task.id}/status"
+                    hx-vals='{"status": "${action.status}", "${csrf.parameterName}": "${csrf.token}"}'>${action.label}</button>
         @endfor
-        <button onclick="htmx.find('#status-actions').style='display: none'">Cancel</button>
+        <button class="cancel" onclick="hideStatusAction()">Cancel</button>
     </div>
     $unsafe{task.description}
     <button class="btn" hx-get="/tasks/${task.id}/edit">Edit</button>
+    <script>
+        function hideStatusAction() {
+            htmx.find('#status-actions').classList.remove('show');
+            htmx.find('#status-overlay').classList.remove('show');
+        }
+
+        function showStatusAction() {
+            htmx.find('#status-actions').classList.toggle('show');
+            htmx.find('#status-overlay').classList.toggle('show');
+        }
+    </script>
 </div>

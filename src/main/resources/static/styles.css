@@ -76,7 +76,6 @@ h1, h2, h3 {
     font-weight: bold;
     padding: 5px 10px;
     border-radius: 12px;
-    text-transform: uppercase;
     margin-left: 10px;
 }
 
@@ -98,28 +97,81 @@ h1, h2, h3 {
     color: white;
 }
 
-/* Forms */
-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+/* Overlay for Status Actions */
+.status-actions-trigger {
+    cursor: pointer;
 }
 
-.form-input {
+#status-actions {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: white;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1000;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    min-width: 250px;
+    text-align: center;
+    visibility: hidden;
+}
+
+/* Show overlay when triggered */
+#status-actions.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    visibility: visible;
+}
+
+/* Dark Background Overlay */
+#status-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    visibility: hidden;
 }
 
-.btn {
-    padding: 10px 20px;
+/* Show Background when Active */
+#status-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Style buttons inside the overlay */
+#status-actions button {
+    width: 100%;
+    margin: 5px 0;
+    padding: 10px;
     border: none;
     border-radius: 5px;
+    font-size: 1em;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: filter 0.2s ease;
 }
+
+#status-actions button:hover {
+    filter: brightness(0.9);
+}
+
+/* Cancel Button */
+#status-actions button.cancel {
+    background: #ccc;
+    color: black;
+}
+
+#status-actions button.cancel:hover {
+    background: #bbb;
+}
+
 
 .btn-primary {
     background-color: #4CAF50;
