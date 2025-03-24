@@ -98,9 +98,11 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun Page.clickEdit() {
-        querySelector("#task button").click()
+        getButton().click()
         waitForLoadState(LoadState.NETWORKIDLE)
     }
+
+    private fun Page.getButton() = querySelectorAll("#task button").first { it.textContent() == "Edit" }
 
     private fun Page.assertForm() {
         val nameInput = querySelector("#name")
