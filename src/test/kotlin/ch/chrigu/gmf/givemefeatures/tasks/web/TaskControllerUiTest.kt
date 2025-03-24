@@ -56,6 +56,18 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     @Test
+    fun `should change status`() {
+        withTask()
+        coEvery { taskService.blockTask(taskId) } returns Task(taskId, name, descriptionHtml, TaskStatus.BLOCKED)
+
+        openTaskPage {
+            assertTask()
+            changeStatus(newStatus = TaskStatus.BLOCKED)
+            assertTask(status = TaskStatus.BLOCKED)
+        }
+    }
+
+    @Test
     fun `should display feature page`() {
         withTask()
 
@@ -109,14 +121,39 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         waitForCondition { querySelector("#task h1") != null }
     }
 
-    private fun Page.assertTask(expectedName: String = name, expectedDescription: String = description) {
-        val title = querySelector("#task h1").textContent()
-        val description = querySelector("#task p").textContent()
-        assertThat(title).isEqualTo("$expectedName OPEN")
-        assertThat(description).isEqualTo(expectedDescription)
+    private fun Page.changeStatus(status: TaskStatus = TaskStatus.OPEN, newStatus: TaskStatus) {
+        val statusElement = querySelector(".status-${status.name}")
+        statusElement.click()
+        val statusActions = querySelector("#status-actions")
+        waitForCondition { !statusActions.getAttribute("style").contains("display: none") }
+        val newStatusElement = statusActions.querySelectorAll("button").first { it.textContent() == newStatus.name }
+        newStatusElement.click()
+        waitForLoadState(LoadState.NETWORKIDLE)
+        waitForCondition { querySelector(".status-${newStatus.name}") != null }
+    }
+
+    private fun Page.assertTask(expectedName: String = name, expectedDescription: String = description, status: TaskStatus = TaskStatus.OPEN) {
+        assertNameAndDescription(expectedName, expectedDescription, status)
+        assertLinks()
+        assertStatus(status)
+    }
+
+    private fun Page.assertStatus(status: TaskStatus) {
+        val statusElement = querySelector(".status-${status.name}")
+        assertThat(statusElement.textContent()).isEqualTo(status.name)
+    }
+
+    private fun Page.assertLinks() {
         val links = querySelectorAll("ul li a")
         assertThat(links).hasSize(1)
         assertThat(links[0].textContent()).isEqualTo(featureName)
+    }
+
+    private fun Page.assertNameAndDescription(expectedName: String, expectedDescription: String, expectedStatus: TaskStatus) {
+        val title = querySelector("#task h1").textContent()
+        val description = querySelector("#task p").textContent()
+        assertThat(title).isEqualTo("$expectedName $expectedStatus")
+        assertThat(description).isEqualTo(expectedDescription)
     }
 
     private fun Page.assertFeature() {

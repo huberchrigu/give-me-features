@@ -6,6 +6,7 @@ import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import ch.chrigu.gmf.givemefeatures.tasks.TaskStatus
+import ch.chrigu.gmf.givemefeatures.tasks.web.ui.TaskDetails
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
@@ -23,7 +24,7 @@ import org.springframework.web.reactive.result.view.Rendering
 class TaskController(private val taskService: TaskService) {
     @GetMapping("/{taskId}")
     suspend fun getTask(@PathVariable taskId: TaskId) = Rendering.view("task")
-        .modelAttribute("task", taskService.getTask(taskId))
+        .modelAttribute("task", taskService.getTask(taskId).toDetails())
         .modelAttribute("items", taskService.getLinkedItems(taskId).toList())
         .build()
 
@@ -35,18 +36,18 @@ class TaskController(private val taskService: TaskService) {
     @Suppress("SpringMVCViewInspection")
     @GetMapping("/{taskId}", headers = [Hx.HEADER])
     suspend fun getTaskSnippet(@PathVariable taskId: TaskId) = Rendering.view("blocks/task")
-        .modelAttribute("task", taskService.getTask(taskId))
+        .modelAttribute("task", taskService.getTask(taskId).toDetails())
         .build()
 
     @Suppress("SpringMVCViewInspection")
     @PatchMapping("/{taskId}", headers = [Hx.HEADER])
     suspend fun updateTask(@PathVariable taskId: TaskId, @Valid updateTask: UpdateTaskDto) = Rendering.view("blocks/task")
-        .modelAttribute("task", taskService.updateTask(taskId, updateTask.toChange()))
+        .modelAttribute("task", taskService.updateTask(taskId, updateTask.toChange()).toDetails())
         .build()
 
     @PutMapping("/{taskId}/status", headers = [Hx.HEADER])
     suspend fun updateStatus(@PathVariable taskId: TaskId, @Valid updateTaskStatus: UpdateTaskStatus) = Rendering.view("blocks/task")
-        .modelAttribute("task", updateTaskStatus.applyOn(taskService, taskId)) // TODO: UI call, UI test (show status and action buttons)
+        .modelAttribute("task", updateTaskStatus.applyOn(taskService, taskId).toDetails()) // TODO: Styling, Frontend refactoring
         .build()
 
     data class UpdateTaskStatus(@field:NotNull val status: TaskStatus?) {
@@ -60,4 +61,6 @@ class TaskController(private val taskService: TaskService) {
     data class UpdateTaskDto(@field:NotEmpty val name: String?, @field:NotNull val description: String?) {
         fun toChange() = Task.TaskUpdate(name!!, Html(description!!))
     }
+
+    private fun Task.toDetails() = TaskDetails(id!!.toString(), name, description.toString(), status, getAvailableStatus())
 }

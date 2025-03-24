@@ -32,18 +32,27 @@ data class Task(
     }
 
     fun block(): Task {
-        check(status == TaskStatus.OPEN) { "Only open task can be blocked" }
+        check(getAvailableStatus().contains(TaskStatus.BLOCKED)) { "Only open task can be blocked" }
         return copy(status = TaskStatus.BLOCKED)
     }
 
     fun reopen(): Task {
-        check(status != TaskStatus.OPEN) { "Task is already open" }
+        check(getAvailableStatus().contains(TaskStatus.OPEN)) { "Task is already open" }
         return copy(status = TaskStatus.OPEN)
     }
 
     fun close(): Task {
-        check(status != TaskStatus.DONE)
+        check(getAvailableStatus().contains(TaskStatus.DONE)) { "Task is already closed" }
         return copy(status = TaskStatus.DONE)
+    }
+
+    /**
+     * The status to which this task can be changed to.
+     */
+    fun getAvailableStatus() = when (status) {
+        TaskStatus.OPEN -> listOf(TaskStatus.BLOCKED, TaskStatus.DONE)
+        TaskStatus.BLOCKED -> listOf(TaskStatus.OPEN, TaskStatus.DONE)
+        TaskStatus.DONE -> listOf(TaskStatus.OPEN)
     }
 
     companion object {

@@ -1,9 +1,11 @@
 @import ch.chrigu.gmf.givemefeatures.tasks.TaskLinkedItem
-@import ch.chrigu.gmf.givemefeatures.tasks.Task
+@import ch.chrigu.gmf.givemefeatures.tasks.web.ui.TaskDetails
+@import org.springframework.security.web.server.csrf.CsrfToken
 
-@param task: Task
+@param task: TaskDetails
 @param items : List<TaskLinkedItem<*>>
 @param error: String?
+@param csrf: CsrfToken
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +18,7 @@
     <link rel="stylesheet" href="/styles.css"/>
 </head>
 <body hx-ext="response-targets" hx-target-error="#error" hx-swap="none">
-@template.blocks.task(task = task)
+@template.blocks.task(task = task, csrf = csrf)
 <div class="card">
     <h2>Linked Features</h2>
     <ul class="list">
