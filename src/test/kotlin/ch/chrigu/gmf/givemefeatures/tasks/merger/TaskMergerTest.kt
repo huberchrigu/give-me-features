@@ -1,6 +1,7 @@
 package ch.chrigu.gmf.givemefeatures.tasks.merger
 
 import ch.chrigu.gmf.givemefeatures.shared.Html
+import ch.chrigu.gmf.givemefeatures.shared.history.AbstractMerger
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 import org.assertj.core.api.Assertions.assertThat
@@ -19,7 +20,7 @@ class TaskMergerTest {
         val base = Task(TaskId("1"), "Name", Html("description"), version = 1)
         val testee = TaskMerger(base, base.copy(description = Html(newVersionDescription)), base.copy(description = Html(persistedNewVersionDescription), version = 2))
         if (expectedDescription == null) {
-            assertThrows<TaskMerger.MergeFailedException> { testee.merge() }
+            assertThrows<AbstractMerger.MergeFailedException> { testee.merge() }
         } else {
             assertThat(testee.merge().description.toString()).isEqualTo(expectedDescription)
         }

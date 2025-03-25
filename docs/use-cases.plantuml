@@ -19,7 +19,7 @@ package Features {
 package Tasks {
 (Creating a task) as NewTask #yellow
 (Adding progress to a task) as Progress
-(Marking a task as blocked) as Blocked #orange
+(Marking a task as blocked) as Blocked #yellow
 (Tackling blocking issues) as Tackling
 (Collaborating on a task) as CollabTask
 }

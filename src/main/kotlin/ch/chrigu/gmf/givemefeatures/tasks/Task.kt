@@ -1,49 +1,34 @@
 package ch.chrigu.gmf.givemefeatures.tasks
 
 import ch.chrigu.gmf.givemefeatures.shared.Html
+import ch.chrigu.gmf.givemefeatures.shared.history.WithHistory
+import ch.chrigu.gmf.givemefeatures.tasks.history.TaskSnapshot
 import ch.chrigu.gmf.givemefeatures.tasks.merger.TaskMerger
 import org.springframework.data.annotation.Version
 
 data class Task(
-    val id: TaskId? = null, val name: String, val description: Html = Html(""),
-    val status: TaskStatus = TaskStatus.OPEN, @field:Version val version: Int? = null
-) {
+    override val id: TaskId? = null, val name: String, val description: Html = Html(""),
+    val status: TaskStatus = TaskStatus.OPEN, @field:Version override val version: Long? = null, override val history: List<TaskSnapshot> = emptyList()
+) : WithHistory<TaskSnapshot, Task, TaskId> {
 
     fun update(update: TaskUpdate): Task {
         check(id != null && version != null) { "ID and version should already be set" }
         return update.apply(this)
     }
 
-    /**
-     * Use it like this:
-     * ```
-     * taskRepository.findById(id).mergeWith(newVersion)
-     * ```
-     * Then, if the repository version has the same version number as `newVersion`, keep the `newVersion`.
-     * Otherwise, try to merge them based on retrieved version for version number `newVersion.version`.
-     */
-    fun mergeWith(newVersion: Task, retrieveVersion: (Int) -> Task): Task {
-        val oldVersion = this
-        require(newVersion.version != null && oldVersion.version != null) { "Can only merge versioned tasks" }
-        require(newVersion.version <= oldVersion.version) { "New version $newVersion should be equal or smaller than older version $oldVersion.version" }
-        if (newVersion.version == oldVersion.version) return newVersion
-        val base = retrieveVersion(newVersion.version)
-        return TaskMerger(base, newVersion, oldVersion).merge()
-    }
-
     fun block(): Task {
         check(getAvailableStatus().contains(TaskStatus.BLOCKED)) { "Only open task can be blocked" }
-        return copy(status = TaskStatus.BLOCKED)
+        return newVersion(copy(status = TaskStatus.BLOCKED))
     }
 
     fun reopen(): Task {
         check(getAvailableStatus().contains(TaskStatus.OPEN)) { "Task is already open" }
-        return copy(status = TaskStatus.OPEN)
+        return newVersion(copy(status = TaskStatus.OPEN))
     }
 
     fun close(): Task {
         check(getAvailableStatus().contains(TaskStatus.DONE)) { "Task is already closed" }
-        return copy(status = TaskStatus.DONE)
+        return newVersion(copy(status = TaskStatus.DONE))
     }
 
     /**
@@ -55,12 +40,16 @@ data class Task(
         TaskStatus.DONE -> listOf(TaskStatus.OPEN)
     }
 
+    override fun toSnapshot() = TaskSnapshot(name, description, status, version!!)
+    override fun withHistory(history: List<TaskSnapshot>) = copy(history = history)
+    override fun getMerger(base: Task, newVersion: Task, oldVersion: Task) = TaskMerger(base, newVersion, oldVersion)
+
     companion object {
         fun describeNewTask(name: String) = Task(name = name)
     }
 
     data class TaskUpdate(val name: String, val description: Html) {
-        fun apply(task: Task) = task.copy(name = name, description = description)
+        fun apply(task: Task) = task.newVersion(task.copy(name = name, description = description))
     }
 }
 

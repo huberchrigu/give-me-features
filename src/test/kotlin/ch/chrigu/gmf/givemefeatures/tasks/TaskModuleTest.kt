@@ -4,7 +4,6 @@ import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
 import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.tasks.repository.TaskRepository
 import com.ninjasquad.springmockk.MockkBean
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.toList
@@ -13,7 +12,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.context.annotation.Import
-import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.modulith.test.ApplicationModuleTest
 
 @ApplicationModuleTest
@@ -51,26 +49,15 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
     }
 
     /**
-     * There are three possible results:
-     * 1. Updates are done one after the other -> both changes there
-     * 2. [OptimisticLockingException] for one update -> other change worked
-     * 3. Other way around
+     * There should never be an optimistic locking exception.
      */
     @Test
     fun `should not merge tasks`() = runTest {
         val task = taskRepository.save(Task.describeNewTask("test"))
-        val askUpdate1 = execAsync { taskService.updateTask(task.id!!, Task.TaskUpdate("new task", Html("new description"))) }
-        val askUpdate2 = execAsync { taskService.blockTask(task.id!!) }
-        val result = awaitAll(askUpdate1, askUpdate2)
-        if (result.none { it is OptimisticLockingFailureException }) {
-            assertThat(taskRepository.findById(task.id!!.toString())).isEqualTo(Task(task.id, "new task", Html("new description"), TaskStatus.BLOCKED, 2))
-        } else {
-            assertThat(taskRepository.findById(task.id!!.toString()))
-                .satisfiesAnyOf(
-                    { assertThat(it).isEqualTo(Task(task.id, "new task", Html("new description"), version = 1)) },
-                    { assertThat(it).isEqualTo(Task(task.id, "test", status = TaskStatus.BLOCKED, version = 1)) }
-                )
-        }
+        val askUpdate1 = async { taskService.updateTask(task.id!!, Task.TaskUpdate("new task", Html("new description"))) }
+        val askUpdate2 = async { taskService.blockTask(task.id!!) }
+        awaitAll(askUpdate1, askUpdate2)
+        assertThat(taskRepository.findById(task.id!!.toString())).isEqualTo(Task(task.id, "new task", Html("new description"), TaskStatus.BLOCKED, 2))
     }
 
     @Test
@@ -81,13 +68,5 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
         val reopened = taskService.reopenTask(task.id!!)
         assertThat(reopened.status).isEqualTo(TaskStatus.OPEN)
         assertThat(taskService.closeTask(task.id!!).status).isEqualTo(TaskStatus.DONE)
-    }
-
-    private fun CoroutineScope.execAsync(block: suspend () -> Unit) = async {
-        try {
-            block()
-        } catch (e: OptimisticLockingFailureException) {
-            e
-        }
     }
 }
