@@ -1,15 +1,16 @@
 package ch.chrigu.gmf.givemefeatures.tasks
 
 import ch.chrigu.gmf.givemefeatures.shared.Html
-import ch.chrigu.gmf.givemefeatures.shared.history.WithHistory
+import ch.chrigu.gmf.givemefeatures.shared.history.History
+import ch.chrigu.gmf.givemefeatures.shared.history.Mergeable
 import ch.chrigu.gmf.givemefeatures.tasks.history.TaskSnapshot
 import ch.chrigu.gmf.givemefeatures.tasks.merger.TaskMerger
 import org.springframework.data.annotation.Version
 
 data class Task(
     override val id: TaskId? = null, val name: String, val description: Html = Html(""),
-    val status: TaskStatus = TaskStatus.OPEN, @field:Version override val version: Long? = null, override val history: List<TaskSnapshot> = emptyList()
-) : WithHistory<TaskSnapshot, Task, TaskId> {
+    val status: TaskStatus = TaskStatus.OPEN, @field:Version override val version: Long? = null, override val history: History<TaskSnapshot> = History()
+) : Mergeable<TaskSnapshot, Task, TaskId> {
 
     fun update(update: TaskUpdate): Task {
         check(id != null && version != null) { "ID and version should already be set" }
@@ -40,8 +41,9 @@ data class Task(
         TaskStatus.DONE -> listOf(TaskStatus.OPEN)
     }
 
-    override fun toSnapshot() = TaskSnapshot(name, description, status, version!!)
-    override fun withHistory(history: List<TaskSnapshot>) = copy(history = history)
+    override val current get() = TaskSnapshot(name, description, status, version!!)
+    override fun withSnapshot(snapshot: TaskSnapshot) = Task(id, snapshot.name, snapshot.description, snapshot.status, snapshot.version, history)
+    override fun withHistory(history: History<TaskSnapshot>) = copy(history = history)
     override fun getMerger(base: Task, newVersion: Task, oldVersion: Task) = TaskMerger(base, newVersion, oldVersion)
 
     companion object {

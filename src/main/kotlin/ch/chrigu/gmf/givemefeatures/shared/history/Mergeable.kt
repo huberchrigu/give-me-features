@@ -1,18 +1,8 @@
 package ch.chrigu.gmf.givemefeatures.shared.history
 
-interface WithHistory<S : Snapshot<S, T, ID>, T : WithHistory<S, T, ID>, ID> {
-    val id: ID?
-    val version: Long?
-    val history: List<S>
-    fun toSnapshot(): S
-    fun withHistory(history: List<S>): T
-    fun getMerger(base: T, newVersion: T, oldVersion: T): AbstractMerger<T, ID>
+interface Mergeable<S : Snapshot<S>, T : Mergeable<S, T, ID>, ID> : Versionable<S, T, ID> {
+    fun getMerger(base: T, newVersion: T, oldVersion: T): AbstractMerger<S, T, ID>
 
-    fun getSnapshot(version: Long) = history.first { it.version == version }
-
-    fun revertTo(snapshot: S) = snapshot.revertFrom(id!!, history.dropWhile { it.version >= snapshot.version })
-
-    fun newVersion(newVersion: T) = newVersion.withHistory(appendCurrentToHistory())
 
     /**
      * Use it like this:
@@ -31,10 +21,5 @@ interface WithHistory<S : Snapshot<S, T, ID>, T : WithHistory<S, T, ID>, ID> {
         return getMerger(revertTo(base), newVersion, oldVersion).merge()
     }
 
-    private fun appendCurrentToHistory() = listOf(toSnapshot()) + history
-}
-
-interface Snapshot<S : Snapshot<S, T, ID>, T, ID> {
-    val version: Long
-    fun revertFrom(id: ID, history: List<S>): T
+    private fun revertTo(snapshot: S) = withSnapshot(snapshot).withHistory(history.before(snapshot.version))
 }

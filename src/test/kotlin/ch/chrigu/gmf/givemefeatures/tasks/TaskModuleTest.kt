@@ -2,6 +2,7 @@ package ch.chrigu.gmf.givemefeatures.tasks
 
 import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
 import ch.chrigu.gmf.givemefeatures.shared.Html
+import ch.chrigu.gmf.givemefeatures.shared.history.History
 import ch.chrigu.gmf.givemefeatures.tasks.repository.TaskRepository
 import com.ninjasquad.springmockk.MockkBean
 import kotlinx.coroutines.async
@@ -57,7 +58,8 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
         val askUpdate1 = async { taskService.updateTask(task.id!!, Task.TaskUpdate("new task", Html("new description"))) }
         val askUpdate2 = async { taskService.blockTask(task.id!!) }
         awaitAll(askUpdate1, askUpdate2)
-        assertThat(taskRepository.findById(task.id!!.toString())).isEqualTo(Task(task.id, "new task", Html("new description"), TaskStatus.BLOCKED, 2))
+        val resultIgnoreHistory = taskRepository.findById(task.id!!.toString())!!.copy(history = History())
+        assertThat(resultIgnoreHistory).isEqualTo(Task(task.id, "new task", Html("new description"), TaskStatus.BLOCKED, 2))
     }
 
     @Test

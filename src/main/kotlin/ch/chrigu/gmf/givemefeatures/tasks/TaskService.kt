@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.stereotype.Service
 
-// TODO: UI should provide version upon which the change is for. So we could throw error if change is not mergeable.
+// TODO: UI should provide version upon which the change is for. So we could throw error if change is not mergeable. Same for feature.
 @Service
 class TaskService(private val taskRepository: TaskRepository, private val linkedItemProvider: LinkedItemProvider) {
     fun resolve(tasks: List<TaskId>) = taskRepository.findAllById(tasks.map { it.toString() })

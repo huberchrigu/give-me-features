@@ -1,0 +1,15 @@
+@startuml
+interface AggregateRoot<S, ID>
+class History<S>
+interface Snapshot
+
+AggregateRoot --> History
+History --> Snapshot
+AggregateRoot --|> Snapshot
+
+class Feature
+class FeatureSnapshot
+
+Feature --|> AggregateRoot
+FeatureSnapshot --|> Snapshot
+@enduml
