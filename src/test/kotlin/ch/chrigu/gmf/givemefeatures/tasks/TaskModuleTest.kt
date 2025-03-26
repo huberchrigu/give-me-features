@@ -53,7 +53,7 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
      * There should never be an optimistic locking exception.
      */
     @Test
-    fun `should not merge tasks`() = runTest {
+    fun `should merge tasks`() = runTest {
         val task = taskRepository.save(Task.describeNewTask("test"))
         val askUpdate1 = async { taskService.updateTask(task.id!!, Task.TaskUpdate("new task", Html("new description"))) }
         val askUpdate2 = async { taskService.blockTask(task.id!!) }
