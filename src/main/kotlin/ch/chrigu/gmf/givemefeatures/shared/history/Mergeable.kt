@@ -20,6 +20,4 @@ interface Mergeable<S : Snapshot<S>, T : Mergeable<S, T, ID>, ID> : Versionable<
         val base = getSnapshot(newVersion.version!!)
         return getMerger(revertTo(base), newVersion, oldVersion).merge()
     }
-
-    private fun revertTo(snapshot: S) = withSnapshot(snapshot).withHistory(history.before(snapshot.version))
 }

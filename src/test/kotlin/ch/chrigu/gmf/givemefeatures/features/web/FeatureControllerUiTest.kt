@@ -88,7 +88,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
 
     private fun withNewFeature() {
         val expectedFeature = Feature.describeNewFeature(featureName, featureDescription)
-        val expectedFeatureWithId = expectedFeature.copy(id = featureId)
+        val expectedFeatureWithId = expectedFeature.copy(id = featureId, version = 0)
         every { featureService.getFeatures() }.returnsMany(emptyFlow(), flowOf(expectedFeatureWithId))
         coEvery { featureService.newFeature(expectedFeature) } returns expectedFeatureWithId
         every { taskService.resolve(emptyList()) } returns emptyFlow()
@@ -97,12 +97,12 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     private fun withTask(feature: Feature) {
         val task = Task.describeNewTask(taskName)
         val featureWithTask = feature.copy(tasks = listOf(taskId))
-        coEvery { featureService.addTask(featureId, task) } returns featureWithTask
+        coEvery { featureService.addTask(featureId, 0, task) } returns featureWithTask
         every { taskService.resolve(listOf(taskId)) } returns flowOf(task.copy(id = taskId))
     }
 
     private fun withFeature(): Feature {
-        val feature = Feature(featureId, featureName, featureDescription, emptyList())
+        val feature = Feature(featureId, featureName, featureDescription, emptyList(), 0)
         every { featureService.getFeatures() } returns flowOf(feature)
         coEvery { featureService.getFeature(featureId) } returns feature
         every { taskService.resolve(emptyList()) } returns emptyFlow()

@@ -16,15 +16,15 @@ class TestDataGeneratorConfiguration {
     fun testDataGenerator(featureService: FeatureService) = ApplicationRunner {
         runBlocking {
             if (featureService.getFeatures().toList().isEmpty()) {
-                val feature = featureService.newFeature(
+                featureService.newFeature(
                     Feature.describeNewFeature(
                         "Task status shall be changeable to blocked",
                         Html("A user can set a task in status <b>open</b> to status <b>blocked</b>")
                     )
                 )
-                featureService.addTask(feature.id!!, Task.describeNewTask("Extend domain model"))
-                featureService.addTask(feature.id!!, Task.describeNewTask("Extend api"))
-                featureService.addTask(feature.id!!, Task.describeNewTask("Add controller method and ui extension"))
+                    .let { featureService.addTask(it.id!!, it.version!!, Task.describeNewTask("Extend domain model"))!! }
+                    .let { featureService.addTask(it.id!!, it.version!!, Task.describeNewTask("Extend api"))!! }
+                    .let { featureService.addTask(it.id!!, it.version!!, Task.describeNewTask("Add controller method and ui extension")) }
             }
         }
     }

@@ -25,7 +25,7 @@ class TaskControllerWebTest(private val webTestClient: WebTestClient, @MockitoBe
     @Test
     fun `should return client-friendly 400 error`() {
         webTestClient.mutateWith(csrf())
-            .put().uri("/tasks/123/status")
+            .put().uri("/tasks/123/status?version=0")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .header(HttpHeaders.ACCEPT_LANGUAGE, "en")
             .header(Hx.HEADER_NAME, "true")

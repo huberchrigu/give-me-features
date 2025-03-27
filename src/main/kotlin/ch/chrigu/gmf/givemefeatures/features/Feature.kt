@@ -6,15 +6,16 @@ import ch.chrigu.gmf.givemefeatures.shared.history.History
 import ch.chrigu.gmf.givemefeatures.shared.history.Mergeable
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
+import org.springframework.data.annotation.Version
 
 data class Feature(
     override val id: FeatureId?, val name: String, val description: Html, val tasks: List<TaskId>,
-    override val version: Long? = null, override val history: History<FeatureSnapshot> = History()
+    @field:Version override val version: Long? = null, override val history: History<FeatureSnapshot> = History()
 ) : Mergeable<FeatureSnapshot, Feature, FeatureId> {
-    fun planNewTask(task: Task) = copy(tasks = tasks + task.id!!)
+    fun planNewTask(task: Task) = newVersion(copy(tasks = tasks + task.id!!))
 
     override fun withSnapshot(snapshot: FeatureSnapshot) = Feature(id, snapshot.name, snapshot.description, snapshot.tasks, snapshot.version, history)
-    override val current get() = FeatureSnapshot(name, description, tasks, version!!)
+    override fun getCurrent() = FeatureSnapshot(name, description, tasks, version!!)
     override fun withHistory(history: History<FeatureSnapshot>) = copy(history = history)
     override fun getMerger(base: Feature, newVersion: Feature, oldVersion: Feature) = FeatureMerger(base, newVersion, oldVersion)
 

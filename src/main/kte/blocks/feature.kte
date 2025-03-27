@@ -16,7 +16,7 @@
                 @endfor
             </ul>
             <h3>Add task</h3>
-            <form hx-post="/features/${feature.id?.toString()}/tasks">
+            <form hx-post="/features/${feature.id?.toString()}/tasks?version=${feature.version}">
                 <label for="taskName">Name: </label>
                 <input class="form-input" type="text" name="name" id="taskName"/>
                 <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>

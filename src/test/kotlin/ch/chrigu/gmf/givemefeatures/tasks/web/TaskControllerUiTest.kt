@@ -58,7 +58,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     @Test
     fun `should change status`() {
         withTask()
-        coEvery { taskService.blockTask(taskId) } returns Task(taskId, name, descriptionHtml, TaskStatus.BLOCKED)
+        coEvery { taskService.blockTask(taskId, 0) } returns Task(taskId, name, descriptionHtml, TaskStatus.BLOCKED, version = 1)
 
         openTaskPage {
             assertTask()
@@ -168,11 +168,11 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun withUpdate() {
-        coEvery { taskService.updateTask(taskId, Task.TaskUpdate(newName, newDescriptionHtml)) } returns Task(taskId, newName, newDescriptionHtml)
+        coEvery { taskService.updateTask(taskId, 0, Task.TaskUpdate(newName, newDescriptionHtml)) } returns Task(taskId, newName, newDescriptionHtml, version = 1)
     }
 
     private fun withTask() {
-        coEvery { taskService.getTask(taskId) } returns Task(taskId, name, descriptionHtml)
+        coEvery { taskService.getTask(taskId) } returns Task(taskId, name, descriptionHtml, version = 0)
         every { taskService.getLinkedItems(taskId) } returns flowOf(TaskLinkedItem(featureId, featureName))
     }
 

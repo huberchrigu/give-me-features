@@ -28,7 +28,7 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
         val task = taskRepository.save(Task.describeNewTask("task"))
         val id = task.id!!
         val newDescription = Html("new description")
-        taskService.updateTask(id, Task.TaskUpdate("task", newDescription))
+        taskService.updateTask(id, 0, Task.TaskUpdate("task", newDescription))
         assertThat(taskRepository.findById(id.toString())?.description).isEqualTo(newDescription)
     }
 
@@ -55,8 +55,8 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
     @Test
     fun `should merge tasks`() = runTest {
         val task = taskRepository.save(Task.describeNewTask("test"))
-        val askUpdate1 = async { taskService.updateTask(task.id!!, Task.TaskUpdate("new task", Html("new description"))) }
-        val askUpdate2 = async { taskService.blockTask(task.id!!) }
+        val askUpdate1 = async { taskService.updateTask(task.id!!, 0, Task.TaskUpdate("new task", Html("new description"))) }
+        val askUpdate2 = async { taskService.blockTask(task.id!!, 0) }
         awaitAll(askUpdate1, askUpdate2)
         val resultIgnoreHistory = taskRepository.findById(task.id!!.toString())!!.copy(history = History())
         assertThat(resultIgnoreHistory).isEqualTo(Task(task.id, "new task", Html("new description"), TaskStatus.BLOCKED, 2))
@@ -65,10 +65,10 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
     @Test
     fun `should block, reopen and close task`() = runTest {
         val task = taskRepository.save(Task.describeNewTask("test"))
-        val blocked = taskService.blockTask(task.id!!)
+        val blocked = taskService.blockTask(task.id!!, task.version!!)
         assertThat(blocked.status).isEqualTo(TaskStatus.BLOCKED)
-        val reopened = taskService.reopenTask(task.id!!)
+        val reopened = taskService.reopenTask(blocked.id!!, blocked.version!!)
         assertThat(reopened.status).isEqualTo(TaskStatus.OPEN)
-        assertThat(taskService.closeTask(task.id!!).status).isEqualTo(TaskStatus.DONE)
+        assertThat(taskService.closeTask(reopened.id!!, reopened.version!!).status).isEqualTo(TaskStatus.DONE)
     }
 }

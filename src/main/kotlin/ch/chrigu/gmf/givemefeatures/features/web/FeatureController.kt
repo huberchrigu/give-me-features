@@ -34,20 +34,20 @@ class FeatureController(private val featureService: FeatureService, private val 
 
     @PostMapping("/{id}/tasks", headers = [Hx.HEADER])
     @ResponseStatus(HttpStatus.CREATED)
-    suspend fun addTaskToFeature(@PathVariable id: FeatureId, @Valid newTaskBody: NewTaskBody): Rendering {
-        val feature = featureService.addTask(id, newTaskBody.toTask()) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    suspend fun addTaskToFeature(@PathVariable id: FeatureId, @RequestParam version: Long, @Valid newTaskBody: NewTaskBody): Rendering {
+        val feature = featureService.addTask(id, version, newTaskBody.toTask()) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         return updateForFeature(feature)
     }
 
     @GetMapping("/{id}", headers = [Hx.HEADER])
     suspend fun getFeature(@PathVariable id: FeatureId): Rendering {
-        val feature = featureService.getFeature(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val feature = featureService.getFeature(id)
         return updateForFeature(feature)
     }
 
     @GetMapping("/{id}")
     suspend fun getFeaturePage(@PathVariable id: FeatureId): Rendering {
-        val feature = featureService.getFeature(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val feature = featureService.getFeature(id)
         return Rendering.view("features")
             .withFeatures(feature.id)
             .modelAttribute("feature", feature.asDetailView(taskService))
@@ -59,8 +59,9 @@ class FeatureController(private val featureService: FeatureService, private val 
         .modelAttribute("feature", feature.asDetailView(taskService))
         .build()
 
-    private fun Rendering.Builder<*>.withFeatures(current: FeatureId?) = modelAttribute("features", featureService.getFeatures()
-        .map { it.asListItem(current) })
+    private fun Rendering.Builder<*>.withFeatures(current: FeatureId?) = modelAttribute(
+        "features", featureService.getFeatures()
+            .map { it.asListItem(current) })
 
     class NewFeatureBody(@field:NotEmpty private val name: String?, @field:NotEmpty private val description: String?) {
         fun toFeature() = Feature.describeNewFeature(name!!, Html(description!!))

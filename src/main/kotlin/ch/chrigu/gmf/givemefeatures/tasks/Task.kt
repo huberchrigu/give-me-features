@@ -41,7 +41,7 @@ data class Task(
         TaskStatus.DONE -> listOf(TaskStatus.OPEN)
     }
 
-    override val current get() = TaskSnapshot(name, description, status, version!!)
+    override fun getCurrent() = TaskSnapshot(name, description, status, version!!)
     override fun withSnapshot(snapshot: TaskSnapshot) = Task(id, snapshot.name, snapshot.description, snapshot.status, snapshot.version, history)
     override fun withHistory(history: History<TaskSnapshot>) = copy(history = history)
     override fun getMerger(base: Task, newVersion: Task, oldVersion: Task) = TaskMerger(base, newVersion, oldVersion)

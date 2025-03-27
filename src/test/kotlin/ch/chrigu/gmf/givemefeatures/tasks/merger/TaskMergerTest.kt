@@ -28,5 +28,5 @@ class TaskMergerTest {
     }
 
     private fun change(base: Task, newVersionDescription: String, version: Long = base.version!!) =
-        base.copy(description = Html(newVersionDescription), history = History(base.current), version = version)
+        base.copy(description = Html(newVersionDescription), history = History(base.getCurrent()), version = version)
 }
