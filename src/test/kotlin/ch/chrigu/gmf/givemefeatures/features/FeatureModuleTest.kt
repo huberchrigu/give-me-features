@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.context.annotation.Import
 import org.springframework.modulith.test.ApplicationModuleTest
 
@@ -50,12 +51,12 @@ class FeatureModuleTest(
         assertThat(result!!.tasks).hasSize(1)
         coVerify { taskService.newTask(task) }
 
-        assertThat(featureService.addTask(FeatureId("0"), 0, task)).isNull()
+        assertThrows<FeatureNotFoundException> { featureService.addTask(FeatureId("0"), 0, task) }
     }
 
     @Test
     fun `should get a feature by id`() = runTest {
-        assertThat(featureService.getFeature(FeatureId("0"))).isNull()
+        assertThrows<FeatureNotFoundException> { assertThat(featureService.getFeature(FeatureId("0"))) }
         assertThat(featureService.getFeature(FeatureId("1"))).isNotNull()
     }
 
@@ -67,7 +68,7 @@ class FeatureModuleTest(
     @Test
     fun `should find linked items`() = runTest {
         val taskId = TaskId("123")
-        featureService.newFeature(Feature(id, name, description, listOf(taskId)))
+        featureService.newFeature(Feature(id, name, description, listOf(taskId), version = 0))
         assertThat(featureProviderService.getFor(taskId).toList()).containsExactly(TaskLinkedItem(id, name))
     }
 }
