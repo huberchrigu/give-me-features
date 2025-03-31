@@ -1,12 +1,9 @@
 package ch.chrigu.gmf.givemefeatures.features
 
 import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
-import ch.chrigu.gmf.givemefeatures.features.repository.FeatureRepository
+import ch.chrigu.gmf.givemefeatures.features.repository.mongo.CoroutineFeatureRepository
 import ch.chrigu.gmf.givemefeatures.shared.Html
-import ch.chrigu.gmf.givemefeatures.tasks.Task
-import ch.chrigu.gmf.givemefeatures.tasks.TaskId
-import ch.chrigu.gmf.givemefeatures.tasks.TaskLinkedItem
-import ch.chrigu.gmf.givemefeatures.tasks.TaskService
+import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -23,7 +20,7 @@ import org.springframework.modulith.test.ApplicationModuleTest
 @Import(TestcontainersConfiguration::class)
 class FeatureModuleTest(
     private val featureService: FeatureService, private val featureProviderService: FeatureProviderService,
-    private val featureRepository: FeatureRepository, @MockkBean private val taskService: TaskService
+    private val featureRepository: CoroutineFeatureRepository, @MockkBean private val taskService: TaskService
 ) {
     private val id = FeatureId("1")
     private val name = "name"
@@ -32,7 +29,7 @@ class FeatureModuleTest(
     @BeforeEach
     fun resetDb() = runTest {
         featureRepository.deleteAll()
-        featureRepository.save(Feature(id, name, description, emptyList()))
+        featureRepository.save(Feature(id, name, description, emptyList(), 0))
     }
 
     @Test
@@ -46,7 +43,7 @@ class FeatureModuleTest(
     @Test
     fun `should add a task to a feature`() = runTest {
         val task = Task.describeNewTask("Task name")
-        coEvery { taskService.newTask(task) } returns task.copy(id = TaskId("1"), version = 0)
+        coEvery { taskService.newTask(task) } returns Task(TaskId("1"), 0, "Task name", Html(""), TaskStatus.OPEN)
         val result = featureService.addTask(id, 0, task)
         assertThat(result!!.tasks).hasSize(1)
         coVerify { taskService.newTask(task) }

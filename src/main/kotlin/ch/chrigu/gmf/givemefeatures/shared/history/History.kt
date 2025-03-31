@@ -1,26 +1,23 @@
 package ch.chrigu.gmf.givemefeatures.shared.history
 
+import ch.chrigu.gmf.givemefeatures.shared.AggregateRoot
+import org.springframework.data.annotation.Version
 import java.util.*
 
-data class History<S : Snapshot<S>>(private val snapshots: SortedMap<Long, S> = sortedMapOf()) {
-    constructor(vararg snapshots: S) : this(TreeMap(snapshots.associateBy { it.version }))
+data class History<T : AggregateRoot<ID>, ID>(private val id: ID?, @field:Version private val version: Long?, private val snapshots: SortedMap<Long, T> = sortedMapOf()) {
+    constructor(vararg snapshots: T) : this(null, null, TreeMap(snapshots.associateBy { it.version }))
 
     init {
         if (snapshots.isNotEmpty()) {
             require(snapshots.keys == (0L..<snapshots.size).toSet()) { "Expected keys from 0 to ${snapshots.size - 1}, but has ${snapshots.keys}" }
+            val ids = snapshots.values.map { it.id }
+            require(ids.size == ids.distinct().size)
         }
     }
 
-    fun before(version: Long) = History(snapshots.headMap(version))
-    fun add(snapshot: S) = History(TreeMap(snapshots + (snapshot.version to snapshot)))
+    fun add(snapshot: T) = copy(snapshots = TreeMap(snapshots + (snapshot.version to snapshot)))
     operator fun get(version: Long) = snapshots[version] ?: throw IllegalArgumentException("No version $version available")
-    fun mergeWith(history: History<S>, commonVersions: History<S>): History<S> {
-        val newSnapshots: Map<Long, S> = history.snapshots - commonVersions.snapshots.keys
-        if (newSnapshots.isEmpty()) return this
-        val latestVersion = snapshots.lastKey()
-        val keyModifier: Long = latestVersion + 1L - newSnapshots.keys.first()
-        return add(newSnapshots.map { entry -> entry.value.withVersion(entry.key + keyModifier) })
-    }
+    fun find(version: Long) = snapshots[version]
 
-    fun add(snapshot: List<S>) = History(TreeMap(snapshots + snapshot.associateBy { it.version }))
+    fun add(snapshot: List<T>) = copy(snapshots = TreeMap(snapshots + snapshot.associateBy { it.version }))
 }

@@ -3,11 +3,13 @@ package ch.chrigu.gmf.givemefeatures.features.web
 import ch.chrigu.gmf.givemefeatures.features.Feature
 import ch.chrigu.gmf.givemefeatures.features.FeatureId
 import ch.chrigu.gmf.givemefeatures.features.FeatureService
+import ch.chrigu.gmf.givemefeatures.features.copy
 import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
+import ch.chrigu.gmf.givemefeatures.tasks.copy
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.options.LoadState
@@ -171,5 +173,4 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         locator("button[type='submit']").click()
         waitForLoadState(LoadState.NETWORKIDLE)
     }
-
 }

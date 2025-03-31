@@ -1,15 +1,48 @@
 @startuml
-interface AggregateRoot<S, ID>
-class History<S>
-interface Snapshot
+package spring {
+  interface CoroutinesRepository<T, ID>
+}
 
-AggregateRoot --> History
-History --> Snapshot
-AggregateRoot --|> Snapshot
+package aggregate {
+  interface AggregateRoot<ID>
+  class AbstractAggregateRoot<ID>
+  AbstractAggregateRoot --|> AggregateRoot : implements
+}
+note bottom of aggregate {
+  Describes an aggregate root with id and version.
+}
 
-class Feature
-class FeatureSnapshot
+package history {
+  class History<T : AggregateRoot>
+  History --> AggregateRoot : manages versions
 
-Feature --|> AggregateRoot
-FeatureSnapshot --|> Snapshot
+  interface HistoryRepository<T : AggregateRoot, ID>
+  HistoryRepository --> History : persists
+  class AbstractHistoryRepository<T : AggregateRoot, ID>
+  AbstractHistoryRepository --|> HistoryRepository : implements
+  AbstractHistoryRepository --> CoroutinesRepository : delegates to
+}
+note bottom of history {
+  Describes and persists the history of an aggregate root.
+}
+
+package features {
+  class Feature
+  note left of Feature {
+    Contains no history/merge logic.
+  }
+  Feature --|> AbstractAggregateRoot : extends
+
+  interface FeatureRepository
+  note left of FeatureRepository {
+    Since an aggregate repository does not extend a Spring Data repository,
+    all custom queries must be translated in its implementation.
+  }
+  FeatureRepository --|> HistoryRepository : implements
+  FeatureRepository --> Feature : persists
+
+  class MongoFeatureRepository
+  MongoFeatureRepository --|> FeatureRepository : implements
+  MongoFeatureRepository --|> AbstractHistoryRepository : extends
+}
 @enduml

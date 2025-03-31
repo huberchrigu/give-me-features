@@ -1,10 +1,7 @@
 package ch.chrigu.gmf.givemefeatures.features.repository
 
 import ch.chrigu.gmf.givemefeatures.features.Feature
-import ch.chrigu.gmf.givemefeatures.tasks.TaskId
-import kotlinx.coroutines.flow.Flow
-import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import ch.chrigu.gmf.givemefeatures.features.FeatureId
+import ch.chrigu.gmf.givemefeatures.shared.history.HistoryRepository
 
-interface FeatureRepository : CoroutineCrudRepository<Feature, String> {
-    fun findByTasksContains(taskId: List<TaskId>): Flow<Feature>
-}
+interface FeatureRepository : HistoryRepository<Feature, FeatureId>

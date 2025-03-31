@@ -10,7 +10,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
-class TaskMergerTest {
+class TaskHistoryMergerTest {
     @ParameterizedTest
     @CsvSource(
         "description, new, new",
