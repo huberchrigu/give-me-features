@@ -6,13 +6,13 @@ import ch.chrigu.gmf.givemefeatures.shared.mongo.transactional
 import kotlinx.coroutines.flow.Flow
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
-import org.springframework.transaction.ReactiveTransactionManager
+import org.springframework.transaction.reactive.TransactionalOperator
 
-abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID : Any>(
+abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID>(
     private val aggregateRepository: CoroutineCrudRepository<T, String>,
     private val historyRepository: CoroutineCrudRepository<History<T, ID>, String>,
     aggregateMerger: AggregateMerger<T, ID>,
-    private val transactionManager: ReactiveTransactionManager
+    private val transactionalOperator: TransactionalOperator
 ) : HistoryRepository<T, ID> {
     private val merger = HistoryMerger(aggregateMerger, ::getVersion)
 
@@ -45,12 +45,12 @@ abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID : Any>(
         return history.find(version)
     }
 
-    override suspend fun deleteAll() = transactionManager.transactional {
+    override suspend fun deleteAll() = transactionalOperator.transactional {
         aggregateRepository.deleteAll()
         historyRepository.deleteAll()
     }
 
-    private suspend fun saveTransactional(aggregate: T): T = transactionManager.transactional {
+    private suspend fun saveTransactional(aggregate: T): T = transactionalOperator.transactional {
         if (!aggregate.isNew()) {
             pushCurrentToHistory(aggregate.id!!)
         }

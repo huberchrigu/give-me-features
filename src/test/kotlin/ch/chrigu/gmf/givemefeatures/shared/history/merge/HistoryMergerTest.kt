@@ -1,42 +1,43 @@
 package ch.chrigu.gmf.givemefeatures.shared.history.merge
 
-import ch.chrigu.gmf.givemefeatures.shared.Html
-import ch.chrigu.gmf.givemefeatures.shared.history.History
-import ch.chrigu.gmf.givemefeatures.tasks.Task
-import ch.chrigu.gmf.givemefeatures.tasks.TaskId
-import ch.chrigu.gmf.givemefeatures.tasks.TaskStatus
-import org.assertj.core.api.Assertions
+import ch.chrigu.gmf.givemefeatures.shared.AbstractAggregateRoot
+import ch.chrigu.gmf.givemefeatures.shared.history.AbstractMerger
+import io.mockk.coEvery
+import kotlinx.coroutines.test.runTest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.mock
 
 class HistoryMergerTest {
-    private val taskId = TaskId("1")
+    private val aggregateId = "1"
     private val originalName = "name"
-    private val newVersion = Task(taskId, 0, "name2", Html("description"), TaskStatus.BLOCKED)
+    private val mergingVersion = DummyAggregate(aggregateId, 0, "name2")
 
-    private val testee = HistoryMerger(aggregateMerger, historyQuery)
+    private val historyQuery = mock<HistoryQuery<DummyAggregate, String>>()
+    private val testee = HistoryMerger(DummyMerger(), historyQuery)
 
     @Test
-    fun `should use new version because version number is the same`() {
+    fun `should use new version because version number is the same`() = runTest {
         val result = mergeWith(0)
-        Assertions.assertThat(result).isEqualTo(newVersion)
+        assertThat(result).isEqualTo(mergingVersion)
     }
-
 
     @Test
-    fun `should merge versions because persisted version number is greater`() {
-        val firstSnapshot = TaskSnapshot(originalName, Html("description"), TaskStatus.OPEN, 0)
-        val result = mergeWith(1, History(firstSnapshot))
-        Assertions.assertThat(result).isEqualTo(
-            Task(
-                taskId, "name2", Html(""), TaskStatus.BLOCKED, 1,
-                History(firstSnapshot, TaskSnapshot(originalName, Html(""), TaskStatus.OPEN, 1L))
-            )
-        )
+    fun `should merge versions because persisted version number is greater`() = runTest {
+        coEvery { historyQuery.getVersion(aggregateId, 0) } returns DummyAggregate(aggregateId, 0, originalName)
+        val result = mergeWith(1)
+        assertThat(result).isEqualTo(DummyAggregate(aggregateId, 1, "name2"))
     }
 
-    private fun mergeWith(persistedVersion: Long, history: History<TaskSnapshot> = History()): Task {
-        val oldVersion = Task(taskId, originalName, version = persistedVersion, history = history)
-        val result = oldVersion.mergeWith(newVersion)
-        return result
+    private suspend fun mergeWith(persistedVersion: Long): DummyAggregate {
+        val currentVersion = DummyAggregate(aggregateId, persistedVersion, originalName)
+        return testee.merge(currentVersion, mergingVersion)
+    }
+
+    class DummyAggregate(id: String, version: Long, val name: String) : AbstractAggregateRoot<String>(id, version)
+    class DummyMerger : AbstractMerger<DummyAggregate, String>() {
+        override fun getMergedAggregate(id: String, version: Long, versions: MergingVersions<DummyAggregate>) = with(versions) {
+            DummyAggregate(id, version, merge { name })
+        }
     }
 }

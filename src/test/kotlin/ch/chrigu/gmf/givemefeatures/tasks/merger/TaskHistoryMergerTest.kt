@@ -2,9 +2,10 @@ package ch.chrigu.gmf.givemefeatures.tasks.merger
 
 import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.shared.history.AbstractMerger
-import ch.chrigu.gmf.givemefeatures.shared.history.History
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
+import ch.chrigu.gmf.givemefeatures.tasks.TaskStatus
+import ch.chrigu.gmf.givemefeatures.tasks.copy
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
@@ -17,16 +18,20 @@ class TaskHistoryMergerTest {
         "new, description, new",
         "new, new,"
     )
-    fun testMerge(newVersionDescription: String, persistedNewVersionDescription: String, expectedDescription: String?) {
-        val base = Task(TaskId("1"), "Name", Html("description"), version = 0)
-        val testee = TaskMerger(base, change(base, newVersionDescription), change(base, persistedNewVersionDescription, version = 1))
+    fun testMerge(mergingDescription: String, currentDescription: String, expectedDescription: String?) {
+        val sharedVersion = Task(TaskId("1"), 0, "Name", Html("description"), TaskStatus.OPEN)
+        val testee = TaskMerger()
+        val mergingVersion = change(sharedVersion, mergingDescription)
+        val currentVersion = change(sharedVersion, currentDescription)
         if (expectedDescription == null) {
-            assertThrows<AbstractMerger.MergeFailedException> { testee.merge() }
+            assertThrows<AbstractMerger.MergeFailedException> { testee.merge(sharedVersion, mergingVersion, currentVersion) }
         } else {
-            assertThat(testee.merge().description.toString()).isEqualTo(expectedDescription)
+            assertThat(testee.merge(sharedVersion, mergingVersion, currentVersion).description.toString()).isEqualTo(
+                expectedDescription
+            )
         }
     }
 
     private fun change(base: Task, newVersionDescription: String, version: Long = base.version!!) =
-        base.copy(description = Html(newVersionDescription), history = History(base.getCurrent()), version = version)
+        base.copy(description = Html(newVersionDescription), version = version)
 }

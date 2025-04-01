@@ -6,25 +6,30 @@ import ch.chrigu.gmf.givemefeatures.shared.Html
 class Task(
     id: TaskId?, version: Long?, val name: String, val description: Html, val status: TaskStatus
 ) : AbstractAggregateRoot<TaskId>(id, version) {
+    init {
+        if (isNew()) {
+            require(status == TaskStatus.OPEN)
+        }
+    }
 
     fun update(update: TaskUpdate): Task {
-        check(id != null && version != null) { "ID and version should already be set" }
+        check(!isNew()) { "ID and version should already be set" }
         return update.apply(this)
     }
 
     fun block(): Task {
         check(getAvailableStatus().contains(TaskStatus.BLOCKED)) { "Only open task can be blocked" }
-        return copy(status = TaskStatus.BLOCKED)
+        return updateState(status = TaskStatus.BLOCKED)
     }
 
     fun reopen(): Task {
         check(getAvailableStatus().contains(TaskStatus.OPEN)) { "Task is already open" }
-        return copy(status = TaskStatus.OPEN)
+        return updateState(status = TaskStatus.OPEN)
     }
 
     fun close(): Task {
         check(getAvailableStatus().contains(TaskStatus.DONE)) { "Task is already closed" }
-        return copy(status = TaskStatus.DONE)
+        return updateState(status = TaskStatus.DONE)
     }
 
     /**
@@ -36,14 +41,14 @@ class Task(
         TaskStatus.DONE -> listOf(TaskStatus.OPEN)
     }
 
-    private fun copy(name: String = this.name, description: Html = this.description, status: TaskStatus = this.status) = Task(id, version, name, description, status)
+    private fun updateState(name: String = this.name, description: Html = this.description, status: TaskStatus = this.status) = Task(id, version, name, description, status)
 
     companion object {
         fun describeNewTask(name: String) = Task(null, null, name, Html(""), TaskStatus.OPEN)
     }
 
     data class TaskUpdate(val name: String, val description: Html) {
-        fun apply(task: Task) = task.copy(name = name, description = description)
+        fun apply(task: Task) = task.updateState(name = name, description = description)
     }
 }
 
