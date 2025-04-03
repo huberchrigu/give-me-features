@@ -62,7 +62,7 @@ abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID>(
     private suspend fun pushCurrentToHistory(id: ID): History<T, ID> {
         val current = aggregateRepository.findById(id.toString())
             ?: throw IllegalStateException("No aggregate found for id $id")
-        val history = historyRepository.findById(id.toString()) ?: History(newId())
+        val history: History<T, ID> = historyRepository.findById(id.toString()) ?: History(newId())
         return historyRepository.save(history.add(current))
     }
 

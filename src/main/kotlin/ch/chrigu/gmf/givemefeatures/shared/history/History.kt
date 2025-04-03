@@ -19,7 +19,7 @@ data class History<T : AggregateRoot<ID>, ID>(
         }
     }
 
-    fun add(snapshot: T) = copy(snapshots = TreeMap(snapshots + (snapshot.version to snapshot)))
+    fun add(snapshot: T): History<T, ID> = copy(snapshots = TreeMap(snapshots + (snapshot.version to snapshot)))
 
     operator fun get(version: Long) =
         snapshots[version] ?: throw IllegalArgumentException("No version $version available")
