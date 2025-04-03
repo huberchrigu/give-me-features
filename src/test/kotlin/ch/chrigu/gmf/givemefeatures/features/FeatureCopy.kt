@@ -4,7 +4,7 @@ import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 
 fun Feature.copy(
-    id: FeatureId? = this.id,
+    id: FeatureId = this.id,
     name: String = this.name,
     description: Html = this.description,
     tasks: List<TaskId> = this.tasks,

@@ -4,8 +4,12 @@ import ch.chrigu.gmf.givemefeatures.shared.AggregateRoot
 import org.springframework.data.annotation.Version
 import java.util.*
 
-data class History<T : AggregateRoot<ID>, ID>(private val id: ID?, @field:Version private val version: Long?, private val snapshots: SortedMap<Long, T> = sortedMapOf()) {
-    constructor(vararg snapshots: T) : this(null, null, TreeMap(snapshots.associateBy { it.version }))
+data class History<T : AggregateRoot<ID>, ID>(
+    private val id: ID,
+    @field:Version private val version: Long?,
+    private val snapshots: SortedMap<Long, T> = sortedMapOf()
+) {
+    constructor(id: ID, vararg snapshots: T) : this(id, null, TreeMap(snapshots.associateBy { it.version }))
 
     init {
         if (snapshots.isNotEmpty()) {
@@ -16,7 +20,10 @@ data class History<T : AggregateRoot<ID>, ID>(private val id: ID?, @field:Versio
     }
 
     fun add(snapshot: T) = copy(snapshots = TreeMap(snapshots + (snapshot.version to snapshot)))
-    operator fun get(version: Long) = snapshots[version] ?: throw IllegalArgumentException("No version $version available")
+
+    operator fun get(version: Long) =
+        snapshots[version] ?: throw IllegalArgumentException("No version $version available")
+
     fun find(version: Long) = snapshots[version]
 
     fun add(snapshot: List<T>) = copy(snapshots = TreeMap(snapshots + snapshot.associateBy { it.version }))

@@ -2,9 +2,10 @@ package ch.chrigu.gmf.givemefeatures.tasks
 
 import ch.chrigu.gmf.givemefeatures.shared.AbstractAggregateRoot
 import ch.chrigu.gmf.givemefeatures.shared.Html
+import java.util.*
 
 class Task(
-    id: TaskId?, version: Long?, val name: String, val description: Html, val status: TaskStatus
+    id: TaskId, version: Long?, val name: String, val description: Html, val status: TaskStatus
 ) : AbstractAggregateRoot<TaskId>(id, version) {
     init {
         if (isNew()) {
@@ -41,10 +42,14 @@ class Task(
         TaskStatus.DONE -> listOf(TaskStatus.OPEN)
     }
 
-    private fun updateState(name: String = this.name, description: Html = this.description, status: TaskStatus = this.status) = Task(id, version, name, description, status)
+    private fun updateState(
+        name: String = this.name,
+        description: Html = this.description,
+        status: TaskStatus = this.status
+    ) = Task(id, version, name, description, status)
 
     companion object {
-        fun describeNewTask(name: String) = Task(null, null, name, Html(""), TaskStatus.OPEN)
+        fun describeNewTask(name: String) = Task(TaskId(), null, name, Html(""), TaskStatus.OPEN)
     }
 
     data class TaskUpdate(val name: String, val description: Html) {
@@ -69,7 +74,6 @@ enum class TaskStatus {
     DONE
 }
 
-@JvmInline
-value class TaskId(private val id: String) {
+data class TaskId(private val id: String = UUID.randomUUID().toString()) {
     override fun toString() = id
 }

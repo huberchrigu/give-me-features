@@ -50,6 +50,8 @@ abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID>(
         historyRepository.deleteAll()
     }
 
+    abstract fun newId(): ID
+
     private suspend fun saveTransactional(aggregate: T): T = transactionalOperator.transactional {
         if (!aggregate.isNew()) {
             pushCurrentToHistory(aggregate.id!!)
@@ -58,12 +60,15 @@ abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID>(
     }
 
     private suspend fun pushCurrentToHistory(id: ID): History<T, ID> {
-        val current = aggregateRepository.findById(id.toString()) ?: throw IllegalStateException("No aggregate found for id $id")
-        val history = historyRepository.findById(id.toString()) ?: History()
+        val current = aggregateRepository.findById(id.toString())
+            ?: throw IllegalStateException("No aggregate found for id $id")
+        val history = historyRepository.findById(id.toString()) ?: History(newId())
         return historyRepository.save(history.add(current))
     }
 
-    private suspend fun getVersion(id: ID, version: Long) = findVersion(id, version) ?: throw VersionNotFoundException(id.toString(), version)
+    private suspend fun getVersion(id: ID, version: Long) =
+        findVersion(id, version) ?: throw VersionNotFoundException(id.toString(), version)
 }
 
-class VersionNotFoundException(id: String, version: Long) : RuntimeException("Version $version in aggregate $id not found in history")
+class VersionNotFoundException(id: String, version: Long) :
+    RuntimeException("Version $version in aggregate $id not found in history")

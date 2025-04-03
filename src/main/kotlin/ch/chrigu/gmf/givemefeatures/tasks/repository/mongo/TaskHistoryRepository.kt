@@ -15,4 +15,13 @@ class TaskHistoryRepository(
     taskRepository: CoroutineCrudRepository<Task, String>,
     taskHistoryRepository: CoroutineCrudRepository<History<Task, TaskId>, String>,
     transactionalOperator: TransactionalOperator
-) : TaskRepository, AbstractHistoryRepository<Task, TaskId>(taskRepository, taskHistoryRepository, TaskMerger(), transactionalOperator)
+) : TaskRepository, AbstractHistoryRepository<Task, TaskId>(
+    taskRepository,
+    taskHistoryRepository,
+    TaskMerger(),
+    transactionalOperator
+) {
+    override fun newId(): TaskId {
+        return TaskId()
+    }
+}

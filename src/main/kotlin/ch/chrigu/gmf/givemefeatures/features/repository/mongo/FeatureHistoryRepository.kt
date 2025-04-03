@@ -13,4 +13,13 @@ class FeatureHistoryRepository(
     featureRepository: CoroutineFeatureRepository,
     historyRepository: CoroutineFeatureHistoryRepository,
     transactionalOperator: TransactionalOperator
-) : FeatureRepository, AbstractHistoryRepository<Feature, FeatureId>(featureRepository, historyRepository, FeatureMerger(), transactionalOperator)
+) : FeatureRepository, AbstractHistoryRepository<Feature, FeatureId>(
+    featureRepository,
+    historyRepository,
+    FeatureMerger(),
+    transactionalOperator
+) {
+    override fun newId(): FeatureId {
+        return FeatureId()
+    }
+}
