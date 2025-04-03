@@ -22,9 +22,15 @@ class TaskHistoryMergerTest {
         val sharedVersion = Task(TaskId("1"), 0, "Name", Html("description"), TaskStatus.OPEN)
         val testee = TaskMerger()
         val mergingVersion = change(sharedVersion, mergingDescription)
-        val currentVersion = change(sharedVersion, currentDescription)
+        val currentVersion = change(sharedVersion, currentDescription, 1)
         if (expectedDescription == null) {
-            assertThrows<AbstractMerger.MergeFailedException> { testee.merge(sharedVersion, mergingVersion, currentVersion) }
+            assertThrows<AbstractMerger.MergeFailedException> {
+                testee.merge(
+                    sharedVersion,
+                    mergingVersion,
+                    currentVersion
+                )
+            }
         } else {
             assertThat(testee.merge(sharedVersion, mergingVersion, currentVersion).description.toString()).isEqualTo(
                 expectedDescription
