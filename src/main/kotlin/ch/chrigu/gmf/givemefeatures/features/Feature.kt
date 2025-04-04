@@ -10,6 +10,26 @@ class Feature(id: FeatureId, val name: String, val description: Html, val tasks:
     AbstractAggregateRoot<FeatureId>(id, version) {
     fun planNewTask(task: Task) = Feature(id, name, description, tasks + task.id, version)
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Feature) return false
+        if (!super.equals(other)) return false
+
+        if (name != other.name) return false
+        if (description != other.description) return false
+        if (tasks != other.tasks) return false
+
+        return super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + description.hashCode()
+        result = 31 * result + tasks.hashCode()
+        return result + 31 * super.hashCode()
+    }
+
     companion object {
         fun describeNewFeature(name: String, description: Html) = Feature(FeatureId(), name, description, emptyList(), null)
     }

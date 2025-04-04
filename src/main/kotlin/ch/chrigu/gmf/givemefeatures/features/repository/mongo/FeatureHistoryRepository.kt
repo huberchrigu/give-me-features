@@ -18,8 +18,4 @@ class FeatureHistoryRepository(
     historyRepository,
     FeatureMerger(),
     transactionalOperator
-) {
-    override fun newId(): FeatureId {
-        return FeatureId()
-    }
-}
+)

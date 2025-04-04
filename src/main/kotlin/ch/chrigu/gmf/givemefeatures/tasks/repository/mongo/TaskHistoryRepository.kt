@@ -20,8 +20,4 @@ class TaskHistoryRepository(
     taskHistoryRepository,
     TaskMerger(),
     transactionalOperator
-) {
-    override fun newId(): TaskId {
-        return TaskId()
-    }
-}
+)

@@ -29,7 +29,7 @@ class FeatureModuleTest(
     @BeforeEach
     fun resetDb() = runTest {
         featureRepository.deleteAll()
-        featureRepository.save(Feature(id, name, description, emptyList(), 0))
+        featureRepository.save(Feature(id, name, description, emptyList(), null))
     }
 
     @Test

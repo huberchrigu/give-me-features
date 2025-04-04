@@ -3,17 +3,17 @@ package ch.chrigu.gmf.givemefeatures.shared.history.merge
 import ch.chrigu.gmf.givemefeatures.shared.AbstractAggregateRoot
 import ch.chrigu.gmf.givemefeatures.shared.history.AbstractMerger
 import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.mock
 
 class HistoryMergerTest {
     private val aggregateId = "1"
     private val originalName = "name"
     private val mergingVersion = DummyAggregate(aggregateId, 0, "name2")
 
-    private val historyQuery = mock<HistoryQuery<DummyAggregate, String>>()
+    private val historyQuery = mockk<HistoryQuery<DummyAggregate, String>>()
     private val testee = HistoryMerger(DummyMerger(), historyQuery)
 
     @Test
