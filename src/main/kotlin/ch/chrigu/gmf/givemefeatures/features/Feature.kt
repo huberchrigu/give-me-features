@@ -19,7 +19,7 @@ class Feature(id: FeatureId, val name: String, val description: Html, val tasks:
         if (description != other.description) return false
         if (tasks != other.tasks) return false
 
-        return super.equals(other)
+        return true
     }
 
     override fun hashCode(): Int {
@@ -27,8 +27,9 @@ class Feature(id: FeatureId, val name: String, val description: Html, val tasks:
         result = 31 * result + name.hashCode()
         result = 31 * result + description.hashCode()
         result = 31 * result + tasks.hashCode()
-        return result + 31 * super.hashCode()
+        return result
     }
+
 
     companion object {
         fun describeNewFeature(name: String, description: Html) = Feature(FeatureId(), name, description, emptyList(), null)

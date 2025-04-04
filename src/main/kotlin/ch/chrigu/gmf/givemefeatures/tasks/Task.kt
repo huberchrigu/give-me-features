@@ -50,22 +50,22 @@ class Task(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Task
+        if (other !is Task) return false
+        if (!super.equals(other)) return false
 
         if (name != other.name) return false
         if (description != other.description) return false
         if (status != other.status) return false
 
-        return super.equals(other)
+        return true
     }
 
     override fun hashCode(): Int {
-        var result = name.hashCode()
+        var result = super.hashCode()
+        result = 31 * result + name.hashCode()
         result = 31 * result + description.hashCode()
         result = 31 * result + status.hashCode()
-        return result + 31 * super.hashCode()
+        return result
     }
 
     companion object {

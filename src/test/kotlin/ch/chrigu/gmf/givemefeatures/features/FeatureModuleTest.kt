@@ -1,7 +1,7 @@
 package ch.chrigu.gmf.givemefeatures.features
 
 import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
-import ch.chrigu.gmf.givemefeatures.features.repository.mongo.CoroutineFeatureRepository
+import ch.chrigu.gmf.givemefeatures.features.repository.FeatureRepository
 import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.ninjasquad.springmockk.MockkBean
@@ -20,7 +20,7 @@ import org.springframework.modulith.test.ApplicationModuleTest
 @Import(TestcontainersConfiguration::class)
 class FeatureModuleTest(
     private val featureService: FeatureService, private val featureProviderService: FeatureProviderService,
-    private val featureRepository: CoroutineFeatureRepository, @MockkBean private val taskService: TaskService
+    private val featureRepository: FeatureRepository, @MockkBean private val taskService: TaskService
 ) {
     private val id = FeatureId("1")
     private val name = "name"

@@ -17,11 +17,10 @@ abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID>(
     private val merger = HistoryMerger(aggregateMerger, ::getVersion)
 
     override suspend fun save(aggregate: T): T {
-        try {
-            return saveTransactional(aggregate)
+        return try {
+            saveTransactional(aggregate)
         } catch (e: OptimisticLockingFailureException) {
-            val merged = merger.merge(aggregateRepository.findById(aggregate.id!!.toString())!!, aggregate)
-            return saveTransactional(merged)
+            handleConflict(aggregate)
         }
     }
 
@@ -48,6 +47,11 @@ abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID>(
     override suspend fun deleteAll() = transactionalOperator.transactional {
         aggregateRepository.deleteAll()
         historyRepository.deleteAll()
+    }
+
+    private suspend fun handleConflict(aggregate: T): T {
+        val merged = merger.merge(aggregateRepository.findById(aggregate.id!!.toString())!!, aggregate)
+        return saveTransactional(merged)
     }
 
     private suspend fun saveTransactional(aggregate: T): T = transactionalOperator.transactional {

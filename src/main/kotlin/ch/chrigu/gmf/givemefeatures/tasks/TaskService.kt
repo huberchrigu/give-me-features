@@ -17,7 +17,7 @@ class TaskService(private val taskRepository: TaskRepository, private val linked
     suspend fun getTask(id: TaskId) = taskRepository.findById(id) ?: throw TaskNotFoundException(id)
     fun getLinkedItems(taskId: TaskId) = linkedItemProvider.getFor(taskId)
 
-    private suspend fun update(id: TaskId, version: Long, applyChange: Task.() -> Task) = taskRepository.findVersion(id, version)?.applyChange() ?: throw TaskNotFoundException(id)
+    private suspend fun update(id: TaskId, version: Long, applyChange: Task.() -> Task) = taskRepository.applyOn(id, version, applyChange) ?: throw TaskNotFoundException(id)
 }
 
 class TaskNotFoundException(id: TaskId) : AggregateNotFoundException("Task $id not found")

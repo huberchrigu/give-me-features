@@ -6,10 +6,7 @@ import ch.chrigu.gmf.givemefeatures.features.FeatureService
 import ch.chrigu.gmf.givemefeatures.features.copy
 import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
-import ch.chrigu.gmf.givemefeatures.tasks.Task
-import ch.chrigu.gmf.givemefeatures.tasks.TaskId
-import ch.chrigu.gmf.givemefeatures.tasks.TaskService
-import ch.chrigu.gmf.givemefeatures.tasks.copy
+import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.options.LoadState
@@ -92,14 +89,14 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         val expectedFeature = Feature.describeNewFeature(featureName, featureDescription)
         val expectedFeatureWithId = expectedFeature.copy(id = featureId, version = 0)
         every { featureService.getFeatures() }.returnsMany(emptyFlow(), flowOf(expectedFeatureWithId))
-        coEvery { featureService.newFeature(expectedFeature) } returns expectedFeatureWithId
+        coEvery { featureService.newFeature(match { expectedFeature.copy(id = it.id) == it }) } returns expectedFeatureWithId
         every { taskService.resolve(emptyList()) } returns emptyFlow()
     }
 
     private fun withTask(feature: Feature) {
         val task = Task.describeNewTask(taskName)
         val featureWithTask = feature.copy(tasks = listOf(taskId))
-        coEvery { featureService.addTask(featureId, 0, task) } returns featureWithTask
+        coEvery { featureService.addTask(featureId, 0L, match { it == Task(it.id, null, taskName, Html(""), TaskStatus.OPEN) }) } returns featureWithTask
         every { taskService.resolve(listOf(taskId)) } returns flowOf(task.copy(id = taskId))
     }
 
