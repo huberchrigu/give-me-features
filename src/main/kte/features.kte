@@ -7,18 +7,11 @@
 @param features: List<FeatureListItem>
 @param csrf: CsrfToken
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Features</title>
-    <script src="/webjars/htmx.org/2.0.3/dist/htmx.min.js"></script>
-    <script src="/webjars/htmx.org/2.0.3/dist/ext/response-targets.js"></script>
+@template.page(title = "Features", head = @`
     <script src="/webjars/tinymce/7.5.1/tinymce.min.js"></script>
     <script src="/script.js"></script>
-    <link rel="stylesheet" href="/styles.css"/>
-</head>
-<body hx-ext="response-targets" hx-target-error="#error" hx-swap="none">
-@template.blocks.features(features = features)
+`, body = @`
+    @template.blocks.features(features = features)
 <div class="card">
     <h2>New Feature</h2>
     <form hx-post="/features">
@@ -26,12 +19,10 @@
         <input class="form-input" type="text" name="name" id="name"/>
         <label for="description">Description: </label>
         <textarea class="form-input" name="description" id="description"></textarea>
-        <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
+            <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
         <button class="btn btn-primary" type="submit">Create</button>
-        <script>initRichtext('#description');</script>
-    </form>
-</div>
-@template.blocks.feature(feature = feature, csrf = csrf)
-@template.blocks.error(error = error)
-</body>
-</html>
+            <script>initRichtext('#description');</script>
+        </form>
+    </div>
+    @template.blocks.feature(feature = feature, csrf = csrf)
+`, error = error)

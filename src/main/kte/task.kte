@@ -7,35 +7,26 @@
 @param error: String?
 @param csrf: CsrfToken
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Task</title>
-    <script src="/webjars/htmx.org/2.0.3/dist/htmx.min.js"></script>
-    <script src="/webjars/htmx.org/2.0.3/dist/ext/response-targets.js"></script>
+@template.page(title = "Task", head = @`
     <script src="/webjars/tinymce/7.5.1/tinymce.min.js"></script>
     <script src="/script.js"></script>
     <script src="/status-update.js"></script>
-    <link rel="stylesheet" href="/styles.css"/>
-</head>
-<body hx-ext="response-targets" hx-target-error="#error" hx-swap="none">
-@template.blocks.task(task = task, csrf = csrf)
-<div class="card">
-    <h2>Linked Features</h2>
-    <ul class="list">
-        @for(item in items)
-            <li class="list-item">
-                <a class="list-link" href="/features/${item.id.toString()}">${item.name}</a>
-            </li>
-        @endfor
-    </ul>
-</div>
-<div class="card">
-    <h2>Actions</h2>
-    <ul class="list">
+`, body = @`
+    @template.blocks.task(task = task, csrf = csrf)
+    <div class="card">
+        <h2>Linked Features</h2>
+        <ul class="list">
+            @for(item in items)
+                <li class="list-item">
+                    <a class="list-link" href="/features/${item.id.toString()}">${item.name}</a>
+                </li>
+            @endfor
+        </ul>
+    </div>
+    <div class="card">
+        <h2>Actions</h2>
+        <ul class="list">
 
-    </ul>
-</div>
-@template.blocks.error(error = error)
-</body>
-</html>
+        </ul>
+    </div>
+`, error = error)
