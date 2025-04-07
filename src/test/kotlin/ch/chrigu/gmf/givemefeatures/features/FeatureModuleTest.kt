@@ -68,4 +68,16 @@ class FeatureModuleTest(
         featureService.newFeature(Feature(id, name, description, listOf(taskId), version = 0))
         assertThat(featureProviderService.getFor(taskId).toList()).containsExactly(TaskLinkedItem(id, name))
     }
+
+    @Test
+    fun `should update feature`() = runTest {
+        val newDescription = Html("<p>updated</p>")
+        val newName = "new name"
+        val result = featureService.updateFeature(id, 0L, FeatureUpdate(newName, newDescription))
+        assertThat(result.name).isEqualTo(newName)
+        assertThat(result.description).isEqualTo(newDescription)
+        val persisted = featureService.getFeature(id)
+        assertThat(persisted.name).isEqualTo(newName)
+        assertThat(persisted.description).isEqualTo(newDescription)
+    }
 }

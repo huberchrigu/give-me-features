@@ -17,7 +17,7 @@ class FeatureService(private val featureRepository: FeatureRepository, private v
     }
 
     suspend fun getFeature(id: FeatureId) = featureRepository.findById(id) ?: throw FeatureNotFoundException(id)
-    suspend fun updateFeature(id: FeatureId, version: Long, featureUpdate: FeatureUpdate): Feature { // TODO: Test
+    suspend fun updateFeature(id: FeatureId, version: Long, featureUpdate: FeatureUpdate): Feature {
         return featureRepository.applyOn(id, version) { update(featureUpdate) } ?: throw FeatureNotFoundException(id)
     }
 }

@@ -1,9 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.features.web
 
-import ch.chrigu.gmf.givemefeatures.features.Feature
-import ch.chrigu.gmf.givemefeatures.features.FeatureId
-import ch.chrigu.gmf.givemefeatures.features.FeatureService
-import ch.chrigu.gmf.givemefeatures.features.copy
+import ch.chrigu.gmf.givemefeatures.features.*
 import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.*
@@ -22,7 +19,9 @@ import org.springframework.boot.test.web.server.LocalServerPort
 @UiTest(FeatureController::class)
 class FeatureControllerUiTest(@MockkBean private val featureService: FeatureService, @MockkBean private val taskService: TaskService) {
     private val featureName = "My new feature"
+    private val newName = "Version 2.0"
     private val featureDescription = Html("<p>Description</p>")
+    private val newDescription = "New description"
     private val featureId = FeatureId("123")
     private val taskName = "New task"
     private val taskId = TaskId("99")
@@ -63,11 +62,14 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     }
 
     @Test
-    fun `should open feature directly`() {
+    fun `should open and update feature`() {
         withFeature()
+        withFeatureUpdate()
 
         openFeaturesPage(featureId) {
             assertFeatureDetails()
+            editFeature()
+            assertFeatureDetails(newName, newDescription)
         }
     }
 
@@ -107,6 +109,11 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         return feature
     }
 
+    private fun withFeatureUpdate() {
+        val html = Html("<p>$newDescription</p>")
+        coEvery { featureService.updateFeature(featureId, 0L, FeatureUpdate(newName, html)) } returns Feature(featureId, newName, html, emptyList(), 1L)
+    }
+
     private fun Page.clickOnFeatureListItem() {
         querySelector("#features li a").click()
         waitForLoadState(LoadState.NETWORKIDLE)
@@ -118,6 +125,20 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         form.querySelector("button[type='submit']").click()
         waitForLoadState(LoadState.NETWORKIDLE)
         waitForCondition { querySelector("#feature ul li") != null }
+    }
+
+    private fun Page.editFeature() {
+        val editButton = querySelectorAll("button").first { it.textContent() == "Edit" }
+        editButton.click()
+        waitForLoadState(LoadState.NETWORKIDLE)
+        val nameField = querySelector("input#name")
+        val descriptionField = frames()[1].querySelector("body#tinymce")
+        val submitButton = querySelector("button[hx-patch]")
+        nameField.fill(newName)
+        descriptionField.fill(newDescription)
+        submitButton.click()
+        waitForLoadState(LoadState.NETWORKIDLE)
+        waitForCondition { querySelector("button[hx-patch]") == null }
     }
 
     private fun Page.assertTask() {
@@ -138,10 +159,10 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         }
     }
 
-    private fun Page.assertFeatureDetails() {
+    private fun Page.assertFeatureDetails(expectedName: String = featureName, expectedDescription: String = "Description") {
         val feature = querySelector("#feature")
-        assertThat(feature.querySelector("h2").textContent()).isEqualTo(featureName)
-        assertThat(feature.querySelector("p").textContent()).isEqualTo("Description")
+        assertThat(feature.querySelector("h2").textContent()).isEqualTo(expectedName)
+        assertThat(feature.querySelector("p").textContent()).isEqualTo(expectedDescription)
     }
 
     private fun Page.assertFeatureList(current: Boolean) {

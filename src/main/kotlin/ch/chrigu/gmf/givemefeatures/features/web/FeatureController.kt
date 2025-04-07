@@ -54,7 +54,7 @@ class FeatureController(private val featureService: FeatureService, private val 
         .build()
 
     @PatchMapping("/{featureId}", headers = [Hx.HEADER])
-    suspend fun updateFeature(@PathVariable featureId: FeatureId, @RequestParam version: Long, @Valid updateFeature: UpdateFeatureDto) = Rendering.view("blocks/feature") // TODO: UI Test
+    suspend fun updateFeature(@PathVariable featureId: FeatureId, @RequestParam version: Long, @Valid updateFeature: UpdateFeatureDto) = Rendering.view("blocks/feature")
         .modelAttribute("feature", featureService.updateFeature(featureId, version, updateFeature.toDomain()).asDetailView(taskService))
         .build()
 
