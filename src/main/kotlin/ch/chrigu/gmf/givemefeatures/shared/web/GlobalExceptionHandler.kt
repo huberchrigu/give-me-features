@@ -2,6 +2,7 @@ package ch.chrigu.gmf.givemefeatures.shared.web
 
 import ch.chrigu.gmf.givemefeatures.features.web.Hx
 import ch.chrigu.gmf.givemefeatures.shared.AggregateNotFoundException
+import ch.chrigu.gmf.givemefeatures.shared.history.VersionNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.http.HttpStatus
@@ -18,6 +19,9 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler
     fun handleNotFound(e: AggregateNotFoundException, exchange: ServerWebExchange) = renderError(e, exchange, HttpStatus.NOT_FOUND)
+
+    @ExceptionHandler
+    fun handleVersionNotFound(e: VersionNotFoundException, exchange: ServerWebExchange) = renderError(e, exchange, HttpStatus.BAD_REQUEST)
 
     @ExceptionHandler
     fun handleResponseStatusException(e: ResponseStatusException, exchange: ServerWebExchange) = renderError(e, exchange, e.statusCode)

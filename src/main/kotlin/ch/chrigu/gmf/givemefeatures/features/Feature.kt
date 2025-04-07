@@ -1,30 +1,41 @@
 package ch.chrigu.gmf.givemefeatures.features
 
-import ch.chrigu.gmf.givemefeatures.features.history.FeatureMerger
+import ch.chrigu.gmf.givemefeatures.shared.AbstractAggregateRoot
 import ch.chrigu.gmf.givemefeatures.shared.Html
-import ch.chrigu.gmf.givemefeatures.shared.history.History
-import ch.chrigu.gmf.givemefeatures.shared.history.Mergeable
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
-import org.springframework.data.annotation.Version
+import java.util.UUID
 
-data class Feature(
-    override val id: FeatureId?, val name: String, val description: Html, val tasks: List<TaskId>,
-    @field:Version override val version: Long? = null, override val history: History<FeatureSnapshot> = History()
-) : Mergeable<FeatureSnapshot, Feature, FeatureId> {
-    fun planNewTask(task: Task) = newVersion(copy(tasks = tasks + task.id!!))
+class Feature(id: FeatureId, val name: String, val description: Html, val tasks: List<TaskId>, version: Long?) :
+    AbstractAggregateRoot<FeatureId>(id, version) {
+    fun planNewTask(task: Task) = Feature(id, name, description, tasks + task.id, version)
 
-    override fun withSnapshot(snapshot: FeatureSnapshot) = Feature(id, snapshot.name, snapshot.description, snapshot.tasks, snapshot.version, history)
-    override fun getCurrent() = FeatureSnapshot(name, description, tasks, version!!)
-    override fun withHistory(history: History<FeatureSnapshot>) = copy(history = history)
-    override fun getMerger(base: Feature, newVersion: Feature, oldVersion: Feature) = FeatureMerger(base, newVersion, oldVersion)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Feature) return false
+        if (!super.equals(other)) return false
+
+        if (name != other.name) return false
+        if (description != other.description) return false
+        if (tasks != other.tasks) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + description.hashCode()
+        result = 31 * result + tasks.hashCode()
+        return result
+    }
+
 
     companion object {
-        fun describeNewFeature(name: String, description: Html) = Feature(null, name, description, emptyList())
+        fun describeNewFeature(name: String, description: Html) = Feature(FeatureId(), name, description, emptyList(), null)
     }
 }
 
-@JvmInline
-value class FeatureId(private val id: String) {
+data class FeatureId(private val id: String = UUID.randomUUID().toString()) {
     override fun toString(): String = id
 }

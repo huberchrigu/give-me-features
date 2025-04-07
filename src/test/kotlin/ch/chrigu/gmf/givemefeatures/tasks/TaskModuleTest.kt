@@ -2,7 +2,6 @@ package ch.chrigu.gmf.givemefeatures.tasks
 
 import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
 import ch.chrigu.gmf.givemefeatures.shared.Html
-import ch.chrigu.gmf.givemefeatures.shared.history.History
 import ch.chrigu.gmf.givemefeatures.tasks.repository.TaskRepository
 import com.ninjasquad.springmockk.MockkBean
 import kotlinx.coroutines.async
@@ -26,10 +25,10 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
     @Test
     fun `should update description`() = runTest {
         val task = taskRepository.save(Task.describeNewTask("task"))
-        val id = task.id!!
+        val id = task.id
         val newDescription = Html("new description")
         taskService.updateTask(id, 0, Task.TaskUpdate("task", newDescription))
-        assertThat(taskRepository.findById(id.toString())?.description).isEqualTo(newDescription)
+        assertThat(taskRepository.findById(id)?.description).isEqualTo(newDescription)
     }
 
     @Test
@@ -44,7 +43,7 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
     @Test
     fun `should resolve tasks`() = runTest {
         val task = taskRepository.save(Task.describeNewTask("test"))
-        val result = taskService.resolve(listOf(task.id!!)).toList()
+        val result = taskService.resolve(listOf(task.id)).toList()
         assertThat(result).hasSize(1)
         assertThat(result[0].name).isEqualTo("test")
     }
@@ -55,20 +54,20 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
     @Test
     fun `should merge tasks`() = runTest {
         val task = taskRepository.save(Task.describeNewTask("test"))
-        val askUpdate1 = async { taskService.updateTask(task.id!!, 0, Task.TaskUpdate("new task", Html("new description"))) }
-        val askUpdate2 = async { taskService.blockTask(task.id!!, 0) }
+        val askUpdate1 = async { taskService.updateTask(task.id, 0, Task.TaskUpdate("new task", Html("new description"))) }
+        val askUpdate2 = async { taskService.blockTask(task.id, 0) }
         awaitAll(askUpdate1, askUpdate2)
-        val resultIgnoreHistory = taskRepository.findById(task.id!!.toString())!!.copy(history = History())
-        assertThat(resultIgnoreHistory).isEqualTo(Task(task.id, "new task", Html("new description"), TaskStatus.BLOCKED, 2))
+        val result = taskRepository.findById(task.id)
+        assertThat(result).isEqualTo(Task(task.id, 2, "new task", Html("new description"), TaskStatus.BLOCKED))
     }
 
     @Test
     fun `should block, reopen and close task`() = runTest {
         val task = taskRepository.save(Task.describeNewTask("test"))
-        val blocked = taskService.blockTask(task.id!!, task.version!!)
+        val blocked = taskService.blockTask(task.id, task.version!!)
         assertThat(blocked.status).isEqualTo(TaskStatus.BLOCKED)
-        val reopened = taskService.reopenTask(blocked.id!!, blocked.version!!)
+        val reopened = taskService.reopenTask(blocked.id, blocked.version!!)
         assertThat(reopened.status).isEqualTo(TaskStatus.OPEN)
-        assertThat(taskService.closeTask(reopened.id!!, reopened.version!!).status).isEqualTo(TaskStatus.DONE)
+        assertThat(taskService.closeTask(reopened.id, reopened.version!!).status).isEqualTo(TaskStatus.DONE)
     }
 }

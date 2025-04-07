@@ -1,30 +1,24 @@
 package ch.chrigu.gmf.givemefeatures.shared.history
 
+import ch.chrigu.gmf.givemefeatures.shared.AggregateRoot
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.util.*
 
 class HistoryTest {
+    private val id = "abc"
+
     @Test
-    fun `should merge histories`() {
-        val testee = History<TestSnapshot>().add(listOf(TestSnapshot("branch1", 0), TestSnapshot("branch1", 1)))
-        val result = testee.mergeWith(History<TestSnapshot>().add(TestSnapshot("branch2", 0)), History())
-        assertThat(result).isEqualTo(
-            History(
-                TreeMap(
-                    mapOf(
-                        0L to TestSnapshot("branch1", 0),
-                        1L to TestSnapshot("branch1", 1),
-                        2L to TestSnapshot("branch2", 2)
-                    )
-                )
-            )
-        )
+    fun `should make sure that version is correct`() {
+        val testee = History(id).add(DummyAggregate(id, 0))
+        val saved = testee.copy(version = 0)
+        val newVersion = saved.add(DummyAggregate(id, 1))
+        val newVersionSaved = newVersion.copy(version = 1)
+        assertThat(newVersionSaved.find(0L)).isEqualTo(DummyAggregate(id, 0))
     }
 
-    data class TestSnapshot(val name: String, override val version: Long) : Snapshot<TestSnapshot> {
-        override fun withVersion(version: Long): TestSnapshot {
-            return copy(version = version)
+    data class DummyAggregate(override val id: String?, override val version: Long?) : AggregateRoot<String> {
+        override fun isNew(): Boolean {
+            return false
         }
     }
 }
