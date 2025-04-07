@@ -12,7 +12,7 @@
             <button class="status-${action.status}" hx-put="/tasks/${task.id}/status?version=${task.version}"
                     hx-vals='{"status": "${action.status}", "${csrf.parameterName}": "${csrf.token}"}'>${action.label}</button>
         @endfor
-        <button class="cancel" onclick="hideStatusAction()">Cancel</button>
+        <button class="btn" onclick="hideStatusAction()">Cancel</button>
     </div>
     $unsafe{task.description}
     <button class="btn" hx-get="/tasks/${task.id}/edit">Edit</button>

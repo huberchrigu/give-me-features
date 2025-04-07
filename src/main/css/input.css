@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply font-sans max-w-3xl mx-auto p-5 bg-gray-100;
+}
+
+h1, h2, h3 { /* TODO: Titles are not different than normal text */
+    @apply text-gray-800 mb-4 border-b-2 border-green-600 pb-1;
+}
+
+.card {
+    @apply bg-white rounded-md shadow p-5 mb-8;
+}
+
+.list {
+    @apply list-none p-0 m-0;
+}
+
+.list-item {
+    @apply border-b border-gray-200 cursor-pointer last:border-b-0;
+}
+
+.list-link {
+    @apply block px-4 py-2 no-underline text-blue-600 transition-colors duration-300 hover:bg-gray-100;
+}
+
+.list-link.current {
+    @apply font-bold text-blue-800 bg-blue-100;
+}
+
+.task-list {
+    @apply bg-gray-50 rounded-md mb-5;
+}
+
+.task-list .list-link:hover {
+    @apply bg-gray-100;
+}
+
+/* Status Labels */
+.status { /* TODO: Status + status change does not look nice anymore */
+    @apply inline-block text-sm font-bold px-3 py-1 rounded-full ml-2;
+}
+
+/* Open Status */
+.status-OPEN {
+    @apply bg-green-600 text-white;
+}
+
+/* Blocked Status */
+.status-BLOCKED {
+    @apply bg-orange-500 text-white;
+}
+
+/* Done Status */
+.status-DONE {
+    @apply bg-blue-600 text-white;
+}
+
+/* Overlay for Status Actions */
+.status-actions-trigger {
+    @apply cursor-pointer;
+}
+
+#status-actions {
+    @apply fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-90 bg-white p-5 rounded-lg shadow-lg z-50 transition-opacity duration-300 ease-in-out opacity-0 min-w-[250px] text-center invisible;
+}
+
+#status-actions.show {
+    @apply opacity-100 scale-100 visible;
+}
+
+/* Dark Background Overlay */
+#status-overlay {
+    @apply fixed top-0 left-0 w-full h-full bg-black opacity-40 z-40 transition-opacity duration-300 ease-in-out invisible;
+}
+
+#status-overlay.show {
+    @apply opacity-100 visible;
+}
+
+/* Style buttons inside the overlay */
+#status-actions button {
+    @apply w-full py-2 my-1 rounded-md text-lg cursor-pointer duration-200 ease-in-out;
+}
+
+#status-actions button:hover {
+    @apply filter brightness-90;
+}
+
+/* General Button Styles */
+.btn { /* TODO: Non-primary button has no styling yet */
+    @apply py-2.5 px-5 border-0 rounded-md cursor-pointer transition-colors duration-300 ease-in-out;
+}
+
+/* Primary Button */
+.btn-primary {
+    @apply bg-green-600 text-white;
+}
+
+.btn-primary:hover {
+    @apply bg-green-700;
+}
+
+/* Error Message */
+.error {
+    @apply bg-red-100 border border-red-300 text-red-700 text-sm p-3 rounded-md text-center fixed top-0 left-0 w-full z-50;
+}
+
+/* Form Label */
+form label {
+    @apply block mb-1 font-bold;
+}
+
+/* Form Input */
+.form-input {
+    @apply w-full py-2 px-3 mb-4 border border-gray-300 rounded-sm;
+}
