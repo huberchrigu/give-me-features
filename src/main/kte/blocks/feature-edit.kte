@@ -11,6 +11,6 @@
     <textarea class="form-input" id="description" name="description">$unsafe{feature.description.toString()}</textarea>
     <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
     <button class="btn btn-primary" hx-patch="/features/${feature.id!!.toString()}?version=${feature.version}">Submit</button>
-    <button class="btn" hx-get="/tasks/${feature.id!!.toString()}">Cancel</button>
+    <button class="btn" hx-get="/features/${feature.id!!.toString()}">Cancel</button>
     <script>initRichtext('#description');</script>
 </form>
