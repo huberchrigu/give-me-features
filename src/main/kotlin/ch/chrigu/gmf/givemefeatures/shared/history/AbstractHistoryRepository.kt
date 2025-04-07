@@ -8,9 +8,9 @@ import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.transaction.reactive.TransactionalOperator
 
-abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID>(
+abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID : Any>(
     private val aggregateRepository: CoroutineCrudRepository<T, String>,
-    private val historyRepository: CoroutineCrudRepository<History<T, ID>, String>,
+    private val historyRepository: DocumentHistoryRepository<T, ID>,
     aggregateMerger: AggregateMerger<T, ID>,
     private val transactionalOperator: TransactionalOperator
 ) : HistoryRepository<T, ID> {
@@ -40,7 +40,7 @@ abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID>(
     override suspend fun findVersion(id: ID, version: Long): T? {
         val current = aggregateRepository.findById(id.toString()) ?: return null
         if (current.version == version) return current
-        val history = historyRepository.findById(id.toString()) ?: return null
+        val history = historyRepository.findById(id) ?: return null
         return history.find(version)
     }
 
@@ -64,7 +64,7 @@ abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID>(
     private suspend fun pushCurrentToHistory(id: ID): History<T, ID> {
         val current = aggregateRepository.findById(id.toString())
             ?: throw IllegalStateException("No aggregate found for id $id")
-        val history: History<T, ID> = historyRepository.findById(id.toString()) ?: History(id)
+        val history: History<T, ID> = historyRepository.findById(id) ?: History(id)
         return historyRepository.save(history.add(current))
     }
 

@@ -9,6 +9,7 @@ import java.util.UUID
 class Feature(id: FeatureId, val name: String, val description: Html, val tasks: List<TaskId>, version: Long?) :
     AbstractAggregateRoot<FeatureId>(id, version) {
     fun planNewTask(task: Task) = Feature(id, name, description, tasks + task.id, version)
+    fun update(featureUpdate: FeatureUpdate) = featureUpdate.apply(this)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -38,4 +39,8 @@ class Feature(id: FeatureId, val name: String, val description: Html, val tasks:
 
 data class FeatureId(private val id: String = UUID.randomUUID().toString()) {
     override fun toString(): String = id
+}
+
+data class FeatureUpdate(private val name: String, private val description: Html) {
+    fun apply(feature: Feature) = Feature(feature.id, name, description, feature.tasks, feature.version)
 }

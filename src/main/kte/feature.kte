@@ -1,0 +1,24 @@
+@import ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureListItem
+@import ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureDetailView
+@import org.springframework.security.web.server.csrf.CsrfToken
+
+@param error: String?
+@param feature: FeatureDetailView
+@param csrf: CsrfToken
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>${feature.name}</title>
+    <script src="/webjars/htmx.org/2.0.3/dist/htmx.min.js"></script>
+    <script src="/webjars/htmx.org/2.0.3/dist/ext/response-targets.js"></script>
+    <script src="/webjars/tinymce/7.5.1/tinymce.min.js"></script>
+    <script src="/script.js"></script>
+    <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body hx-ext="response-targets" hx-target-error="#error" hx-swap="none">
+@template.blocks.feature(feature = feature, csrf = csrf)
+<button class="btn" hx-get="/features/${feature.id.toString()}/edit">Edit</button>
+@template.blocks.error(error = error)
+</body>
+</html>

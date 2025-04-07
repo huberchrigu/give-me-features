@@ -1,0 +1,16 @@
+@import ch.chrigu.gmf.givemefeatures.features.Feature
+@import org.springframework.security.web.server.csrf.CsrfToken
+
+@param csrf: CsrfToken
+@param feature: Feature
+
+<form class="card" id="feature" hx-swap-oob="true">
+    <label for="name">Name: </label>
+    <input class="form-input" id="name" name="name" value="${feature.name}">
+    <label for="description">Description: </label>
+    <textarea class="form-input" id="description" name="description">$unsafe{feature.description.toString()}</textarea>
+    <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
+    <button class="btn btn-primary" hx-patch="/features/${feature.id!!.toString()}?version=${feature.version}">Submit</button>
+    <button class="btn" hx-get="/tasks/${feature.id!!.toString()}">Cancel</button>
+    <script>initRichtext('#description');</script>
+</form>

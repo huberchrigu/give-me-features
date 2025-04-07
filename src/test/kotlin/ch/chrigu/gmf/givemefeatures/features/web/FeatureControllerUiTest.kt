@@ -67,7 +67,6 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         withFeature()
 
         openFeaturesPage(featureId) {
-            assertFeatureList(true)
             assertFeatureDetails()
         }
     }
