@@ -322,7 +322,6 @@ h3 {
   font-weight: var(--font-weight-bold);
 }
 .status-OPEN {
-  margin-left: calc(var(--spacing) * 2);
   display: inline-block;
   border-radius: calc(infinity * 1px);
   background-color: var(--color-green-600);
@@ -336,7 +335,6 @@ h3 {
   text-transform: uppercase;
 }
 .status-BLOCKED {
-  margin-left: calc(var(--spacing) * 2);
   display: inline-block;
   border-radius: calc(infinity * 1px);
   background-color: var(--color-orange-500);
@@ -350,7 +348,6 @@ h3 {
   text-transform: uppercase;
 }
 .status-DONE {
-  margin-left: calc(var(--spacing) * 2);
   display: inline-block;
   border-radius: calc(infinity * 1px);
   background-color: var(--color-blue-600);
@@ -425,7 +422,7 @@ h3 {
 }
 #status-overlay.show {
   visibility: visible;
-  opacity: 100%;
+  opacity: 75%;
 }
 #status-actions button {
   margin-block: calc(var(--spacing) * 1);

@@ -55,15 +55,15 @@ h3 {
 }
 
 .status-OPEN {
-    @apply inline-block text-sm font-bold py-1 px-2 rounded-full uppercase ml-2 bg-green-600 text-white;
+    @apply inline-block text-sm font-bold py-1 px-2 rounded-full uppercase bg-green-600 text-white;
 }
 
 .status-BLOCKED {
-    @apply inline-block text-sm font-bold py-1 px-2 rounded-full uppercase ml-2 bg-orange-500 text-white;
+    @apply inline-block text-sm font-bold py-1 px-2 rounded-full uppercase bg-orange-500 text-white;
 }
 
 .status-DONE {
-    @apply inline-block text-sm font-bold py-1 px-2 rounded-full uppercase ml-2 bg-blue-600 text-white;
+    @apply inline-block text-sm font-bold py-1 px-2 rounded-full uppercase bg-blue-600 text-white;
 }
 
 /* Overlay for Status Actions */
@@ -85,7 +85,7 @@ h3 {
 }
 
 #status-overlay.show {
-    @apply opacity-100 visible;
+    @apply opacity-75 visible;
 }
 
 /* Style buttons inside the overlay */
