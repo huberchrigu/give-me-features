@@ -303,16 +303,46 @@ h3 {
   font-weight: var(--font-weight-bold);
 }
 .status-OPEN {
+  margin-left: calc(var(--spacing) * 2);
+  display: inline-block;
+  border-radius: calc(infinity * 1px);
   background-color: var(--color-green-600);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 1);
+  font-size: var(--text-sm);
+  line-height: var(--tw-leading, var(--text-sm--line-height));
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
   color: var(--color-white);
+  text-transform: uppercase;
 }
 .status-BLOCKED {
+  margin-left: calc(var(--spacing) * 2);
+  display: inline-block;
+  border-radius: calc(infinity * 1px);
   background-color: var(--color-orange-500);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 1);
+  font-size: var(--text-sm);
+  line-height: var(--tw-leading, var(--text-sm--line-height));
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
   color: var(--color-white);
+  text-transform: uppercase;
 }
 .status-DONE {
+  margin-left: calc(var(--spacing) * 2);
+  display: inline-block;
+  border-radius: calc(infinity * 1px);
   background-color: var(--color-blue-600);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 1);
+  font-size: var(--text-sm);
+  line-height: var(--tw-leading, var(--text-sm--line-height));
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
   color: var(--color-white);
+  text-transform: uppercase;
 }
 .status-actions-trigger {
   cursor: pointer;

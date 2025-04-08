@@ -50,23 +50,20 @@ h3 {
 }
 
 /* Status Labels */
-.status { /* TODO: Status + status change does not look nice anymore */
+.status {
     @apply inline-block text-sm font-bold px-3 py-1 rounded-full ml-2;
 }
 
-/* Open Status */
 .status-OPEN {
-    @apply bg-green-600 text-white;
+    @apply inline-block text-sm font-bold py-1 px-2 rounded-full uppercase ml-2 bg-green-600 text-white;
 }
 
-/* Blocked Status */
 .status-BLOCKED {
-    @apply bg-orange-500 text-white;
+    @apply inline-block text-sm font-bold py-1 px-2 rounded-full uppercase ml-2 bg-orange-500 text-white;
 }
 
-/* Done Status */
 .status-DONE {
-    @apply bg-blue-600 text-white;
+    @apply inline-block text-sm font-bold py-1 px-2 rounded-full uppercase ml-2 bg-blue-600 text-white;
 }
 
 /* Overlay for Status Actions */
