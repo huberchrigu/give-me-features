@@ -8,8 +8,17 @@ body {
     @apply font-sans max-w-3xl mx-auto p-5 bg-gray-100;
 }
 
-h1, h2, h3 { /* TODO: Titles are not different than normal text */
+h1, h2, h3 {
     @apply text-gray-800 mb-4 border-b-2 border-green-600 pb-1;
+}
+h1 {
+    @apply text-2xl;
+}
+h2 {
+    @apply text-xl;
+}
+h3 {
+    @apply text-lg;
 }
 
 .card {
