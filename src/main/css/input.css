@@ -98,13 +98,13 @@ h3 {
 }
 
 /* General Button Styles */
-.btn { /* TODO: Non-primary button has no styling yet */
-    @apply py-2.5 px-5 border-0 rounded-md cursor-pointer transition-colors duration-300 ease-in-out;
+.btn {
+    @apply bg-gray-200 px-5 py-2 rounded-md text-sm cursor-pointer transition-colors duration-300 filter ease-in-out;
 }
 
 /* Primary Button */
 .btn-primary {
-    @apply bg-green-600 text-white;
+    @apply bg-green-600 text-white transition-colors duration-300;
 }
 
 .btn-primary:hover {
