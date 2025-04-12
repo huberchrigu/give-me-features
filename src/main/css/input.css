@@ -8,8 +8,17 @@ body {
     @apply font-sans max-w-3xl mx-auto p-5 bg-gray-100;
 }
 
-h1, h2, h3 { /* TODO: Titles are not different than normal text */
+h1, h2, h3 {
     @apply text-gray-800 mb-4 border-b-2 border-green-600 pb-1;
+}
+h1 {
+    @apply text-2xl;
+}
+h2 {
+    @apply text-xl;
+}
+h3 {
+    @apply text-lg;
 }
 
 .card {
@@ -41,23 +50,20 @@ h1, h2, h3 { /* TODO: Titles are not different than normal text */
 }
 
 /* Status Labels */
-.status { /* TODO: Status + status change does not look nice anymore */
+.status {
     @apply inline-block text-sm font-bold px-3 py-1 rounded-full ml-2;
 }
 
-/* Open Status */
 .status-OPEN {
-    @apply bg-green-600 text-white;
+    @apply inline-block text-sm font-bold py-1 px-2 rounded-full uppercase bg-green-600 text-white;
 }
 
-/* Blocked Status */
 .status-BLOCKED {
-    @apply bg-orange-500 text-white;
+    @apply inline-block text-sm font-bold py-1 px-2 rounded-full uppercase bg-orange-500 text-white;
 }
 
-/* Done Status */
 .status-DONE {
-    @apply bg-blue-600 text-white;
+    @apply inline-block text-sm font-bold py-1 px-2 rounded-full uppercase bg-blue-600 text-white;
 }
 
 /* Overlay for Status Actions */
@@ -79,7 +85,7 @@ h1, h2, h3 { /* TODO: Titles are not different than normal text */
 }
 
 #status-overlay.show {
-    @apply opacity-100 visible;
+    @apply opacity-75 visible;
 }
 
 /* Style buttons inside the overlay */
@@ -92,13 +98,13 @@ h1, h2, h3 { /* TODO: Titles are not different than normal text */
 }
 
 /* General Button Styles */
-.btn { /* TODO: Non-primary button has no styling yet */
-    @apply py-2.5 px-5 border-0 rounded-md cursor-pointer transition-colors duration-300 ease-in-out;
+.btn {
+    @apply bg-gray-200 px-5 py-2 rounded-md text-sm cursor-pointer transition-colors duration-300 filter ease-in-out;
 }
 
 /* Primary Button */
 .btn-primary {
-    @apply bg-green-600 text-white;
+    @apply bg-green-600 text-white transition-colors duration-300;
 }
 
 .btn-primary:hover {
