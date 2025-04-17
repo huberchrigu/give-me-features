@@ -3,9 +3,9 @@ import kotlin.io.path.Path
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.4.3"
+	id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
-    id("gg.jte.gradle") version "3.1.12"
+	id("gg.jte.gradle") version "3.1.16"
 }
 
 group = "ch.chrigu.gmf"
@@ -13,7 +13,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -27,7 +27,7 @@ repositories {
     mavenCentral()
 }
 
-extra["springModulithVersion"] = "1.3.3"
+extra["springModulithVersion"] = "1.3.4"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -36,14 +36,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("gg.jte:jte-kotlin:3.2.0")
-    implementation("gg.jte:jte-spring-boot-starter-3:3.2.0")
+    implementation("gg.jte:jte-kotlin:3.1.16")
+    implementation("gg.jte:jte-spring-boot-starter-3:3.1.16")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("org.springframework.modulith:spring-modulith-starter-core")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    testImplementation("org.springframework.boot:spring-boot-devtools")
+    testImplementation("org.springframework.boot:spring-boot-devtools") // because we use the Test... run config
     runtimeOnly("org.springframework.modulith:spring-modulith-actuator")
     runtimeOnly("org.springframework.modulith:spring-modulith-observability")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
