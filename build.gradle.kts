@@ -36,8 +36,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("gg.jte:jte-kotlin:3.1.12")
-    implementation("gg.jte:jte-spring-boot-starter-3:3.1.12")
+    implementation("gg.jte:jte-kotlin:3.2.0")
+    implementation("gg.jte:jte-spring-boot-starter-3:3.2.0")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
@@ -65,7 +65,6 @@ dependencies {
     testImplementation("com.microsoft.playwright:playwright:1.45.1")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     implementation("org.jsoup:jsoup:1.18.3")
-    testImplementation("io.projectreactor:reactor-test")
 }
 
 dependencyManagement {
