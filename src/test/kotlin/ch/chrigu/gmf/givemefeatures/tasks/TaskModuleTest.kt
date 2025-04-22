@@ -4,9 +4,12 @@ import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
 import ch.chrigu.gmf.givemefeatures.shared.Html
 import ch.chrigu.gmf.givemefeatures.tasks.repository.TaskRepository
 import com.ninjasquad.springmockk.MockkBean
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -69,5 +72,32 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
         val reopened = taskService.reopenTask(blocked.id, blocked.version!!)
         assertThat(reopened.status).isEqualTo(TaskStatus.OPEN)
         assertThat(taskService.closeTask(reopened.id, reopened.version!!).status).isEqualTo(TaskStatus.DONE)
+    }
+
+    @Test
+    fun `should get updates`() = runTest {
+        val result = mutableMapOf<Int, Task>()
+
+        val tasks = (0 until 100).map {
+            taskRepository.save(Task.describeNewTask("test$it"))
+        }
+        val updates = (0 until 100).map {
+            async { taskService.updateTask(tasks[it].id, 0L, Task.TaskUpdate("changed$it", Html(""))) }
+        }
+        val jobs = (0 until 100).map { i ->
+            launch(Dispatchers.IO) {
+                taskService.getTaskUpdates(tasks[i].id).collect {
+                    assertThat(result[i]).isNull()
+                    result.put(i, it)
+                }
+            }
+        }
+        updates.awaitAll()
+        delay(1000L)
+        testScheduler.advanceUntilIdle()
+        (0 until 100).onEach { i ->
+            assertThat(result[i]).isEqualTo(Task(tasks[i].id, 1L, "changed$i", Html(""), TaskStatus.OPEN))
+        }
+        jobs.onEach { it.cancel() }
     }
 }
