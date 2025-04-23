@@ -11,12 +11,13 @@
     <title>${title}</title>
     <script src="/webjars/htmx.org/2.0.3/dist/htmx.min.js"></script>
     <script src="/webjars/htmx.org/2.0.3/dist/ext/response-targets.js"></script>
+    <script src="/webjars/htmx.org/2.0.3/dist/ext/sse.js"></script>
     <link rel="stylesheet" href="/styles.css"/>
     @if(head != null)
         ${head}
     @endif
 </head>
-<body hx-ext="response-targets" hx-target-error="#error" hx-swap="none">
+<body hx-ext="response-targets,sse" hx-target-error="#error" hx-swap="none">
 ${body}
 @template.blocks.error(error)
 </body>

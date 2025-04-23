@@ -4,7 +4,7 @@
 @param task: TaskDetails
 @param csrf: CsrfToken
 
-<div id="task" class="card" hx-swap-oob="true">
+<div id="task" class="card" hx-swap-oob="true" sse-connect="/tasks/${task.id}">
     <h1>${task.name} <span class="status-${task.status} status-actions-trigger" onclick="showStatusAction()">${task.status}</span></h1>
     <div id="status-overlay" onclick="hideStatusAction()"></div>
     <div id="status-actions">

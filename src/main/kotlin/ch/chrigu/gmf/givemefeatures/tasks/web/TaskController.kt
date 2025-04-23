@@ -10,14 +10,11 @@ import ch.chrigu.gmf.givemefeatures.tasks.web.ui.TaskDetails
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.result.view.Rendering
 
 @Controller
@@ -39,6 +36,14 @@ class TaskController(private val taskService: TaskService) {
     suspend fun getTaskSnippet(@PathVariable taskId: TaskId) = Rendering.view("blocks/task")
         .modelAttribute("task", taskService.getTask(taskId).toDetails())
         .build()
+
+    @GetMapping("/{taskId}", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    fun getTaskUpdates(@PathVariable taskId: TaskId) = taskService.getTaskUpdates(taskId) // TODO: UI test
+        .map {
+            Rendering.view("blocks/task")
+                .modelAttribute("task", it.toDetails())
+                .build()
+        }
 
     @Suppress("SpringMVCViewInspection")
     @PatchMapping("/{taskId}", headers = [Hx.HEADER])
@@ -63,5 +68,5 @@ class TaskController(private val taskService: TaskService) {
         fun toChange() = Task.TaskUpdate(name!!, Html(description!!))
     }
 
-    private fun Task.toDetails() = TaskDetails(id!!.toString(), name, description.toString(), status, getAvailableStatus(), version!!)
+    private fun Task.toDetails() = TaskDetails(id.toString(), name, description.toString(), status, getAvailableStatus(), version!!)
 }

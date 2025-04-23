@@ -20,7 +20,7 @@ class TaskService(private val taskRepository: TaskRepository, private val linked
     suspend fun closeTask(id: TaskId, version: Long) = update(id, version) { close() }
 
     suspend fun getTask(id: TaskId) = taskRepository.findById(id) ?: throw TaskNotFoundException(id)
-    suspend fun getTaskUpdates(id: TaskId) = getTaskState(id).filterNotNull() // TODO: Use in web layer
+    fun getTaskUpdates(id: TaskId) = getTaskState(id).filterNotNull()
 
     fun getLinkedItems(taskId: TaskId) = linkedItemProvider.getFor(taskId)
 
