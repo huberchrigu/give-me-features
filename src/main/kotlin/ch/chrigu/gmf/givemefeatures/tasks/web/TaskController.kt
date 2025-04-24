@@ -16,10 +16,11 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.result.view.Rendering
+import org.springframework.web.server.ServerWebExchange
 
 @Controller
 @RequestMapping("/tasks")
-class TaskController(private val taskService: TaskService) {
+class TaskController(private val taskService: TaskService, private val htmlRenderService: HtmlRenderService) {
     @GetMapping("/{taskId}")
     suspend fun getTask(@PathVariable taskId: TaskId) = Rendering.view("task")
         .modelAttribute("task", taskService.getTask(taskId).toDetails())
@@ -38,11 +39,10 @@ class TaskController(private val taskService: TaskService) {
         .build()
 
     @GetMapping("/{taskId}", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
-    fun getTaskUpdates(@PathVariable taskId: TaskId) = taskService.getTaskUpdates(taskId) // TODO: UI test
+    @ResponseBody
+    fun getTaskUpdates(@PathVariable taskId: TaskId, exchange: ServerWebExchange) = taskService.getTaskUpdates(taskId)
         .map {
-            Rendering.view("blocks/task")
-                .modelAttribute("task", it.toDetails())
-                .build()
+            htmlRenderService.render("blocks/task", mapOf("task" to it.toDetails()), exchange)
         }
 
     @Suppress("SpringMVCViewInspection")

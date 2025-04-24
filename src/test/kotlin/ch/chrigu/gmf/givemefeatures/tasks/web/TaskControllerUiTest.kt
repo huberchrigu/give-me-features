@@ -10,7 +10,10 @@ import com.microsoft.playwright.options.LoadState
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
 import io.mockk.every
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -27,6 +30,8 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private val featureName = "Feature"
     private val featureId = FeatureId("featureId")
 
+    private val taskUpdates = MutableStateFlow<Task?>(null)
+
     @LocalServerPort
     private var port: Int = 0
 
@@ -41,6 +46,17 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
             assertForm()
             submitTaskForm()
             assertTask(newName, newDescription)
+        }
+    }
+
+    @Test
+    fun `should show external change`() {
+        withTask()
+
+        openTaskPage {
+            assertTask()
+            externalTaskChange(newName, newDescription, TaskStatus.BLOCKED)
+            assertTask(newName, newDescription, TaskStatus.BLOCKED)
         }
     }
 
@@ -134,6 +150,11 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         waitForCondition { querySelector("h1 .status-${newStatus.name}") != null }
     }
 
+    private fun Page.externalTaskChange(name: String, description: String, status: TaskStatus) = runBlocking {
+        taskUpdates.emit(Task(taskId, 1L, name, Html(description), status))
+        waitForCondition { querySelector("h1 .status-${status.name}") != null }
+    }
+
     private fun Page.assertTask(expectedName: String = name, expectedDescription: String = description, status: TaskStatus = TaskStatus.OPEN) {
         assertNameAndDescription(expectedName, expectedDescription, status)
         assertLinks()
@@ -174,6 +195,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private fun withTask() {
         coEvery { taskService.getTask(taskId) } returns Task(taskId, 0, name, descriptionHtml, TaskStatus.OPEN)
         every { taskService.getLinkedItems(taskId) } returns flowOf(TaskLinkedItem(featureId, featureName))
+        coEvery { taskService.getTaskUpdates(taskId) } returns taskUpdates.filterNotNull()
     }
 
     private fun withNoTask() {
