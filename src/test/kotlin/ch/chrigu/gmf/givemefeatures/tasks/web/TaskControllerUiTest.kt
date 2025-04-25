@@ -2,6 +2,7 @@ package ch.chrigu.gmf.givemefeatures.tasks.web
 
 import ch.chrigu.gmf.givemefeatures.features.FeatureId
 import ch.chrigu.gmf.givemefeatures.shared.Html
+import ch.chrigu.gmf.givemefeatures.shared.web.JteRenderService
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.microsoft.playwright.Page
@@ -10,15 +11,17 @@ import com.microsoft.playwright.options.LoadState
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
 import io.mockk.every
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.context.annotation.Import
 
 @UiTest(TaskController::class)
+@Import(JteRenderService::class)
 class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private val taskId = TaskId("1")
     private val name = "My task"
@@ -30,7 +33,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private val featureName = "Feature"
     private val featureId = FeatureId("featureId")
 
-    private val taskUpdates = MutableStateFlow<Task?>(null)
+    private val taskUpdates = MutableSharedFlow<Task>()
 
     @LocalServerPort
     private var port: Int = 0
@@ -55,7 +58,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
 
         openTaskPage {
             assertTask()
-            externalTaskChange(newName, newDescription, TaskStatus.BLOCKED)
+            externalTaskChange(newName, newDescriptionHtml, TaskStatus.BLOCKED)
             assertTask(newName, newDescription, TaskStatus.BLOCKED)
         }
     }
@@ -150,8 +153,8 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         waitForCondition { querySelector("h1 .status-${newStatus.name}") != null }
     }
 
-    private fun Page.externalTaskChange(name: String, description: String, status: TaskStatus) = runBlocking {
-        taskUpdates.emit(Task(taskId, 1L, name, Html(description), status))
+    private fun Page.externalTaskChange(name: String, description: Html, status: TaskStatus) = runBlocking {
+        taskUpdates.emit(Task(taskId, 1L, name, description, status))
         waitForCondition { querySelector("h1 .status-${status.name}") != null }
     }
 
@@ -195,7 +198,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private fun withTask() {
         coEvery { taskService.getTask(taskId) } returns Task(taskId, 0, name, descriptionHtml, TaskStatus.OPEN)
         every { taskService.getLinkedItems(taskId) } returns flowOf(TaskLinkedItem(featureId, featureName))
-        coEvery { taskService.getTaskUpdates(taskId) } returns taskUpdates.filterNotNull()
+        coEvery { taskService.getTaskUpdates(taskId) } returns taskUpdates.asSharedFlow()
     }
 
     private fun withNoTask() {

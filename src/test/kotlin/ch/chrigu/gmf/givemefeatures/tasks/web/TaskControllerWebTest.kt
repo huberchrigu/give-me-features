@@ -1,6 +1,7 @@
 package ch.chrigu.gmf.givemefeatures.tasks.web
 
 import ch.chrigu.gmf.givemefeatures.features.web.Hx
+import ch.chrigu.gmf.givemefeatures.shared.ViewRenderService
 import ch.chrigu.gmf.givemefeatures.shared.security.SecurityConfiguration
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import gg.jte.springframework.boot.autoconfigure.ReactiveJteAutoConfiguration
@@ -21,7 +22,11 @@ import org.springframework.web.reactive.function.BodyInserters
 @AutoConfigureWebTestClient(timeout = "30s")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @Import(SecurityConfiguration::class, ReactiveJteAutoConfiguration::class)
-class TaskControllerWebTest(private val webTestClient: WebTestClient, @MockitoBean private val taskService: TaskService) {
+class TaskControllerWebTest(
+    private val webTestClient: WebTestClient,
+    @MockitoBean private val taskService: TaskService,
+    @MockitoBean private val viewRenderService: ViewRenderService
+) {
     @Test
     fun `should return client-friendly 400 error`() {
         webTestClient.mutateWith(csrf())

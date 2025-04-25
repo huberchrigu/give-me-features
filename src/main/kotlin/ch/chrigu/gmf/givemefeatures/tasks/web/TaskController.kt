@@ -2,6 +2,7 @@ package ch.chrigu.gmf.givemefeatures.tasks.web
 
 import ch.chrigu.gmf.givemefeatures.features.web.Hx
 import ch.chrigu.gmf.givemefeatures.shared.Html
+import ch.chrigu.gmf.givemefeatures.shared.ViewRenderService
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
@@ -20,7 +21,8 @@ import org.springframework.web.server.ServerWebExchange
 
 @Controller
 @RequestMapping("/tasks")
-class TaskController(private val taskService: TaskService, private val htmlRenderService: HtmlRenderService) {
+@Suppress("SpringMVCViewInspection")
+class TaskController(private val taskService: TaskService, private val viewRenderService: ViewRenderService) {
     @GetMapping("/{taskId}")
     suspend fun getTask(@PathVariable taskId: TaskId) = Rendering.view("task")
         .modelAttribute("task", taskService.getTask(taskId).toDetails())
@@ -32,7 +34,6 @@ class TaskController(private val taskService: TaskService, private val htmlRende
         .modelAttribute("task", taskService.getTask(taskId))
         .build()
 
-    @Suppress("SpringMVCViewInspection")
     @GetMapping("/{taskId}", headers = [Hx.HEADER])
     suspend fun getTaskSnippet(@PathVariable taskId: TaskId) = Rendering.view("blocks/task")
         .modelAttribute("task", taskService.getTask(taskId).toDetails())
@@ -42,10 +43,9 @@ class TaskController(private val taskService: TaskService, private val htmlRende
     @ResponseBody
     fun getTaskUpdates(@PathVariable taskId: TaskId, exchange: ServerWebExchange) = taskService.getTaskUpdates(taskId)
         .map {
-            htmlRenderService.render("blocks/task", mapOf("task" to it.toDetails()), exchange)
+            viewRenderService.render("blocks/task", mapOf("task" to it.toDetails()), exchange)
         }
 
-    @Suppress("SpringMVCViewInspection")
     @PatchMapping("/{taskId}", headers = [Hx.HEADER])
     suspend fun updateTask(@PathVariable taskId: TaskId, @RequestParam version: Long, @Valid updateTask: UpdateTaskDto) = Rendering.view("blocks/task")
         .modelAttribute("task", taskService.updateTask(taskId, version, updateTask.toChange()).toDetails())

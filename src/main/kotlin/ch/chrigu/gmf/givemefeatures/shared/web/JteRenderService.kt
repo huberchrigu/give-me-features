@@ -1,6 +1,6 @@
-package ch.chrigu.gmf.givemefeatures.tasks.web
+package ch.chrigu.gmf.givemefeatures.shared.web
 
-import ch.chrigu.gmf.givemefeatures.shared.web.GlobalControllerAdvice
+import ch.chrigu.gmf.givemefeatures.shared.ViewRenderService
 import gg.jte.TemplateEngine
 import gg.jte.output.StringOutput
 import gg.jte.springframework.boot.autoconfigure.JteProperties
@@ -9,8 +9,9 @@ import org.springframework.stereotype.Service
 import org.springframework.web.server.ServerWebExchange
 
 @Service
-class HtmlRenderService(private val templateEngine: TemplateEngine, private val jteProperties: JteProperties, private val globalControllerAdvice: GlobalControllerAdvice) {
-    suspend fun render(viewName: String, params: Map<String, Any?> = emptyMap(), exchange: ServerWebExchange): String {
+class JteRenderService(private val templateEngine: TemplateEngine, private val jteProperties: JteProperties, private val globalControllerAdvice: GlobalControllerAdvice) :
+    ViewRenderService {
+    override suspend fun render(viewName: String, params: Map<String, Any?>, exchange: ServerWebExchange): String {
         val output = StringOutput()
         val withCsrf = params + mapOf("csrf" to globalControllerAdvice.csrf(exchange)?.awaitSingle())
         templateEngine.render("${viewName}${jteProperties.templateSuffix}", withCsrf, output)
