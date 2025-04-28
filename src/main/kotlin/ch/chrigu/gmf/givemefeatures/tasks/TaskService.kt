@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class TaskService(private val taskRepository: TaskRepository, private val linkedItemProvider: LinkedItemProvider) {
-    private val taskStates = ConcurrentHashMap<TaskId, MutableSharedFlow<Task>>() // TODO: Make stateless
+    private val taskStates = ConcurrentHashMap<TaskId, MutableSharedFlow<Task>>() // TODO: Make stateless, clean up flows
 
     fun resolve(tasks: List<TaskId>) = taskRepository.findAllById(tasks)
     suspend fun newTask(task: Task) = taskRepository.save(task)
@@ -24,16 +24,16 @@ class TaskService(private val taskRepository: TaskRepository, private val linked
 
     fun getLinkedItems(taskId: TaskId) = linkedItemProvider.getFor(taskId)
 
-    private fun getTaskState(id: TaskId) = taskStates.getOrPut(id) {
-        MutableSharedFlow()
-    }
-
     private suspend fun update(id: TaskId, version: Long, applyChange: Task.() -> Task) = taskRepository.applyOn(id, version, applyChange)
         ?.apply { registerTaskUpdate(this) }
         ?: throw TaskNotFoundException(id)
 
     private suspend fun registerTaskUpdate(task: Task) {
-        getTaskState(task.id).emit(task)
+        taskStates[task.id]?.emit(task)
+    }
+
+    private fun getTaskState(id: TaskId) = taskStates.getOrPut(id) {
+        MutableSharedFlow()
     }
 }
 
