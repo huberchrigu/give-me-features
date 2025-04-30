@@ -149,7 +149,6 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         waitForCondition { statusActions.getAttribute("class").contains("show") }
         val newStatusElement = statusActions.querySelectorAll("button").first { it.textContent() == newStatus.name }
         newStatusElement.click()
-        waitForLoadState(LoadState.NETWORKIDLE)
         waitForCondition { querySelector("h1 .status-${newStatus.name}") != null }
     }
 
