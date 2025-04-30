@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.map
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.reactive.result.view.FragmentsRendering
 import org.springframework.web.reactive.result.view.Rendering
 import org.springframework.web.server.ResponseStatusException
 
@@ -30,20 +31,20 @@ class FeatureController(private val featureService: FeatureService, private val 
 
     @PostMapping(headers = [Hx.HEADER])
     @ResponseStatus(HttpStatus.CREATED)
-    suspend fun addFeature(@Valid newFeatureBody: NewFeatureBody): Rendering {
+    suspend fun addFeature(@Valid newFeatureBody: NewFeatureBody): FragmentsRendering {
         val feature = featureService.newFeature(newFeatureBody.toFeature())
         return updateForFeature(feature)
     }
 
     @PostMapping("/{id}/tasks", headers = [Hx.HEADER])
     @ResponseStatus(HttpStatus.CREATED)
-    suspend fun addTaskToFeature(@PathVariable id: FeatureId, @RequestParam version: Long, @Valid newTaskBody: NewTaskBody): Rendering {
+    suspend fun addTaskToFeature(@PathVariable id: FeatureId, @RequestParam version: Long, @Valid newTaskBody: NewTaskBody): FragmentsRendering {
         val feature = featureService.addTask(id, version, newTaskBody.toTask()) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         return updateForFeature(feature)
     }
 
     @GetMapping("/{id}", headers = [Hx.HEADER])
-    suspend fun getFeature(@PathVariable id: FeatureId): Rendering {
+    suspend fun getFeature(@PathVariable id: FeatureId): FragmentsRendering {
         val feature = featureService.getFeature(id)
         return updateForFeature(feature)
     }
@@ -66,9 +67,9 @@ class FeatureController(private val featureService: FeatureService, private val 
             .build()
     }
 
-    private suspend fun updateForFeature(feature: Feature) = Rendering.view("blocks/update-feature")
-        .withFeatures(feature.id)
-        .modelAttribute("feature", feature.asDetailView(taskService))
+    private suspend fun updateForFeature(feature: Feature) = FragmentsRendering
+        .with("blocks/features", mapOf("features" to featureService.getFeatures().map { it.asListItem(feature.id) }).toMutableMap() as Map<String, Any>)
+        .fragment("blocks/feature", mapOf("feature" to feature.asDetailView(taskService)).toMutableMap() as Map<String, Any>) // TODO: Github ticket for supporting immutable maps
         .build()
 
     private fun Rendering.Builder<*>.withFeatures(current: FeatureId?) = modelAttribute(

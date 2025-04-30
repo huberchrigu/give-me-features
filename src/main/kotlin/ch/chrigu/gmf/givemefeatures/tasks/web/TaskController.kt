@@ -43,7 +43,7 @@ class TaskController(private val taskService: TaskService, private val viewRende
     @ResponseBody
     fun getTaskUpdates(@PathVariable taskId: TaskId, exchange: ServerWebExchange) = taskService.getTaskUpdates(taskId)
         .map {
-            viewRenderService.render("blocks/task", mapOf("task" to it.toDetails()), exchange)
+            viewRenderService.render("blocks/task", mapOf("task" to it.toDetails()), exchange) // TODO: Create github ticket for SSE FragmentRendering
         }
 
     @PatchMapping("/{taskId}", headers = [Hx.HEADER])

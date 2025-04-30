@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class TaskService(private val taskRepository: TaskRepository, private val linkedItemProvider: LinkedItemProvider) {
-    private val taskStates = ConcurrentHashMap<TaskId, MutableSharedFlow<Task>>() // TODO: Make stateless, clean up flows
+    private val taskStates = ConcurrentHashMap<TaskId, MutableSharedFlow<Task>>() // TODO: Make stateless & clean up flows
 
     fun resolve(tasks: List<TaskId>) = taskRepository.findAllById(tasks)
     suspend fun newTask(task: Task) = taskRepository.save(task)
@@ -20,7 +20,7 @@ class TaskService(private val taskRepository: TaskRepository, private val linked
     suspend fun closeTask(id: TaskId, version: Long) = update(id, version) { close() }
 
     suspend fun getTask(id: TaskId) = taskRepository.findById(id) ?: throw TaskNotFoundException(id)
-    fun getTaskUpdates(id: TaskId): Flow<Task> = getTaskState(id).asSharedFlow()
+    fun getTaskUpdates(id: TaskId): Flow<Task> = getTaskState(id).asSharedFlow() // TODO: Extract solution and provide it for all views, incl. edit forms
 
     fun getLinkedItems(taskId: TaskId) = linkedItemProvider.getFor(taskId)
 
