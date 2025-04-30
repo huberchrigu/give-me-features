@@ -4,6 +4,7 @@ import ch.chrigu.gmf.givemefeatures.features.Feature
 import ch.chrigu.gmf.givemefeatures.features.FeatureId
 import ch.chrigu.gmf.givemefeatures.features.FeatureService
 import ch.chrigu.gmf.givemefeatures.features.FeatureUpdate
+import ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureListItem
 import ch.chrigu.gmf.givemefeatures.features.web.ui.asDetailView
 import ch.chrigu.gmf.givemefeatures.features.web.ui.asListItem
 import ch.chrigu.gmf.givemefeatures.shared.Html
@@ -12,10 +13,15 @@ import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.codec.ServerSentEvent
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.reactive.result.view.Fragment
 import org.springframework.web.reactive.result.view.FragmentsRendering
 import org.springframework.web.reactive.result.view.Rendering
 import org.springframework.web.server.ResponseStatusException
@@ -43,6 +49,21 @@ class FeatureController(private val featureService: FeatureService, private val 
         return updateForFeature(feature)
     }
 
+    @GetMapping("/{id}", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    fun getFeatureUpdates(@PathVariable id: FeatureId) = featureService.getUpdates(id) // TODO: UI Test
+        .map {
+            val featureDetail = featureService.getFeature(id).asDetailView(taskService)
+            ServerSentEvent.builder(Fragment.create("blocks/feature", mutableMapOf("feature" to featureDetail) as Map<String, Any>)).build()
+        }
+
+    @GetMapping(produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    fun getFeatureListUpdate() = featureService.getAllUpdates() // TODO: UI Test
+        .map {
+            ServerSentEvent.builder(
+                Fragment.create("blocks/features", mutableMapOf("features" to getFeatureList(null).toList()) as Map<String, Any>)
+            ).build() // TODO: Pass current item
+        }
+
     @GetMapping("/{id}", headers = [Hx.HEADER])
     suspend fun getFeature(@PathVariable id: FeatureId): FragmentsRendering {
         val feature = featureService.getFeature(id)
@@ -67,10 +88,15 @@ class FeatureController(private val featureService: FeatureService, private val 
             .build()
     }
 
+    /**
+     * Creates both fragments with feature data for the feature list page.
+     */
     private suspend fun updateForFeature(feature: Feature) = FragmentsRendering
-        .with("blocks/features", mapOf("features" to featureService.getFeatures().map { it.asListItem(feature.id) }).toMutableMap() as Map<String, Any>)
+        .with("blocks/features", mapOf("features" to getFeatureList(feature.id)).toMutableMap() as Map<String, Any>)
         .fragment("blocks/feature", mapOf("feature" to feature.asDetailView(taskService)).toMutableMap() as Map<String, Any>) // TODO: Github ticket for supporting immutable maps
         .build()
+
+    private fun getFeatureList(current: FeatureId?): Flow<FeatureListItem> = featureService.getFeatures().map { it.asListItem(current) }
 
     private fun Rendering.Builder<*>.withFeatures(current: FeatureId?) = modelAttribute(
         "features", featureService.getFeatures()

@@ -2,7 +2,7 @@
 
 @param features: List<FeatureListItem>
 
-<div id="features" class="card" hx-swap-oob="true">
+<div id="features" class="card" hx-swap-oob="true" sse-connect="/features" sse-swap="message">
     <h1>Features</h1>
     <ul class="list">
         @for(featureListItem in features)

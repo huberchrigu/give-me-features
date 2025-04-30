@@ -2,7 +2,6 @@ package ch.chrigu.gmf.givemefeatures.tasks.web
 
 import ch.chrigu.gmf.givemefeatures.features.FeatureId
 import ch.chrigu.gmf.givemefeatures.shared.Html
-import ch.chrigu.gmf.givemefeatures.shared.web.JteRenderService
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.microsoft.playwright.Page
@@ -18,10 +17,8 @@ import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.context.annotation.Import
 
 @UiTest(TaskController::class)
-@Import(JteRenderService::class)
 class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private val taskId = TaskId("1")
     private val name = "My task"

@@ -2,7 +2,6 @@ package ch.chrigu.gmf.givemefeatures.tasks.web
 
 import ch.chrigu.gmf.givemefeatures.features.web.Hx
 import ch.chrigu.gmf.givemefeatures.shared.Html
-import ch.chrigu.gmf.givemefeatures.shared.ViewRenderService
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
@@ -14,15 +13,16 @@ import jakarta.validation.constraints.NotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.http.MediaType
+import org.springframework.http.codec.ServerSentEvent
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.reactive.result.view.Fragment
 import org.springframework.web.reactive.result.view.Rendering
-import org.springframework.web.server.ServerWebExchange
 
 @Controller
 @RequestMapping("/tasks")
 @Suppress("SpringMVCViewInspection")
-class TaskController(private val taskService: TaskService, private val viewRenderService: ViewRenderService) {
+class TaskController(private val taskService: TaskService) {
     @GetMapping("/{taskId}")
     suspend fun getTask(@PathVariable taskId: TaskId) = Rendering.view("task")
         .modelAttribute("task", taskService.getTask(taskId).toDetails())
@@ -40,10 +40,11 @@ class TaskController(private val taskService: TaskService, private val viewRende
         .build()
 
     @GetMapping("/{taskId}", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
-    @ResponseBody
-    fun getTaskUpdates(@PathVariable taskId: TaskId, exchange: ServerWebExchange) = taskService.getTaskUpdates(taskId)
+    fun getTaskUpdates(@PathVariable taskId: TaskId) = taskService.getTaskUpdates(taskId)
         .map {
-            viewRenderService.render("blocks/task", mapOf("task" to it.toDetails()), exchange) // TODO: Create github ticket for SSE FragmentRendering
+            ServerSentEvent.builder(
+                Fragment.create("blocks/task", mapOf("task" to it.toDetails()).toMutableMap() as Map<String, Any>)
+            ).build()
         }
 
     @PatchMapping("/{taskId}", headers = [Hx.HEADER])

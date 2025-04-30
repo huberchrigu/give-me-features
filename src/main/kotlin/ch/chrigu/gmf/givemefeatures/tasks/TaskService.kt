@@ -1,16 +1,14 @@
 package ch.chrigu.gmf.givemefeatures.tasks
 
 import ch.chrigu.gmf.givemefeatures.shared.AggregateNotFoundException
+import ch.chrigu.gmf.givemefeatures.shared.SingleAggregateChanges
 import ch.chrigu.gmf.givemefeatures.tasks.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import org.springframework.stereotype.Service
-import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class TaskService(private val taskRepository: TaskRepository, private val linkedItemProvider: LinkedItemProvider) {
-    private val taskStates = ConcurrentHashMap<TaskId, MutableSharedFlow<Task>>() // TODO: Make stateless & clean up flows
+    private val changes = SingleAggregateChanges<Task, TaskId>()
 
     fun resolve(tasks: List<TaskId>) = taskRepository.findAllById(tasks)
     suspend fun newTask(task: Task) = taskRepository.save(task)
@@ -20,21 +18,14 @@ class TaskService(private val taskRepository: TaskRepository, private val linked
     suspend fun closeTask(id: TaskId, version: Long) = update(id, version) { close() }
 
     suspend fun getTask(id: TaskId) = taskRepository.findById(id) ?: throw TaskNotFoundException(id)
-    fun getTaskUpdates(id: TaskId): Flow<Task> = getTaskState(id).asSharedFlow() // TODO: Extract solution and provide it for all views, incl. edit forms
+
+    fun getTaskUpdates(id: TaskId): Flow<Task> = changes.listen(id) // TODO: Provide it for all views, incl. edit forms
 
     fun getLinkedItems(taskId: TaskId) = linkedItemProvider.getFor(taskId)
 
     private suspend fun update(id: TaskId, version: Long, applyChange: Task.() -> Task) = taskRepository.applyOn(id, version, applyChange)
-        ?.apply { registerTaskUpdate(this) }
+        ?.apply { changes.emitIfListened(this.id, this) }
         ?: throw TaskNotFoundException(id)
-
-    private suspend fun registerTaskUpdate(task: Task) {
-        taskStates[task.id]?.emit(task)
-    }
-
-    private fun getTaskState(id: TaskId) = taskStates.getOrPut(id) {
-        MutableSharedFlow()
-    }
 }
 
 class TaskNotFoundException(id: TaskId) : AggregateNotFoundException("Task $id not found")
