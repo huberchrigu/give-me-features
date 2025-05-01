@@ -3,6 +3,6 @@ package ch.chrigu.gmf.givemefeatures.features.web.ui
 import ch.chrigu.gmf.givemefeatures.features.Feature
 import ch.chrigu.gmf.givemefeatures.features.FeatureId
 
-class FeatureListItem(val name: String, val link: String, val current: Boolean)
+class FeatureListItem(val id: FeatureId, val name: String, val link: String)
 
-fun Feature.asListItem(current: FeatureId?) = FeatureListItem(name, "/features/${id!!}", current == id)
+fun Feature.asListItem() = FeatureListItem(id, name, "/features/${id}")

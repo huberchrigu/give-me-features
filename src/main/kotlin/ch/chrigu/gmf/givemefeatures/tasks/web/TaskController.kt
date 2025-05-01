@@ -43,7 +43,7 @@ class TaskController(private val taskService: TaskService) {
     fun getTaskUpdates(@PathVariable taskId: TaskId) = taskService.getTaskUpdates(taskId)
         .map {
             ServerSentEvent.builder(
-                Fragment.create("blocks/task", mapOf("task" to it.toDetails()).toMutableMap() as Map<String, Any>)
+                Fragment.create("blocks/task", mutableMapOf("task" to it.toDetails()) as Map<String, Any>)
             ).build()
         }
 

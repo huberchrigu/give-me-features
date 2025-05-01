@@ -1,13 +1,15 @@
 @import ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureListItem
+@import ch.chrigu.gmf.givemefeatures.features.FeatureId
 
 @param features: List<FeatureListItem>
+@param current: FeatureId?
 
-<div id="features" class="card" hx-swap-oob="true" sse-connect="/features" sse-swap="message">
+<div id="features" class="card" hx-swap-oob="true" sse-connect="/features?current=${current?.toString()}" sse-swap="message">
     <h1>Features</h1>
     <ul class="list">
         @for(featureListItem in features)
             <li class="list-item">
-                <a class="list-link ${if (featureListItem.current)  "current" else ""}" hx-get="${featureListItem.link}"><span>${featureListItem.name}</span></a>
+                <a class="list-link ${if (featureListItem.id == current)  "current" else ""}" hx-get="${featureListItem.link}"><span>${featureListItem.name}</span></a>
             </li>
         @endfor
     </ul>

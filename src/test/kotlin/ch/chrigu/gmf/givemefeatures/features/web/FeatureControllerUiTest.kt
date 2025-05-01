@@ -10,9 +10,10 @@ import com.microsoft.playwright.options.LoadState
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
 import io.mockk.every
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.server.LocalServerPort
 
@@ -26,8 +27,16 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     private val taskName = "New task"
     private val taskId = TaskId("99")
 
+    private val changes = MutableSharedFlow<Feature>()
+
     @LocalServerPort
     private var port: Int = 0
+
+    @BeforeEach
+    fun initChanges() {
+        every { featureService.getUpdates(any()) } answers { changes.filter { it.id == firstArg<FeatureId>() } }
+        every { featureService.getAllUpdates() } returns changes.asSharedFlow()
+    }
 
     @Test
     fun `should create a new feature`() {
@@ -74,6 +83,31 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     }
 
     @Test
+    fun `should show changes in feature list immediately`() {
+        withFeature()
+
+        openFeaturesPage {
+            assertFeatureList(false)
+            clickOnFeatureListItem()
+            assertFeatureDetails()
+            withExternalChange()
+            assertFeatureDetails(newName, newDescription)
+            assertFeatureList(true)
+        }
+    }
+
+    @Test
+    fun `should show changes in feature details immediately`() {
+        withFeature()
+
+        openFeaturesPage(featureId) {
+            assertFeatureDetails()
+            withExternalChange()
+            assertFeatureDetails(newName, newDescription)
+        }
+    }
+
+    @Test
     fun `should add a task`() {
         val feature = withFeature()
         withTask(feature)
@@ -114,16 +148,20 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         coEvery { featureService.updateFeature(featureId, 0L, FeatureUpdate(newName, html)) } returns Feature(featureId, newName, html, emptyList(), 1L)
     }
 
+    private fun Page.withExternalChange() = runBlocking {
+        changes.emit(Feature(featureId, newName, Html("<p>$newDescription</p>"), emptyList(), 1L))
+        waitForCondition { querySelector("#feature h2").textContent() != featureName }
+    }
+
     private fun Page.clickOnFeatureListItem() {
         querySelector("#features li a").click()
-        waitForLoadState(LoadState.NETWORKIDLE)
+        waitForCondition { querySelector("#feature h2") != null }
     }
 
     private fun Page.submitNewTaskForm() {
         val form = querySelector("#feature form")
         form.querySelector("#taskName").fill(taskName)
         form.querySelector("button[type='submit']").click()
-        waitForLoadState(LoadState.NETWORKIDLE)
         waitForCondition { querySelector("#feature ul li") != null }
     }
 
@@ -188,6 +226,6 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         querySelector("#name").fill(name)
         frames()[1].querySelector("body#tinymce").fill("Description")
         locator("button[type='submit']").click()
-        waitForLoadState(LoadState.NETWORKIDLE)
+        waitForCondition { querySelector("#feature h2") != null || querySelector("#error .error") != null }
     }
 }

@@ -11,7 +11,7 @@
     <script src="/webjars/tinymce/tinymce.min.js"></script>
     <script src="/script.js"></script>
 `, body = @`
-    @template.blocks.features(features = features)
+    @template.blocks.features(features = features, current = feature?.id)
     <div class="card">
         <h2>New Feature</h2>
         <form hx-post="/features">
