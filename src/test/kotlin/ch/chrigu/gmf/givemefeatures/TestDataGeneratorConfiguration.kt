@@ -22,9 +22,9 @@ class TestDataGeneratorConfiguration {
                         Html("A user can set a task in status <b>open</b> to status <b>blocked</b>")
                     )
                 )
-                    .let { featureService.addTask(it.id!!, it.version!!, Task.describeNewTask("Extend domain model"))!! }
-                    .let { featureService.addTask(it.id!!, it.version!!, Task.describeNewTask("Extend api"))!! }
-                    .let { featureService.addTask(it.id!!, it.version!!, Task.describeNewTask("Add controller method and ui extension")) }
+                    .let { featureService.addTask(it.id, it.version!!, Task.describeNewTask("Extend domain model"))!! }
+                    .let { featureService.addTask(it.id, it.version!!, Task.describeNewTask("Extend api"))!! }
+                    .let { featureService.addTask(it.id, it.version!!, Task.describeNewTask("Add controller method and ui extension")) }
             }
         }
     }

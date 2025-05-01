@@ -93,7 +93,7 @@ class FeatureController(private val featureService: FeatureService, private val 
      */
     private suspend fun updateForFeature(feature: Feature) = FragmentsRendering
         .with("blocks/features", mapOf("features" to getFeatureList(feature.id)).toMutableMap() as Map<String, Any>)
-        .fragment("blocks/feature", mapOf("feature" to feature.asDetailView(taskService)).toMutableMap() as Map<String, Any>) // TODO: Github ticket for supporting immutable maps
+        .fragment("blocks/feature", mapOf("feature" to feature.asDetailView(taskService)).toMutableMap() as Map<String, Any>) // TODO: https://github.com/spring-projects/spring-framework/issues/34848
         .build()
 
     private fun getFeatureList(current: FeatureId?): Flow<FeatureListItem> = featureService.getFeatures().map { it.asListItem(current) }
