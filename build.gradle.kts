@@ -3,9 +3,9 @@ import kotlin.io.path.Path
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
-	id("org.springframework.boot") version "3.4.4"
+    id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
-	id("gg.jte.gradle") version "3.1.16"
+    id("gg.jte.gradle") version "3.1.16"
 }
 
 group = "ch.chrigu.gmf"
@@ -13,7 +13,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
     toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -59,8 +59,11 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Misc
-    implementation("org.webjars.npm:htmx.org:2.0.3")
-    implementation("org.webjars.npm:tinymce:7.5.1")
+    runtimeOnly("org.webjars.npm:htmx.org:2.0.4")
+    runtimeOnly("org.webjars.npm:htmx-ext-sse:2.2.3")
+    runtimeOnly("org.webjars.npm:htmx-ext-response-targets:2.0.3")
+    runtimeOnly("org.webjars.npm:tinymce:7.7.2")
+    runtimeOnly("org.webjars:webjars-locator-lite")
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     testImplementation("com.microsoft.playwright:playwright:1.45.1")
     testImplementation("com.ninja-squad:springmockk:4.0.2")

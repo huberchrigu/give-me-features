@@ -8,19 +8,19 @@
 @param csrf: CsrfToken
 
 @template.page(title = "Features", head = @`
-    <script src="/webjars/tinymce/7.5.1/tinymce.min.js"></script>
+    <script src="/webjars/tinymce/tinymce.min.js"></script>
     <script src="/script.js"></script>
 `, body = @`
     @template.blocks.features(features = features)
-<div class="card">
-    <h2>New Feature</h2>
-    <form hx-post="/features">
-        <label for="name">Name: </label>
-        <input class="form-input" type="text" name="name" id="name"/>
-        <label for="description">Description: </label>
-        <textarea class="form-input" name="description" id="description"></textarea>
+    <div class="card">
+        <h2>New Feature</h2>
+        <form hx-post="/features">
+            <label for="name">Name: </label>
+            <input class="form-input" type="text" name="name" id="name"/>
+            <label for="description">Description: </label>
+            <textarea class="form-input" name="description" id="description"></textarea>
             <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
-        <button class="btn btn-primary" type="submit">Create</button>
+            <button class="btn btn-primary" type="submit">Create</button>
             <script>initRichtext('#description');</script>
         </form>
     </div>

@@ -21,7 +21,10 @@ import org.springframework.web.reactive.function.BodyInserters
 @AutoConfigureWebTestClient(timeout = "30s")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @Import(SecurityConfiguration::class, ReactiveJteAutoConfiguration::class)
-class TaskControllerWebTest(private val webTestClient: WebTestClient, @MockitoBean private val taskService: TaskService) {
+class TaskControllerWebTest(
+    private val webTestClient: WebTestClient,
+    @MockitoBean private val taskService: TaskService
+) {
     @Test
     fun `should return client-friendly 400 error`() {
         webTestClient.mutateWith(csrf())

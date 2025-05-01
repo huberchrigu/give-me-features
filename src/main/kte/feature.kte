@@ -7,7 +7,7 @@
 @param csrf: CsrfToken
 
 @template.page(title = feature.name, head = @`
-    <script src="/webjars/tinymce/7.5.1/tinymce.min.js"></script>
+    <script src="/webjars/tinymce/tinymce.min.js"></script>
     <script src="/script.js"></script>
 `, body = @`
     @template.blocks.feature(feature = feature, csrf = csrf)

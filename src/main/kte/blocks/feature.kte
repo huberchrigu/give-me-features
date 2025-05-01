@@ -4,7 +4,7 @@
 @param feature: FeatureDetailView?
 @param csrf: CsrfToken
 
-<div id="feature" hx-swap-oob="true">
+<div id="feature" hx-swap-oob="true" sse-connect="${if (feature != null) "/features/${feature.id}" else ""}" sse-swap="${if (feature != null) "message" else ""}">
     @if(feature != null)
         <div class="card">
             <h2>${feature.name}</h2>
