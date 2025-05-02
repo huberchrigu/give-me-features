@@ -17,8 +17,12 @@
         ${head}
     @endif
 </head>
-<body hx-ext="response-targets,sse" hx-target-error="#error" hx-swap="none">
+<body hx-ext="response-targets,sse" hx-target-error="#error" hx-swap="none" hx-indicator="#loading-overlay">
 ${body}
 @template.blocks.error(error)
+<!-- Global Loading Spinner -->
+<div id="loading-overlay">
+    <div class="spinner"></div>
+</div>
 </body>
 </html>

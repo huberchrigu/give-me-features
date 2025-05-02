@@ -11,12 +11,15 @@ body {
 h1, h2, h3 {
     @apply text-gray-800 mb-4 border-b-2 border-green-600 pb-1;
 }
+
 h1 {
     @apply text-2xl;
 }
+
 h2 {
     @apply text-xl;
 }
+
 h3 {
     @apply text-lg;
 }
@@ -124,4 +127,19 @@ form label {
 /* Form Input */
 .form-input {
     @apply w-full py-2 px-3 mb-4 border border-gray-300 rounded-sm;
+}
+
+/* Loading overlay */
+/* Custom class for global HTMX loading indicator */
+#loading-overlay {
+    @apply fixed inset-0 bg-white z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200;
+}
+
+/* When HTMX is making a request, this class will be added automatically */
+.htmx-request#loading-overlay {
+    @apply opacity-75 pointer-events-auto;
+}
+
+#loading-overlay .spinner {
+    @apply animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500
 }
