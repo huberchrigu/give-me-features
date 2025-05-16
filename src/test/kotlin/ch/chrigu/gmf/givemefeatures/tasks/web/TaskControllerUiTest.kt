@@ -133,7 +133,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
 
     private fun Page.submitTaskForm() {
         querySelector("#name").fill(newName)
-        frames()[1].querySelector("body#tinymce").fill(newDescription)
+        querySelector("#description").fill(newDescriptionHtml.toString())
         querySelector("#task button.btn").click()
         waitForLoadState(LoadState.NETWORKIDLE)
         waitForCondition { querySelector("#task h1") != null }

@@ -7,10 +7,7 @@
 @param features: List<FeatureListItem>
 @param csrf: CsrfToken
 
-@template.page(title = "Features", head = @`
-    <script src="/webjars/tinymce/tinymce.min.js"></script>
-    <script src="/script.js"></script>
-`, body = @`
+@template.page(title = "Features", body = @`
     @template.blocks.features(features = features, current = feature?.id)
     <div class="card">
         <h2>New Feature</h2>

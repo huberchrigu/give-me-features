@@ -8,8 +8,6 @@
 @param csrf: CsrfToken
 
 @template.page(title = "Task", head = @`
-    <script src="/webjars/tinymce/tinymce.min.js"></script>
-    <script src="/script.js"></script>
     <script src="/status-update.js"></script>
 `, body = @`
     @template.blocks.task(task = task, csrf = csrf)

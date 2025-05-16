@@ -62,7 +62,6 @@ dependencies {
     runtimeOnly("org.webjars.npm:htmx.org:2.0.4")
     runtimeOnly("org.webjars.npm:htmx-ext-sse:2.2.3")
     runtimeOnly("org.webjars.npm:htmx-ext-response-targets:2.0.3")
-    runtimeOnly("org.webjars.npm:tinymce:7.7.2")
     runtimeOnly("org.webjars:webjars-locator-lite")
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     testImplementation("com.microsoft.playwright:playwright:1.45.1")
