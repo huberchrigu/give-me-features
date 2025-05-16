@@ -1,7 +1,7 @@
 package ch.chrigu.gmf.givemefeatures.features.web
 
 import ch.chrigu.gmf.givemefeatures.features.*
-import ch.chrigu.gmf.givemefeatures.shared.Html
+import ch.chrigu.gmf.givemefeatures.shared.Markdown
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.microsoft.playwright.Page
@@ -21,7 +21,7 @@ import org.springframework.boot.test.web.server.LocalServerPort
 class FeatureControllerUiTest(@MockkBean private val featureService: FeatureService, @MockkBean private val taskService: TaskService) {
     private val featureName = "My new feature"
     private val newName = "Version 2.0"
-    private val featureDescription = Html("<p>Description</p>")
+    private val featureDescription = Markdown("Description")
     private val newDescription = "New description"
     private val featureId = FeatureId("123")
     private val taskName = "New task"
@@ -131,7 +131,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     private fun withTask(feature: Feature) {
         val task = Task.describeNewTask(taskName)
         val featureWithTask = feature.copy(tasks = listOf(taskId))
-        coEvery { featureService.addTask(featureId, 0L, match { it == Task(it.id, null, taskName, Html(""), TaskStatus.OPEN) }) } returns featureWithTask
+        coEvery { featureService.addTask(featureId, 0L, match { it == Task(it.id, null, taskName, Markdown(""), TaskStatus.OPEN) }) } returns featureWithTask
         every { taskService.resolve(listOf(taskId)) } returns flowOf(task.copy(id = taskId))
     }
 
@@ -144,12 +144,12 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     }
 
     private fun withFeatureUpdate() {
-        val html = Html("<p>$newDescription</p>")
-        coEvery { featureService.updateFeature(featureId, 0L, FeatureUpdate(newName, html)) } returns Feature(featureId, newName, html, emptyList(), 1L)
+        val markdown = Markdown(newDescription)
+        coEvery { featureService.updateFeature(featureId, 0L, FeatureUpdate(newName, markdown)) } returns Feature(featureId, newName, markdown, emptyList(), 1L)
     }
 
     private fun Page.withExternalChange() = runBlocking {
-        changes.emit(Feature(featureId, newName, Html("<p>$newDescription</p>"), emptyList(), 1L))
+        changes.emit(Feature(featureId, newName, Markdown(newDescription), emptyList(), 1L))
         waitForCondition { querySelector("#feature h2").textContent() != featureName }
     }
 

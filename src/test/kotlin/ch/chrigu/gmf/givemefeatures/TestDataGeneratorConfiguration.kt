@@ -2,7 +2,7 @@ package ch.chrigu.gmf.givemefeatures
 
 import ch.chrigu.gmf.givemefeatures.features.Feature
 import ch.chrigu.gmf.givemefeatures.features.FeatureService
-import ch.chrigu.gmf.givemefeatures.shared.Html
+import ch.chrigu.gmf.givemefeatures.shared.Markdown
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -19,7 +19,7 @@ class TestDataGeneratorConfiguration {
                 featureService.newFeature(
                     Feature.describeNewFeature(
                         "Task status shall be changeable to blocked",
-                        Html("A user can set a task in status <b>open</b> to status <b>blocked</b>")
+                        Markdown("A user can set a task in status **open** to status **blocked**")
                     )
                 )
                     .let { featureService.addTask(it.id, it.version!!, Task.describeNewTask("Extend domain model"))!! }

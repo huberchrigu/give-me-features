@@ -58,15 +58,22 @@ dependencies {
     testImplementation("org.testcontainers:mongodb")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    // Misc
+    // Webjars
     runtimeOnly("org.webjars.npm:htmx.org:2.0.4")
     runtimeOnly("org.webjars.npm:htmx-ext-sse:2.2.3")
     runtimeOnly("org.webjars.npm:htmx-ext-response-targets:2.0.3")
     runtimeOnly("org.webjars:webjars-locator-lite")
+
+    // HTML sanitizer
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
+
+    // Markdown
+    implementation("org.jetbrains:markdown:0.7.3")
+
+    // Testing
     testImplementation("com.microsoft.playwright:playwright:1.45.1")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
-    implementation("org.jsoup:jsoup:1.18.3")
+    testImplementation("org.jsoup:jsoup:1.18.3")
 }
 
 dependencyManagement {
