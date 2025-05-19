@@ -173,7 +173,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         val descriptionField = querySelector("#description")
         val submitButton = querySelector("button[hx-patch]")
         nameField.fill(newName)
-        descriptionField.fill("<p>$newDescription</p>")
+        descriptionField.fill(newDescription)
         submitButton.click()
         waitForLoadState(LoadState.NETWORKIDLE)
         waitForCondition { querySelector("button[hx-patch]") == null }
@@ -224,7 +224,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
 
     private fun Page.submitNewFeatureForm(name: String = featureName) {
         querySelector("#name").fill(name)
-        querySelector("#description").fill("<p>Description</p>")
+        querySelector("#description").fill(featureDescription.toString())
         locator("button[type='submit']").click()
         waitForCondition { querySelector("#feature h2") != null || querySelector("#error .error") != null }
     }
