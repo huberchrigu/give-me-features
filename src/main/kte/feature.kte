@@ -8,5 +8,6 @@
 
 @template.page(title = feature.name, body = @`
     @template.blocks.feature(feature = feature, csrf = csrf)
-    <button class="btn" hx-get="/features/${feature.id.toString()}/edit">Edit</button>
+    <button class="btn btn-primary" hx-get="/features/${feature.id.toString()}/edit">Edit</button>
+    <a class="btn" href="/features">Back to list</a>
 `, error = error)

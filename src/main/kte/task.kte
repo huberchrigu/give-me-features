@@ -13,18 +13,12 @@
     @template.blocks.task(task = task, csrf = csrf)
     <div class="card">
         <h2>Linked Features</h2>
-        <ul class="list">
+        <ul>
             @for(item in items)
-                <li class="list-item">
-                    <a class="list-link" href="/features/${item.id.toString()}">${item.name}</a>
+                <li>
+                    <a href="/features/${item.id.toString()}">${item.name}</a>
                 </li>
             @endfor
-        </ul>
-    </div>
-    <div class="card">
-        <h2>Actions</h2>
-        <ul class="list">
-
         </ul>
     </div>
 `, error = error)

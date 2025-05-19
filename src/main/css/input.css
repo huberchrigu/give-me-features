@@ -28,27 +28,35 @@ h3 {
     @apply bg-white rounded-md shadow p-5 mb-8;
 }
 
-.list {
+ul {
     @apply list-none p-0 m-0;
 }
 
-.list-item {
-    @apply border-b border-gray-200 cursor-pointer last:border-b-0;
+ul li {
+    @apply border-b border-gray-200 cursor-pointer last:border-b-0 flex justify-between items-center w-full;
 }
 
-.list-link {
-    @apply block px-4 py-2 no-underline text-blue-600 transition-colors duration-300 hover:bg-gray-100;
+ul li a {
+    @apply px-4 py-2 no-underline text-blue-600 transition-colors duration-300 hover:bg-gray-100;
 }
 
-.list-link.current {
+ul li a:first-child {
+    @apply grow;
+}
+
+ul li a.current {
     @apply font-bold text-blue-800 bg-blue-100;
+}
+
+ul li a.right {
+    @apply text-sm text-gray-800 font-bold;
 }
 
 .task-list {
     @apply bg-gray-50 rounded-md mb-5;
 }
 
-.task-list .list-link:hover {
+.task-list a:hover {
     @apply bg-gray-100;
 }
 
