@@ -1,7 +1,7 @@
 package ch.chrigu.gmf.givemefeatures.tasks.web
 
 import ch.chrigu.gmf.givemefeatures.features.FeatureId
-import ch.chrigu.gmf.givemefeatures.shared.Html
+import ch.chrigu.gmf.givemefeatures.shared.Markdown
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.microsoft.playwright.Page
@@ -23,10 +23,10 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private val taskId = TaskId("1")
     private val name = "My task"
     private val description = "desc"
-    private val descriptionHtml = Html("<p>$description</p>")
+    private val descriptionMarkdown = Markdown(description)
     private val newName = "Updated task"
     private val newDescription = "Updated desc"
-    private val newDescriptionHtml = Html("<p>$newDescription</p>")
+    private val newDescriptionMarkdown = Markdown(newDescription)
     private val featureName = "Feature"
     private val featureId = FeatureId("featureId")
 
@@ -55,7 +55,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
 
         openTaskPage {
             assertTask()
-            externalTaskChange(newName, newDescriptionHtml, TaskStatus.BLOCKED)
+            externalTaskChange(newName, newDescriptionMarkdown, TaskStatus.BLOCKED)
             assertTask(newName, newDescription, TaskStatus.BLOCKED)
         }
     }
@@ -74,7 +74,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     @Test
     fun `should change status`() {
         withTask()
-        coEvery { taskService.blockTask(taskId, 0) } returns Task(taskId, 1, name, descriptionHtml, TaskStatus.BLOCKED)
+        coEvery { taskService.blockTask(taskId, 0) } returns Task(taskId, 1, name, descriptionMarkdown, TaskStatus.BLOCKED)
 
         openTaskPage {
             assertTask()
@@ -125,7 +125,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         val descriptionInput = querySelector("#description")
         val buttons = querySelectorAll("#task button.btn")
         assertThat(nameInput.inputValue()).isEqualTo(name)
-        assertThat(descriptionInput.inputValue()).isEqualTo(descriptionHtml.toString())
+        assertThat(descriptionInput.inputValue()).isEqualTo(descriptionMarkdown.toString())
         assertThat(buttons).hasSize(2)
         assertThat(buttons[0].textContent()).isEqualTo("Submit")
         assertThat(buttons[1].textContent()).isEqualTo("Cancel")
@@ -133,7 +133,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
 
     private fun Page.submitTaskForm() {
         querySelector("#name").fill(newName)
-        frames()[1].querySelector("body#tinymce").fill(newDescription)
+        querySelector("#description").fill(newDescriptionMarkdown.toString())
         querySelector("#task button.btn").click()
         waitForLoadState(LoadState.NETWORKIDLE)
         waitForCondition { querySelector("#task h1") != null }
@@ -149,7 +149,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         waitForCondition { querySelector("h1 .status-${newStatus.name}") != null }
     }
 
-    private fun Page.externalTaskChange(name: String, description: Html, status: TaskStatus) = runBlocking {
+    private fun Page.externalTaskChange(name: String, description: Markdown, status: TaskStatus) = runBlocking {
         taskUpdates.emit(Task(taskId, 1L, name, description, status))
         waitForCondition { querySelector("h1 .status-${status.name}") != null }
     }
@@ -188,11 +188,11 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun withUpdate() {
-        coEvery { taskService.updateTask(taskId, 0, Task.TaskUpdate(newName, newDescriptionHtml)) } returns Task(taskId, 1, newName, newDescriptionHtml, TaskStatus.OPEN)
+        coEvery { taskService.updateTask(taskId, 0, Task.TaskUpdate(newName, newDescriptionMarkdown)) } returns Task(taskId, 1, newName, newDescriptionMarkdown, TaskStatus.OPEN)
     }
 
     private fun withTask() {
-        coEvery { taskService.getTask(taskId) } returns Task(taskId, 0, name, descriptionHtml, TaskStatus.OPEN)
+        coEvery { taskService.getTask(taskId) } returns Task(taskId, 0, name, descriptionMarkdown, TaskStatus.OPEN)
         every { taskService.getLinkedItems(taskId) } returns flowOf(TaskLinkedItem(featureId, featureName))
         coEvery { taskService.getTaskUpdates(taskId) } returns taskUpdates.asSharedFlow()
     }

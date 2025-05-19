@@ -6,10 +6,7 @@
 @param feature: FeatureDetailView
 @param csrf: CsrfToken
 
-@template.page(title = feature.name, head = @`
-    <script src="/webjars/tinymce/tinymce.min.js"></script>
-    <script src="/script.js"></script>
-`, body = @`
+@template.page(title = feature.name, body = @`
     @template.blocks.feature(feature = feature, csrf = csrf)
     <button class="btn" hx-get="/features/${feature.id.toString()}/edit">Edit</button>
 `, error = error)

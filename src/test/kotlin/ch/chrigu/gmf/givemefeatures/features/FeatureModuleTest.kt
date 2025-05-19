@@ -2,7 +2,7 @@ package ch.chrigu.gmf.givemefeatures.features
 
 import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
 import ch.chrigu.gmf.givemefeatures.features.repository.FeatureRepository
-import ch.chrigu.gmf.givemefeatures.shared.Html
+import ch.chrigu.gmf.givemefeatures.shared.Markdown
 import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
@@ -24,7 +24,7 @@ class FeatureModuleTest(
 ) {
     private val id = FeatureId("1")
     private val name = "name"
-    private val description = Html("description")
+    private val description = Markdown("description")
 
     @BeforeEach
     fun resetDb() = runTest {
@@ -34,7 +34,7 @@ class FeatureModuleTest(
 
     @Test
     fun `should describe a feature`() = runTest {
-        val result = featureService.newFeature(Feature.describeNewFeature("Login", Html("A user should be able to login")))
+        val result = featureService.newFeature(Feature.describeNewFeature("Login", Markdown("A user should be able to login")))
         assertThat(result.name).isEqualTo(result.name)
         assertThat(result.description).isEqualTo(result.description)
         assertThat(result.id).isNotNull()
@@ -43,7 +43,7 @@ class FeatureModuleTest(
     @Test
     fun `should add a task to a feature`() = runTest {
         val task = Task.describeNewTask("Task name")
-        coEvery { taskService.newTask(task) } returns Task(TaskId("1"), 0, "Task name", Html(""), TaskStatus.OPEN)
+        coEvery { taskService.newTask(task) } returns Task(TaskId("1"), 0, "Task name", Markdown(""), TaskStatus.OPEN)
         val result = featureService.addTask(id, 0, task)
         assertThat(result!!.tasks).hasSize(1)
         coVerify { taskService.newTask(task) }
@@ -71,7 +71,7 @@ class FeatureModuleTest(
 
     @Test
     fun `should update feature`() = runTest {
-        val newDescription = Html("<p>updated</p>")
+        val newDescription = Markdown("updated")
         val newName = "new name"
         val result = featureService.updateFeature(id, 0L, FeatureUpdate(newName, newDescription))
         assertThat(result.name).isEqualTo(newName)

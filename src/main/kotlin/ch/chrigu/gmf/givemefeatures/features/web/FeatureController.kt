@@ -7,7 +7,7 @@ import ch.chrigu.gmf.givemefeatures.features.FeatureUpdate
 import ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureListItem
 import ch.chrigu.gmf.givemefeatures.features.web.ui.asDetailView
 import ch.chrigu.gmf.givemefeatures.features.web.ui.asListItem
-import ch.chrigu.gmf.givemefeatures.shared.Html
+import ch.chrigu.gmf.givemefeatures.shared.Markdown
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import jakarta.validation.Valid
@@ -105,7 +105,7 @@ class FeatureController(private val featureService: FeatureService, private val 
     private fun listFragment(current: FeatureId?) = Fragment.create("blocks/features", mutableMapOf("features" to getFeatureList(), "current" to current) as Map<String, Any>)
 
     class NewFeatureBody(@field:NotEmpty private val name: String?, @field:NotEmpty private val description: String?) {
-        fun toFeature() = Feature.describeNewFeature(name!!, Html(description!!))
+        fun toFeature() = Feature.describeNewFeature(name!!, Markdown(description!!))
     }
 
     class NewTaskBody(@field:NotEmpty private val name: String?) {
@@ -113,6 +113,6 @@ class FeatureController(private val featureService: FeatureService, private val 
     }
 }
 
-class UpdateFeatureDto(@field:NotEmpty private val name: String?, @field:NotNull private val description: Html?) {
+class UpdateFeatureDto(@field:NotEmpty private val name: String?, @field:NotNull private val description: Markdown?) {
     fun toDomain() = FeatureUpdate(name!!, description!!)
 }

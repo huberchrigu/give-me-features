@@ -1,7 +1,7 @@
 package ch.chrigu.gmf.givemefeatures.tasks
 
 import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
-import ch.chrigu.gmf.givemefeatures.shared.Html
+import ch.chrigu.gmf.givemefeatures.shared.Markdown
 import ch.chrigu.gmf.givemefeatures.tasks.repository.TaskRepository
 import com.ninjasquad.springmockk.MockkBean
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,7 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
     fun `should update description`() = runTest {
         val task = taskRepository.save(Task.describeNewTask("task"))
         val id = task.id
-        val newDescription = Html("new description")
+        val newDescription = Markdown("new description")
         taskService.updateTask(id, 0, Task.TaskUpdate("task", newDescription))
         assertThat(taskRepository.findById(id)?.description).isEqualTo(newDescription)
     }
@@ -57,11 +57,11 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
     @Test
     fun `should merge tasks`() = runTest {
         val task = taskRepository.save(Task.describeNewTask("test"))
-        val askUpdate1 = async { taskService.updateTask(task.id, 0, Task.TaskUpdate("new task", Html("new description"))) }
+        val askUpdate1 = async { taskService.updateTask(task.id, 0, Task.TaskUpdate("new task", Markdown("new description"))) }
         val askUpdate2 = async { taskService.blockTask(task.id, 0) }
         awaitAll(askUpdate1, askUpdate2)
         val result = taskRepository.findById(task.id)
-        assertThat(result).isEqualTo(Task(task.id, 2, "new task", Html("new description"), TaskStatus.BLOCKED))
+        assertThat(result).isEqualTo(Task(task.id, 2, "new task", Markdown("new description"), TaskStatus.BLOCKED))
     }
 
     @Test
@@ -82,7 +82,7 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
             taskRepository.save(Task.describeNewTask("test$it"))
         }
         val updates = (0 until 100).map {
-            async { taskService.updateTask(tasks[it].id, 0L, Task.TaskUpdate("changed$it", Html(""))) }
+            async { taskService.updateTask(tasks[it].id, 0L, Task.TaskUpdate("changed$it", Markdown(""))) }
         }
         val jobs = (0 until 100).map { i ->
             launch(Dispatchers.IO) {
@@ -96,7 +96,7 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
         delay(1000L)
         testScheduler.advanceUntilIdle()
         (0 until 100).onEach { i ->
-            assertThat(result[i]).isEqualTo(Task(tasks[i].id, 1L, "changed$i", Html(""), TaskStatus.OPEN))
+            assertThat(result[i]).isEqualTo(Task(tasks[i].id, 1L, "changed$i", Markdown(""), TaskStatus.OPEN))
         }
         jobs.onEach { it.cancel() }
     }

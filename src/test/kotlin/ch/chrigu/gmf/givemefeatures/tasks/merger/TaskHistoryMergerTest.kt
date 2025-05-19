@@ -1,6 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.tasks.merger
 
-import ch.chrigu.gmf.givemefeatures.shared.Html
+import ch.chrigu.gmf.givemefeatures.shared.Markdown
 import ch.chrigu.gmf.givemefeatures.shared.history.AbstractMerger
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
@@ -19,7 +19,7 @@ class TaskHistoryMergerTest {
         "new, new,"
     )
     fun testMerge(mergingDescription: String, currentDescription: String, expectedDescription: String?) {
-        val sharedVersion = Task(TaskId("1"), 0, "Name", Html("description"), TaskStatus.OPEN)
+        val sharedVersion = Task(TaskId("1"), 0, "Name", Markdown("description"), TaskStatus.OPEN)
         val testee = TaskMerger()
         val mergingVersion = change(sharedVersion, mergingDescription)
         val currentVersion = change(sharedVersion, currentDescription, 1)
@@ -39,5 +39,5 @@ class TaskHistoryMergerTest {
     }
 
     private fun change(base: Task, newVersionDescription: String, version: Long = base.version!!) =
-        base.copy(description = Html(newVersionDescription), version = version)
+        base.copy(description = Markdown(newVersionDescription), version = version)
 }
