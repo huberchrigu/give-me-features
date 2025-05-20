@@ -9,9 +9,8 @@
     <ul>
         @for(featureListItem in features)
             <li>
-                <a class="${if (featureListItem.id == current) "current" else ""}" hx-get="${featureListItem.link}" href="${featureListItem.link}">
-                    ${featureListItem.name}
-                </a>
+                <a class="${if (featureListItem.id == current) "current" else ""}" hx-get="${featureListItem.link}"
+                   href="${featureListItem.link}">${featureListItem.name}</a>
                 <a class="right" href="${featureListItem.link}">&rarr;</a>
             </li>
         @endfor

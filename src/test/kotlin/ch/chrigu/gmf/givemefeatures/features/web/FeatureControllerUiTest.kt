@@ -206,8 +206,8 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     private fun Page.assertFeatureList(current: Boolean) {
         val items = querySelectorAll("#features li")
         assertThat(items).hasSize(1)
-        assertThat(items[0].querySelector("span").textContent()).isEqualTo(featureName)
         val link = items[0].querySelector("a")
+        assertThat(link.textContent()).isEqualTo(featureName)
         assertThat(link.getAttribute("hx-get")).isEqualTo("/features/$featureId")
         val clazz = link.getAttribute("class").split(" ")
         if (current) {
