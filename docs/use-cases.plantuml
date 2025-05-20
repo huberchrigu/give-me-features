@@ -14,6 +14,7 @@ package Features {
 (Planning a feature go-live) as GoLive
 (Collaborating on a feature) as CollabFeature
 (Testing a feature) as Testing
+(Completing a feature) as CompleteFeature
 }
 
 package Tasks {
@@ -22,9 +23,36 @@ package Tasks {
 (Marking a task as blocked) as Blocked #yellow
 (Tackling blocking issues) as Tackling
 (Collaborating on a task) as CollabTask
+(Completing a task) as CompleteTask
 }
+
 package Interfaces {
-(Describing interfaces) as NewInterface
+(Describing an interface) as NewInterface
+}
+
+package Services {
+(Describing a service) as NewService
+}
+
+package SolutionDesigns {
+(Describing architecture) as NewSolutionDesign
+}
+
+package Tests {
+(Describing a test) as NewTest
+(Linked to feature/task/interface) as LinkTest
+(Marked as executable) as ExecutableTest
+(Executing tests) as TestExecuted
+}
+
+package SoftFeatures {
+(Starting a discussion) as Discussion
+(Giving feedback) as Feedback
+(Tracking impediments) as Impediment
+(Making proposals/opinions) as Opinion
+(Tracking decisions) as Decision
+(Recording conflicts) as Conflict
+note bottom of SoftFeatures : To be defined
 }
 
 RE --> NewFeature
@@ -49,6 +77,11 @@ PO --> GoLive
 Architect --> NewInterface
 Developer --> NewInterface
 
+Architect --> NewService
+Developer --> NewService
+
+Architect --> NewSolutionDesign
+
 RE --> CollabFeature
 Architect --> CollabFeature
 PO --> CollabFeature
@@ -57,6 +90,14 @@ Architect --> CollabTask
 Developer --> CollabTask
 
 QM --> Testing
+
+QM --> NewTest
+QM --> LinkTest
+Developer --> ExecutableTest
+QM --> TestExecuted
+
+QM --> CompleteTask
+QM --> CompleteFeature
 
 legend
   | <#yellow>yellow  | Use case implemented |
