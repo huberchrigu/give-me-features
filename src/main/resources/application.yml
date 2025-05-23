@@ -3,6 +3,8 @@ spring:
     name: give-me-features
 gg:
   jte:
-    developmentMode: true
+    developmentMode: true # TODO: Fix for production
     templateLocation: src/main/kte
     templateSuffix: .kte
+server:
+  shutdown: immediate # TODO: Fix for production
