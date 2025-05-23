@@ -12,5 +12,4 @@
     <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
     <button class="btn btn-primary" hx-patch="/tasks/${task.id!!.toString()}?version=${task.version}">Submit</button>
     <button class="btn" hx-get="/tasks/${task.id!!.toString()}">Cancel</button>
-    <script>initRichtext('#description');</script>
 </form>

@@ -18,7 +18,6 @@
             <textarea class="form-input" name="description" id="description"></textarea>
             <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
             <button class="btn btn-primary" type="submit">Create</button>
-            <script>initRichtext('#description');</script>
         </form>
     </div>
     @template.blocks.feature(feature = feature, csrf = csrf)
