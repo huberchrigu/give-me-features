@@ -1,14 +1,14 @@
 package ch.chrigu.gmf.givemefeatures.tasks
 
+import ch.chrigu.gmf.givemefeatures.shared.AggregateChangesFactory
 import ch.chrigu.gmf.givemefeatures.shared.AggregateNotFoundException
-import ch.chrigu.gmf.givemefeatures.shared.SingleAggregateChanges
 import ch.chrigu.gmf.givemefeatures.tasks.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
 import org.springframework.stereotype.Service
 
 @Service
-class TaskService(private val taskRepository: TaskRepository, private val linkedItemProvider: LinkedItemProvider) {
-    private val changes = SingleAggregateChanges<Task, TaskId>()
+class TaskService(private val taskRepository: TaskRepository, private val linkedItemProvider: LinkedItemProvider, aggregateChangesFactory: AggregateChangesFactory) {
+    private val changes = aggregateChangesFactory.create(Task::class.java)
 
     fun resolve(tasks: List<TaskId>) = taskRepository.findAllById(tasks)
     suspend fun newTask(task: Task) = taskRepository.save(task)
