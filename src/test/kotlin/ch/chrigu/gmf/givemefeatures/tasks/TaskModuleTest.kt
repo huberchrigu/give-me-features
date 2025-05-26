@@ -12,14 +12,20 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility.await
+import org.jetbrains.kotlin.util.javaslang.getOrNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Import
 import org.springframework.modulith.test.ApplicationModuleTest
+import java.time.Duration
 
 @ApplicationModuleTest
 @Import(TestcontainersConfiguration::class)
 class TaskModuleTest(private val taskService: TaskService, private val taskRepository: TaskRepository, @MockkBean private val linkedItemProvider: LinkedItemProvider) {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     @BeforeEach
     fun reset() = runTest {
         taskRepository.deleteAll()
@@ -87,13 +93,14 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
         val jobs = (0 until 100).map { i ->
             launch(Dispatchers.IO) {
                 taskService.getTaskUpdates(tasks[i].id).collect {
+                    logger.info("Received update $i")
                     assertThat(result[i]).isNull()
                     result.put(i, it)
                 }
             }
         }
         updates.awaitAll()
-        delay(1000L)
+        await().atMost(Duration.ofMinutes(2)).until { (0 until 100).all { i -> result[i] != null } }
         testScheduler.advanceUntilIdle()
         (0 until 100).onEach { i ->
             assertThat(result[i]).isEqualTo(Task(tasks[i].id, 1L, "changed$i", Markdown(""), TaskStatus.OPEN))
