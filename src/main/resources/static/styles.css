@@ -11,6 +11,8 @@
     --color-red-300: oklch(80.8% 0.114 19.571);
     --color-red-700: oklch(50.5% 0.213 27.518);
     --color-orange-500: oklch(70.5% 0.213 47.604);
+    --color-green-50: oklch(98.2% 0.018 155.826);
+    --color-green-100: oklch(96.2% 0.044 156.743);
     --color-green-600: oklch(62.7% 0.194 149.214);
     --color-green-700: oklch(52.7% 0.154 150.069);
     --color-blue-100: oklch(93.2% 0.032 255.585);
@@ -192,6 +194,9 @@
   }
 }
 @layer utilities {
+  .block {
+    display: block;
+  }
   .contents {
     display: contents;
   }
@@ -204,9 +209,6 @@
   .border {
     border-style: var(--tw-border-style);
     border-width: 1px;
-  }
-  .italic {
-    font-style: italic;
   }
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
@@ -531,6 +533,55 @@ form label {
   border-bottom-width: 4px;
   border-color: var(--color-blue-500);
 }
+.description li {
+  display: list-item;
+  cursor: auto;
+  list-style-position: inside;
+  border-style: var(--tw-border-style);
+  border-width: 0px;
+}
+.description ul li {
+  list-style-type: disc;
+}
+.description ol li {
+  list-style-type: decimal;
+}
+.description table, .description tr, .description td, .description th {
+  table-layout: auto;
+  border-style: var(--tw-border-style);
+  border-width: 1px;
+  --tw-border-style: solid;
+  border-style: solid;
+  border-color: var(--color-green-600);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 1);
+  text-align: left;
+}
+.description {
+  border-radius: var(--radius-md);
+  border-style: var(--tw-border-style);
+  border-width: 1px;
+  --tw-border-style: hidden;
+  border-style: hidden;
+  border-color: var(--color-green-600);
+  background-color: var(--color-green-50);
+  padding-inline: calc(var(--spacing) * 5);
+  padding-block: calc(var(--spacing) * 2);
+  --tw-leading: calc(var(--spacing) * 7);
+  line-height: calc(var(--spacing) * 7);
+}
+.description blockquote {
+  margin-block: calc(var(--spacing) * 4);
+  border-style: var(--tw-border-style);
+  border-width: 1px;
+  border-left-style: var(--tw-border-style);
+  border-left-width: 4px;
+  --tw-border-style: solid;
+  border-style: solid;
+  border-color: var(--color-green-600);
+  background-color: var(--color-green-100);
+  padding: calc(var(--spacing) * 4);
+}
 @property --tw-border-style {
   syntax: "*";
   inherits: false;
@@ -721,6 +772,10 @@ form label {
   syntax: "*";
   inherits: false;
 }
+@property --tw-leading {
+  syntax: "*";
+  inherits: false;
+}
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -771,6 +826,7 @@ form label {
       --tw-skew-x: skewX(0);
       --tw-skew-y: skewY(0);
       --tw-ease: initial;
+      --tw-leading: initial;
     }
   }
 }

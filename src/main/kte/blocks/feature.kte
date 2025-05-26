@@ -8,7 +8,9 @@
     @if(feature != null)
         <div class="card">
             <h2>${feature.name}</h2>
-            $unsafe{feature.description}
+            <div class="description">
+                $unsafe{feature.description}
+            </div>
             <h3>Tasks</h3>
             <ul class="task-list">
                 @for(task in feature.tasks)
