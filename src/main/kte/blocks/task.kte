@@ -14,6 +14,8 @@
         @endfor
         <button class="btn" onclick="hideStatusAction()">Cancel</button>
     </div>
-    $unsafe{task.description}
+    <div class="richtext">
+        $unsafe{task.description}
+    </div>
     <button class="btn" hx-get="/tasks/${task.id}/edit">Edit</button>
 </div>
