@@ -8,7 +8,7 @@
     @if(feature != null)
         <div class="card">
             <h2>${feature.name}</h2>
-            <div class="description">
+            <div class="richtext">
                 $unsafe{feature.description}
             </div>
             <h3>Tasks</h3>
