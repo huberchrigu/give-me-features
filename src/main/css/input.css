@@ -151,3 +151,43 @@ form label {
 #loading-overlay .spinner {
     @apply animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500
 }
+
+/* Markdown specifications are contained in the class "richtext" */
+.richtext li {
+    @apply list-item list-inside cursor-auto border-0;
+}
+
+.richtext ul li {
+    @apply list-disc;
+}
+
+.richtext ol li {
+    @apply list-decimal;
+}
+
+.richtext table,
+.richtext tr,
+.richtext td,
+.richtext th {
+    @apply table-auto border border-solid py-1 px-2 text-left border-green-600;
+}
+
+.richtext {
+    @apply border-hidden border border-green-600 px-5 py-2 rounded-md bg-green-50 leading-7
+}
+
+.richtext blockquote {
+    @apply p-4 my-4 border-solid border border-l-4 bg-green-100 border-green-600
+}
+
+.richtext a {
+    @apply font-medium text-blue-600 hover:underline dark:text-blue-500;
+}
+
+.richtext pre code {
+    @apply block border border-gray-300 p-4;
+}
+
+.richtext code {
+    @apply bg-gray-200;
+}

@@ -69,7 +69,7 @@ class Task(
     }
 
     companion object {
-        fun describeNewTask(name: String) = Task(TaskId(), null, name, Markdown(""), TaskStatus.OPEN)
+        fun describeNewTask(name: String,description: String = "") = Task(TaskId(), null, name, Markdown(description), TaskStatus.OPEN)
     }
 
     data class TaskUpdate(val name: String, val description: Markdown) {
