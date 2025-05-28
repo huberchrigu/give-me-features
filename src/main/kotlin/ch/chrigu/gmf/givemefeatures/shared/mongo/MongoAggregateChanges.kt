@@ -4,6 +4,7 @@ import ch.chrigu.gmf.givemefeatures.shared.AggregateChangesFactory
 import ch.chrigu.gmf.givemefeatures.shared.AggregateRoot
 import ch.chrigu.gmf.givemefeatures.shared.AllAggregateChanges
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.reactive.asFlow
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
@@ -19,6 +20,7 @@ class MongoAggregateChanges<T : AggregateRoot<ID>, ID>(private val mongoTemplate
             .filter(Criteria.where("_id").isEqualTo(id))
             .listen().asFlow()
             .mapNotNull { it.body }
+            .conflate()
     }
 
     override suspend fun emitIfListened(id: ID, value: T) {
@@ -30,6 +32,7 @@ class MongoAggregateChanges<T : AggregateRoot<ID>, ID>(private val mongoTemplate
             .watchCollection(mongoTemplate.getCollectionName(clazz))
             .listen().asFlow()
             .mapNotNull { it.body }
+            .conflate()
     }
 }
 
