@@ -11,6 +11,9 @@ import kotlinx.coroutines.runBlocking
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.stereotype.Component
 
+/**
+ * delete operations are ignored, because they have no body.
+ */
 class MongoAggregateChanges<T : AggregateRoot<ID>, ID>(mongoTemplate: ReactiveMongoTemplate, clazz: Class<T>) : AllAggregateChanges<T, ID> {
     private val flow = MutableSharedFlow<T>()
 
@@ -18,6 +21,7 @@ class MongoAggregateChanges<T : AggregateRoot<ID>, ID>(mongoTemplate: ReactiveMo
         mongoTemplate.changeStream<T>(clazz)
             .watchCollection(mongoTemplate.getCollectionName(clazz))
             .listen()
+            .filter { it.body != null }
             .subscribe { runBlocking { flow.emit(it.body!!) } }
     }
 
