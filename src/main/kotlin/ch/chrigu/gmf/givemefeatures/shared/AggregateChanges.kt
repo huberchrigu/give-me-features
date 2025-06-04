@@ -3,7 +3,7 @@ package ch.chrigu.gmf.givemefeatures.shared
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Tracks changes on aggregates and allows listening to them.
+ * Tracks changes on aggregates and allows listening to them. Only the latest change is emitted, intermediate values may be discarded.
  */
 interface AggregateChanges<T, ID> {
     fun listen(id: ID): Flow<T>

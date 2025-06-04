@@ -4,23 +4,25 @@ import ch.chrigu.gmf.givemefeatures.shared.AggregateChangesFactory
 import ch.chrigu.gmf.givemefeatures.shared.AggregateRoot
 import ch.chrigu.gmf.givemefeatures.shared.AllAggregateChanges
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.runBlocking
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
-import org.springframework.data.mongodb.core.query.Criteria
-import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.stereotype.Component
 
-// TODO: Test how many open connections
-class MongoAggregateChanges<T : AggregateRoot<ID>, ID>(private val mongoTemplate: ReactiveMongoTemplate, private val clazz: Class<T>) : AllAggregateChanges<T, ID> {
-    override fun listen(id: ID): Flow<T> {
-        return mongoTemplate.changeStream<T>(clazz)
+class MongoAggregateChanges<T : AggregateRoot<ID>, ID>(mongoTemplate: ReactiveMongoTemplate, clazz: Class<T>) : AllAggregateChanges<T, ID> {
+    private val flow = MutableSharedFlow<T>()
+
+    init {
+        mongoTemplate.changeStream<T>(clazz)
             .watchCollection(mongoTemplate.getCollectionName(clazz))
-            .filter(Criteria.where("_id").isEqualTo(id))
-            .listen().asFlow()
-            .mapNotNull { it.body }
-            .conflate()
+            .listen()
+            .subscribe { runBlocking { flow.emit(it.body!!) } }
+    }
+
+    override fun listen(id: ID): Flow<T> {
+        return flow.filter { it.id == id }.conflate()
     }
 
     override suspend fun emitIfListened(id: ID, value: T) {
@@ -28,11 +30,7 @@ class MongoAggregateChanges<T : AggregateRoot<ID>, ID>(private val mongoTemplate
     }
 
     override fun listenToAll(): Flow<T> {
-        return mongoTemplate.changeStream<T>(clazz)
-            .watchCollection(mongoTemplate.getCollectionName(clazz))
-            .listen().asFlow()
-            .mapNotNull { it.body }
-            .conflate()
+        return flow.conflate()
     }
 }
 
