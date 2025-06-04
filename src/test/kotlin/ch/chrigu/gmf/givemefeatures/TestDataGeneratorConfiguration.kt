@@ -7,10 +7,10 @@ import ch.chrigu.gmf.givemefeatures.tasks.Task
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.springframework.boot.ApplicationRunner
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 
-@Configuration
+@TestConfiguration
 class TestDataGeneratorConfiguration {
     @Bean
     fun testDataGenerator(featureService: FeatureService) = ApplicationRunner {

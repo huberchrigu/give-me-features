@@ -19,7 +19,7 @@ abstract class AbstractHistoryRepository<T : AggregateRoot<ID>, ID : Any>(
     override suspend fun save(aggregate: T): T {
         return try {
             saveTransactional(aggregate)
-        } catch (e: OptimisticLockingFailureException) {
+        } catch (_: OptimisticLockingFailureException) {
             handleConflict(aggregate)
         }
     }

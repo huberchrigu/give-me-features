@@ -7,19 +7,24 @@ import com.ninjasquad.springmockk.MockkBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Import
 import org.springframework.modulith.test.ApplicationModuleTest
+import java.time.Duration
 
 @ApplicationModuleTest
 @Import(TestcontainersConfiguration::class)
 class TaskModuleTest(private val taskService: TaskService, private val taskRepository: TaskRepository, @MockkBean private val linkedItemProvider: LinkedItemProvider) {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     @BeforeEach
     fun reset() = runTest {
         taskRepository.deleteAll()
@@ -77,25 +82,26 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
     @Test
     fun `should get updates`() = runTest {
         val result = mutableMapOf<Int, Task>()
+        val indices = 0 until 100
 
-        val tasks = (0 until 100).map {
+        val tasks = indices.map {
             taskRepository.save(Task.describeNewTask("test$it"))
         }
-        val updates = (0 until 100).map {
-            async { taskService.updateTask(tasks[it].id, 0L, Task.TaskUpdate("changed$it", Markdown(""))) }
+        val updates = indices.map {
+            launch(Dispatchers.IO) { taskService.updateTask(tasks[it].id, 0L, Task.TaskUpdate("changed$it", Markdown(""))) }
         }
-        val jobs = (0 until 100).map { i ->
+        val jobs = indices.map { i ->
             launch(Dispatchers.IO) {
                 taskService.getTaskUpdates(tasks[i].id).collect {
+                    logger.info("Received update $i")
                     assertThat(result[i]).isNull()
                     result.put(i, it)
                 }
             }
         }
-        updates.awaitAll()
-        delay(1000L)
-        testScheduler.advanceUntilIdle()
-        (0 until 100).onEach { i ->
+        updates.joinAll()
+        await().atMost(Duration.ofSeconds(10)).until { indices.all { i -> result[i] != null } }
+        indices.onEach { i ->
             assertThat(result[i]).isEqualTo(Task(tasks[i].id, 1L, "changed$i", Markdown(""), TaskStatus.OPEN))
         }
         jobs.onEach { it.cancel() }

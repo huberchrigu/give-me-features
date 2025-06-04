@@ -1,15 +1,15 @@
 package ch.chrigu.gmf.givemefeatures.features
 
 import ch.chrigu.gmf.givemefeatures.features.repository.FeatureRepository
+import ch.chrigu.gmf.givemefeatures.shared.AggregateChangesFactory
 import ch.chrigu.gmf.givemefeatures.shared.AggregateNotFoundException
-import ch.chrigu.gmf.givemefeatures.shared.MultiAggregateChanges
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import org.springframework.stereotype.Service
 
 @Service
-class FeatureService(private val featureRepository: FeatureRepository, private val taskService: TaskService) {
-    private val changes = MultiAggregateChanges<Feature, FeatureId>()
+class FeatureService(private val featureRepository: FeatureRepository, private val taskService: TaskService, aggregateChangesFactory: AggregateChangesFactory) {
+    private val changes = aggregateChangesFactory.create(Feature::class.java)
 
     suspend fun newFeature(feature: Feature) = featureRepository.save(feature)
 
