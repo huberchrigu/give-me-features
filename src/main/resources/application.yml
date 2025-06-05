@@ -1,10 +1,10 @@
 spring:
   application:
     name: give-me-features
+  profiles:
+    default: local
 gg:
   jte:
-    developmentMode: true # TODO: Fix for production
     templateLocation: src/main/kte
     templateSuffix: .kte
-server:
-  shutdown: immediate # TODO: Fix for production
+    use-precompiled-templates: true

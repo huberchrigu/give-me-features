@@ -1,0 +1,6 @@
+gg:
+  jte:
+    developmentMode: true
+    use-precompiled-templates: false
+server:
+  shutdown: immediate
