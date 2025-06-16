@@ -15,10 +15,6 @@ class MultiAggregateChanges<T : AggregateRoot<ID>, ID> : AllAggregateChanges<T, 
         return emittedAll.asSharedFlow()
     }
 
-    override suspend fun emitIfListened(id: ID, value: T) {
-        emittedAll.emit(value)
-    }
-
     override fun listen(id: ID): Flow<T> {
         return emittedAll.filter { it.id == id }
     }

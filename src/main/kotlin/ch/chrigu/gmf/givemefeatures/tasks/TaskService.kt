@@ -24,7 +24,6 @@ class TaskService(private val taskRepository: TaskRepository, private val linked
     fun getLinkedItems(taskId: TaskId) = linkedItemProvider.getFor(taskId)
 
     private suspend fun update(id: TaskId, version: Long, applyChange: Task.() -> Task) = taskRepository.applyOn(id, version, applyChange)
-        ?.apply { changes.emitIfListened(this.id, this) }
         ?: throw TaskNotFoundException(id)
 }
 

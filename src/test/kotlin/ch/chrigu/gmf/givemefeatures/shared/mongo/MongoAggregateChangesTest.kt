@@ -36,10 +36,10 @@ class MongoAggregateChangesTest(private val mongoTemplate: ReactiveMongoTemplate
 
     class TestDocument(override val id: Int) : AggregateRoot<Int> {
         override val version: Long?
-            get() = TODO("Not yet implemented")
+            get() = throw UnsupportedOperationException()
 
         override fun isNew(): Boolean {
-            TODO("Not yet implemented")
+            throw UnsupportedOperationException()
         }
     }
 }

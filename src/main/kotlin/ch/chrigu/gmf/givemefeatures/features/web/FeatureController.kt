@@ -52,7 +52,7 @@ class FeatureController(private val featureService: FeatureService, private val 
     fun getFeatureUpdates(@PathVariable id: FeatureId) = featureService.getUpdates(id)
         .map {
             val featureDetail = it.asDetailView(taskService)
-            ServerSentEvent.builder(Fragment.create("blocks/feature", mutableMapOf("feature" to featureDetail) as Map<String, Any>)).build()
+            ServerSentEvent.builder(Fragment.create("blocks/feature", mapOf("feature" to featureDetail))).build()
         }
 
     @GetMapping(produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
@@ -92,8 +92,8 @@ class FeatureController(private val featureService: FeatureService, private val 
         .withCollection(listOf(listFragment(feature.id)))
         .fragment(
             "blocks/feature",
-            mutableMapOf("feature" to feature.asDetailView(taskService)) as Map<String, Any>
-        ) // TODO: https://github.com/spring-projects/spring-framework/issues/34848
+            mapOf("feature" to feature.asDetailView(taskService))
+        )
         .build()
 
     private fun getFeatureList(): Flow<FeatureListItem> = featureService.getFeatures().map { it.asListItem() }
@@ -102,7 +102,7 @@ class FeatureController(private val featureService: FeatureService, private val 
         "features", featureService.getFeatures()
             .map { it.asListItem() })
 
-    private fun listFragment(current: FeatureId?) = Fragment.create("blocks/features", mutableMapOf("features" to getFeatureList(), "current" to current) as Map<String, Any>)
+    private fun listFragment(current: FeatureId?) = Fragment.create("blocks/features", mapOf("features" to getFeatureList(), "current" to current))
 
     class NewFeatureBody(@field:NotEmpty private val name: String?, @field:NotEmpty private val description: String?) {
         fun toFeature() = Feature.describeNewFeature(name!!, Markdown(description!!))

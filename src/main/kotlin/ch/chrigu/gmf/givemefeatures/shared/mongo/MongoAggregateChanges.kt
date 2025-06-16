@@ -29,10 +29,6 @@ class MongoAggregateChanges<T : AggregateRoot<ID>, ID>(mongoTemplate: ReactiveMo
         return flow.filter { it.id == id }.conflate()
     }
 
-    override suspend fun emitIfListened(id: ID, value: T) {
-        // TODO: noting to do
-    }
-
     override fun listenToAll(): Flow<T> {
         return flow.conflate()
     }

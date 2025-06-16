@@ -33,8 +33,8 @@ class FeatureService(private val featureRepository: FeatureRepository, private v
         version: Long,
         applyChange: suspend Feature.() -> Feature
     ): Feature = featureRepository.applyOn(id, version, applyChange)
-        ?.apply { changes.emitIfListened(this.id, this) }
         ?: throw FeatureNotFoundException(id)
 }
 
 class FeatureNotFoundException(id: FeatureId) : AggregateNotFoundException("Feature $id not found")
+

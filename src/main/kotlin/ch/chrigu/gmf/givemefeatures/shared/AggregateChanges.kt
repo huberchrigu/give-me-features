@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
  */
 interface AggregateChanges<T, ID> {
     fun listen(id: ID): Flow<T>
-    suspend fun emitIfListened(id: ID, value: T)
 }
 
 interface AllAggregateChanges<T : AggregateRoot<ID>, ID> : AggregateChanges<T, ID> {

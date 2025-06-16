@@ -12,10 +12,6 @@ class SingleAggregateChanges<T, ID> : AggregateChanges<T, ID> {
 
     override fun listen(id: ID): Flow<T> = getOrCreate(id).asSharedFlow()
 
-    override suspend fun emitIfListened(id: ID, value: T) {
-        emittedPerId[id]?.emit(value)
-    }
-
     private fun getOrCreate(id: ID) = emittedPerId.getOrPut(id) {
         MutableSharedFlow()
     }
