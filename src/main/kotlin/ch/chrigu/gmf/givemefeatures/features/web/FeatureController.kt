@@ -8,6 +8,7 @@ import ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureListItem
 import ch.chrigu.gmf.givemefeatures.features.web.ui.asDetailView
 import ch.chrigu.gmf.givemefeatures.features.web.ui.asListItem
 import ch.chrigu.gmf.givemefeatures.shared.Markdown
+import ch.chrigu.gmf.givemefeatures.shared.web.FieldUpdate
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import jakarta.validation.Valid
@@ -60,6 +61,37 @@ class FeatureController(private val featureService: FeatureService, private val 
         .map {
             ServerSentEvent.builder(listFragment(current)).build()
         }
+
+    @GetMapping("/{id}/fields", produces = [MediaType.TEXT_EVENT_STREAM_VALUE]) // TODO: Test, same for task-edit
+    suspend fun getFeatureFormUpdates(@PathVariable id: FeatureId, @RequestParam version: Long) = featureService.getDescriptionUpdates(id, version)
+        .map {
+            ServerSentEvent.builder(
+                Fragment.create(
+                    "atoms/updates", mapOf(
+                        "fieldName" to "description",
+                        "update" to FieldUpdate(
+                            "/features/$id/description", it.description.toString(), // TODO: Do actual merge
+                            it.description.toString()
+                        )
+                    )
+                )
+            ).build()
+        }
+
+    @PutMapping("/{id}/description", headers = [Hx.HEADER]) // TODO: Test, same for task-edit, should resolve conflict, too many "description" duplications
+    fun mergeDescription(@PathVariable id: FeatureId, description: FeatureDescription): Rendering {
+        return Rendering.view("atoms/richtext")
+            .model(
+                mapOf(
+                    "fieldName" to "description",
+                    "fieldTitle" to "Description",
+                    "fieldValue" to description.description
+                )
+            )
+            .build()
+    }
+
+    data class FeatureDescription(@field:NotNull val description: Markdown?)
 
     @GetMapping("/{id}", headers = [Hx.HEADER])
     suspend fun getFeature(@PathVariable id: FeatureId): FragmentsRendering {

@@ -19,7 +19,7 @@ class TaskService(private val taskRepository: TaskRepository, private val linked
 
     suspend fun getTask(id: TaskId) = taskRepository.findById(id) ?: throw TaskNotFoundException(id)
 
-    fun getTaskUpdates(id: TaskId): Flow<Task> = changes.listen(id) // TODO: Provide it for all views, incl. edit forms
+    fun getTaskUpdates(id: TaskId): Flow<Task> = changes.listen(id)
 
     fun getLinkedItems(taskId: TaskId) = linkedItemProvider.getFor(taskId)
 

@@ -1,0 +1,11 @@
+@import ch.chrigu.gmf.givemefeatures.shared.Markdown
+
+@param fieldName: String
+@param fieldTitle: String
+@param fieldValue: Markdown?
+
+<div id="${fieldName}-richtext" hx-swap-oob="true">
+    <label for="${fieldName}">${fieldTitle}: </label>
+    <textarea class="form-input" name="${fieldName}" id="${fieldName}">$unsafe{fieldValue?.toString() ?: ""}</textarea>
+    @template.atoms.updates(fieldName)
+</div>

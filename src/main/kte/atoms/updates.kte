@@ -1,0 +1,12 @@
+@import ch.chrigu.gmf.givemefeatures.shared.web.FieldUpdate
+
+@param fieldName: String
+@param update: FieldUpdate? = null
+
+<div id="${fieldName}-updates" hx-swap-oob="true">
+    @if(update != null)
+        <button class="btn" hx-put="${update.mergeUri}" hx-vals='{"${fieldName}": "${update.mergeBody}"}'>Merge changes</button>
+        <a href="javascript:document.querySelector('#${fieldName}-updates-new').toggleAttribute('hidden')">Show new version</a>
+        <div id="${fieldName}-updates-new" hidden="hidden">${update.newVersion}</div>
+    @endif
+</div>

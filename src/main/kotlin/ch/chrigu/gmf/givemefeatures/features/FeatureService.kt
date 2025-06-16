@@ -5,6 +5,8 @@ import ch.chrigu.gmf.givemefeatures.shared.AggregateChangesFactory
 import ch.chrigu.gmf.givemefeatures.shared.AggregateNotFoundException
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import org.springframework.stereotype.Service
 
 @Service
@@ -27,6 +29,11 @@ class FeatureService(private val featureRepository: FeatureRepository, private v
 
     fun getUpdates(id: FeatureId) = changes.listen(id)
     fun getAllUpdates() = changes.listenToAll()
+
+    suspend fun getDescriptionUpdates(id: FeatureId, version: Long): Flow<Feature> {
+        val feature = featureRepository.findVersion(id, version)
+        return changes.listen(id).filter { it.description != feature?.description }
+    }
 
     private suspend fun update(
         id: FeatureId,

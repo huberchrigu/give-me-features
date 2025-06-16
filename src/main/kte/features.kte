@@ -14,8 +14,7 @@
         <form hx-post="/features">
             <label for="name">Name: </label>
             <input class="form-input" type="text" name="name" id="name"/>
-            <label for="description">Description: </label>
-            <textarea class="form-input" name="description" id="description"></textarea>
+            @template.atoms.richtext("description", "Description", null)
             <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
             <button class="btn btn-primary" type="submit">Create</button>
         </form>
