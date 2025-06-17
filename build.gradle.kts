@@ -3,7 +3,7 @@ import kotlin.io.path.Path
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
-	id("org.springframework.boot") version "3.5.0"
+    id("org.springframework.boot") version "3.5.0"
     id("io.spring.dependency-management") version "1.1.7"
     id("gg.jte.gradle") version "3.1.16"
 }
@@ -69,6 +69,7 @@ dependencies {
 
     // Markdown
     implementation("org.jetbrains:markdown:0.7.3")
+    implementation("io.github.java-diff-utils:java-diff-utils:4.15")
 
     // Testing
     testImplementation("com.microsoft.playwright:playwright:1.45.1")

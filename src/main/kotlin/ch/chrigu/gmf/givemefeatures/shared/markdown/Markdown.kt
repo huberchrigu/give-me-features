@@ -7,5 +7,7 @@ data class Markdown(private val markdownContent: String) {
     fun toHtml() = MarkdownToHtmlConverter.convert(markdownContent)
         .let { HtmlSanitizer.sanitize(it) }
 
+    operator fun plus(other: String) = Markdown(markdownContent + other)
+
     override fun toString(): String = markdownContent
 }

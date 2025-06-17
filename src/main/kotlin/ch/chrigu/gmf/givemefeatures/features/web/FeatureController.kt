@@ -62,7 +62,7 @@ class FeatureController(private val featureService: FeatureService, private val 
             ServerSentEvent.builder(listFragment(current)).build()
         }
 
-    @GetMapping("/{id}/fields", produces = [MediaType.TEXT_EVENT_STREAM_VALUE]) // TODO: Test, same for task-edit
+    @GetMapping("/{id}/fields", produces = [MediaType.TEXT_EVENT_STREAM_VALUE]) // TODO: same for task-edit
     suspend fun getFeatureFormUpdates(@PathVariable id: FeatureId, @RequestParam version: Long) = featureService.getDescriptionUpdates(id, version)
         .map {
             ServerSentEvent.builder(
@@ -70,7 +70,7 @@ class FeatureController(private val featureService: FeatureService, private val 
                     "atoms/updates", mapOf(
                         "fieldName" to "description",
                         "update" to FieldUpdate(
-                            "/features/$id/description", it.description.toString(), // TODO: Do actual merge
+                            "/features/$id/description", it.version!!,
                             it.description.toString()
                         )
                     )
@@ -78,20 +78,21 @@ class FeatureController(private val featureService: FeatureService, private val 
             ).build()
         }
 
-    @PutMapping("/{id}/description", headers = [Hx.HEADER]) // TODO: Test, same for task-edit, should resolve conflict, too many "description" duplications
-    fun mergeDescription(@PathVariable id: FeatureId, description: FeatureDescription): Rendering {
+    @PutMapping("/{id}/description", headers = [Hx.HEADER])
+    suspend // TODO: same for task-edit, should resolve conflict, too many "description" duplications
+    fun mergeDescription(@PathVariable id: FeatureId, featureDescription: FeatureDescription): Rendering {
         return Rendering.view("atoms/richtext")
             .model(
                 mapOf(
                     "fieldName" to "description",
                     "fieldTitle" to "Description",
-                    "fieldValue" to description.description
+                    "fieldValue" to featureService.mergeDescription(id, featureDescription.description!!, featureDescription.newVersion)
                 )
             )
             .build()
     }
 
-    data class FeatureDescription(@field:NotNull val description: Markdown?)
+    data class FeatureDescription(@field:NotNull val description: Markdown?, val newVersion: Long)
 
     @GetMapping("/{id}", headers = [Hx.HEADER])
     suspend fun getFeature(@PathVariable id: FeatureId): FragmentsRendering {

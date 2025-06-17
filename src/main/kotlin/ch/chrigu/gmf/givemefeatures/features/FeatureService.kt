@@ -3,11 +3,14 @@ package ch.chrigu.gmf.givemefeatures.features
 import ch.chrigu.gmf.givemefeatures.features.repository.FeatureRepository
 import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateChangesFactory
 import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateNotFoundException
+import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
+import ch.chrigu.gmf.givemefeatures.shared.markdown.MarkdownDiff
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import org.springframework.stereotype.Service
+
 
 @Service
 class FeatureService(private val featureRepository: FeatureRepository, private val taskService: TaskService, aggregateChangesFactory: AggregateChangesFactory) {
@@ -33,6 +36,10 @@ class FeatureService(private val featureRepository: FeatureRepository, private v
     suspend fun getDescriptionUpdates(id: FeatureId, version: Long): Flow<Feature> {
         val feature = featureRepository.findVersion(id, version)
         return changes.listen(id).filter { it.description != feature?.description }
+    }
+
+    suspend fun mergeDescription(id: FeatureId, newDescription: Markdown, compareWith: Long): Markdown {
+        return MarkdownDiff.diff(newDescription, featureRepository.findVersion(id, compareWith)?.description)
     }
 
     private suspend fun update(

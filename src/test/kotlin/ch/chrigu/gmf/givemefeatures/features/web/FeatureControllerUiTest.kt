@@ -4,8 +4,7 @@ import ch.chrigu.gmf.givemefeatures.features.*
 import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.*
-import com.microsoft.playwright.Page
-import com.microsoft.playwright.Playwright
+import com.microsoft.playwright.*
 import com.microsoft.playwright.options.LoadState
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
@@ -13,11 +12,19 @@ import io.mockk.every
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.jetbrains.kotlin.incremental.createDirectory
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.extension.BeforeEachCallback
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.api.extension.TestWatcher
 import org.springframework.boot.test.web.server.LocalServerPort
+import java.io.File
+import java.nio.file.Paths
 
 @UiTest(FeatureController::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(FeatureControllerUiTest.SaveArtifactsOnFailure::class)
 class FeatureControllerUiTest(@MockkBean private val featureService: FeatureService, @MockkBean private val taskService: TaskService) {
     private val featureName = "My new feature"
     private val newName = "Version 2.0"
@@ -27,15 +34,34 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     private val taskName = "New task"
     private val taskId = TaskId("99")
 
-    private val changes = MutableSharedFlow<Feature>()
+    private lateinit var changes: MutableSharedFlow<Feature>
 
     @LocalServerPort
     private var port: Int = 0
 
+    lateinit var playwright: Playwright
+    lateinit var browser: Browser
+    lateinit var context: BrowserContext
+    lateinit var page: Page
+
+    @BeforeAll
+    fun setupAll() {
+        playwright = Playwright.create()
+        browser = playwright.chromium().launch()
+    }
+
+    @AfterAll
+    fun tearDownAll() {
+        browser.close()
+        playwright.close()
+    }
+
     @BeforeEach
     fun initChanges() {
+        changes = MutableSharedFlow()
         every { featureService.getUpdates(any()) } answers { changes.filter { it.id == firstArg<FeatureId>() } }
         every { featureService.getAllUpdates() } returns changes.asSharedFlow()
+        coEvery { featureService.getDescriptionUpdates(featureId, 0L) } returns changes.filter { it.id == featureId }
     }
 
     @Test
@@ -79,6 +105,23 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
             assertFeatureDetails()
             editFeature()
             assertFeatureDetails(newName, newDescription)
+        }
+    }
+
+    @Test
+    fun `should edit feature and merge with external change`() {
+        withFeature()
+
+        openFeaturesPage(featureId) {
+            openEditView()
+            fillInFeatureEditForm()
+            runBlocking {
+                changes.emit(Feature(featureId, "$featureName 2", featureDescription + "\n**bold**", emptyList(), 1L))
+            }
+            waitForCondition { querySelector("#description-updates button") != null }
+            clickMerge()
+            submitEditForm()
+            assertFeatureDetails("Theirs: $featureName 2 --- Yours: $newName", "$newDescription\n**bold**")
         }
     }
 
@@ -166,17 +209,38 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     }
 
     private fun Page.editFeature() {
-        val editButton = querySelectorAll("button").first { it.textContent() == "Edit" }
-        editButton.click()
+        openEditView()
+        fillInFeatureEditForm()
+        submitEditForm()
+    }
+
+    private fun Page.clickMerge() {
+        val mergeButton = querySelector("#description-updates button")
+        assertThat(mergeButton).isNotNull.extracting { it.isHidden }.isEqualTo(false)
+
+        mergeButton.click()
         waitForLoadState(LoadState.NETWORKIDLE)
-        val nameField = querySelector("input#name")
-        val descriptionField = querySelector("#description")
+        waitForCondition { querySelector("#description-updates button").isHidden }
+    }
+
+    private fun Page.submitEditForm() {
         val submitButton = querySelector("button[hx-patch]")
-        nameField.fill(newName)
-        descriptionField.fill(newDescription)
         submitButton.click()
         waitForLoadState(LoadState.NETWORKIDLE)
         waitForCondition { querySelector("button[hx-patch]") == null }
+    }
+
+    private fun Page.fillInFeatureEditForm() {
+        val nameField = querySelector("input#name")
+        val descriptionField = querySelector("#description")
+        nameField.fill(newName)
+        descriptionField.fill(newDescription)
+    }
+
+    private fun Page.openEditView() {
+        val editButton = querySelectorAll("button").first { it.textContent() == "Edit" }
+        editButton.click()
+        waitForCondition { querySelector("form#feature") != null }
     }
 
     private fun Page.assertTask() {
@@ -185,16 +249,10 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     }
 
     private fun openFeaturesPage(selectFeature: FeatureId? = null, test: Page.() -> Unit) {
-        Playwright.create().use { playwright ->
-            val browser = playwright.chromium().launch()
-            val page = browser.newPage()
-            val append = selectFeature?.let { "/$selectFeature" } ?: ""
-            page.navigate("http://localhost:$port/features$append")
+        val append = selectFeature?.let { "/$selectFeature" } ?: ""
+        page.navigate("http://localhost:$port/features$append")
 
-            test(page)
-
-            browser.close()
-        }
+        test(page)
     }
 
     private fun Page.assertFeatureDetails(expectedName: String = featureName, expectedDescription: String = "Description") {
@@ -227,5 +285,28 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         querySelector("#description").fill(featureDescription.toString())
         locator("button[type='submit']").click()
         waitForCondition { querySelector("#feature h2") != null || querySelector("#error .error") != null }
+    }
+
+    class SaveArtifactsOnFailure : TestWatcher, BeforeEachCallback { // TODO: Extract for all @UiTests
+        override fun beforeEach(ctx: ExtensionContext) {
+            val testInstance = ctx.requiredTestInstance as FeatureControllerUiTest
+            testInstance.context = testInstance.browser.newContext()
+            testInstance.context.tracing().start(Tracing.StartOptions().setScreenshots(true).setSnapshots(true))
+            testInstance.page = testInstance.context.newPage()
+        }
+
+        override fun testFailed(ctx: ExtensionContext, cause: Throwable) {
+            val test = ctx.requiredTestInstance as FeatureControllerUiTest
+            val name = ctx.requiredTestMethod.name.replace(' ', '_')
+            test.page.screenshot(Page.ScreenshotOptions().setPath(Paths.get("build/screenshots/$name.png")))
+            test.context.tracing().stop(Tracing.StopOptions().setPath(Paths.get("build/traces/$name.zip")))
+            File(File("build/html").also { it.createDirectory() }, "$name.html")
+                .writeText(test.page.content())
+            test.context.close()
+        }
+
+        override fun testSuccessful(ctx: ExtensionContext) {
+            (ctx.requiredTestInstance as FeatureControllerUiTest).context.close()
+        }
     }
 }
