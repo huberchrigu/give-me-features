@@ -1,4 +1,4 @@
-package ch.chrigu.gmf.givemefeatures.shared.web
+package ch.chrigu.gmf.givemefeatures.shared.web.advices
 
 import org.springframework.security.web.server.csrf.CsrfToken
 import org.springframework.web.bind.annotation.ControllerAdvice

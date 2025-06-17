@@ -7,7 +7,7 @@ import ch.chrigu.gmf.givemefeatures.features.FeatureUpdate
 import ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureListItem
 import ch.chrigu.gmf.givemefeatures.features.web.ui.asDetailView
 import ch.chrigu.gmf.givemefeatures.features.web.ui.asListItem
-import ch.chrigu.gmf.givemefeatures.shared.Markdown
+import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
 import ch.chrigu.gmf.givemefeatures.shared.web.FieldUpdate
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService

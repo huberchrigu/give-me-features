@@ -1,6 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.shared.internalflow
 
-import ch.chrigu.gmf.givemefeatures.shared.AggregateChanges
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateChanges
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

@@ -1,6 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.shared.history
 
-import ch.chrigu.gmf.givemefeatures.shared.AggregateRoot
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateRoot
 import org.springframework.data.annotation.Version
 import org.springframework.data.mongodb.core.mapping.FieldType
 import org.springframework.data.mongodb.core.mapping.MongoId

@@ -1,5 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.shared
 
+import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
 import org.assertj.core.api.Assertions.assertThat
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.Test

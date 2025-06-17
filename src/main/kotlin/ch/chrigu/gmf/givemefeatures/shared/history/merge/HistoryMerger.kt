@@ -1,6 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.shared.history.merge
 
-import ch.chrigu.gmf.givemefeatures.shared.AggregateRoot
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateRoot
 import ch.chrigu.gmf.givemefeatures.shared.history.AggregateMerger
 
 class HistoryMerger<T : AggregateRoot<ID>, ID>(private val aggregateMerger: AggregateMerger<T, ID>, private val historyQuery: HistoryQuery<T, ID>) {

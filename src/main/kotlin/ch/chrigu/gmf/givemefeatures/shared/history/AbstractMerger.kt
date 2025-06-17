@@ -1,6 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.shared.history
 
-import ch.chrigu.gmf.givemefeatures.shared.AggregateRoot
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateRoot
 
 abstract class AbstractMerger<T : AggregateRoot<ID>, ID> : AggregateMerger<T, ID> {
 

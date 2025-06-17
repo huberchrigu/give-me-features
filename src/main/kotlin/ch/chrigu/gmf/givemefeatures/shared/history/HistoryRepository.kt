@@ -1,6 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.shared.history
 
-import ch.chrigu.gmf.givemefeatures.shared.AggregateRoot
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateRoot
 import kotlinx.coroutines.flow.Flow
 
 interface HistoryRepository<T : AggregateRoot<ID>, ID> {

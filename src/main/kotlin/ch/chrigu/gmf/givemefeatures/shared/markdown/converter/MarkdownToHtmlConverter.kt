@@ -1,4 +1,4 @@
-package ch.chrigu.gmf.givemefeatures.shared.markdown
+package ch.chrigu.gmf.givemefeatures.shared.markdown.converter
 
 import org.intellij.markdown.IElementType
 import org.intellij.markdown.flavours.space.SFMFlavourDescriptor

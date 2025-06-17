@@ -1,7 +1,7 @@
-package ch.chrigu.gmf.givemefeatures.shared
+package ch.chrigu.gmf.givemefeatures.shared.markdown
 
 import ch.chrigu.gmf.givemefeatures.shared.html.HtmlSanitizer
-import ch.chrigu.gmf.givemefeatures.shared.markdown.MarkdownToHtmlConverter
+import ch.chrigu.gmf.givemefeatures.shared.markdown.converter.MarkdownToHtmlConverter
 
 data class Markdown(private val markdownContent: String) {
     fun toHtml() = MarkdownToHtmlConverter.convert(markdownContent)

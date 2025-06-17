@@ -1,7 +1,7 @@
 package ch.chrigu.gmf.givemefeatures.tasks
 
-import ch.chrigu.gmf.givemefeatures.shared.AggregateChangesFactory
-import ch.chrigu.gmf.givemefeatures.shared.AggregateNotFoundException
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateChangesFactory
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateNotFoundException
 import ch.chrigu.gmf.givemefeatures.tasks.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
 import org.springframework.stereotype.Service

@@ -1,7 +1,7 @@
-package ch.chrigu.gmf.givemefeatures.shared.web
+package ch.chrigu.gmf.givemefeatures.shared.web.advices
 
 import ch.chrigu.gmf.givemefeatures.features.web.Hx
-import ch.chrigu.gmf.givemefeatures.shared.AggregateNotFoundException
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateNotFoundException
 import ch.chrigu.gmf.givemefeatures.shared.history.VersionNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.dao.OptimisticLockingFailureException

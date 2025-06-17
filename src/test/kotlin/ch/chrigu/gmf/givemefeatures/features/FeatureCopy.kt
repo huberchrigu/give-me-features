@@ -1,6 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.features
 
-import ch.chrigu.gmf.givemefeatures.shared.Markdown
+import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
 import ch.chrigu.gmf.givemefeatures.tasks.TaskId
 
 fun Feature.copy(

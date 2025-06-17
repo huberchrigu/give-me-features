@@ -1,8 +1,8 @@
 package ch.chrigu.gmf.givemefeatures.features
 
 import ch.chrigu.gmf.givemefeatures.features.repository.FeatureRepository
-import ch.chrigu.gmf.givemefeatures.shared.AggregateChangesFactory
-import ch.chrigu.gmf.givemefeatures.shared.AggregateNotFoundException
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateChangesFactory
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateNotFoundException
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import kotlinx.coroutines.flow.Flow

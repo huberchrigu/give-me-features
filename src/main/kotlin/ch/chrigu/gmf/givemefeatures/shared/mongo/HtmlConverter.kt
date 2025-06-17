@@ -1,6 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.shared.mongo
 
-import ch.chrigu.gmf.givemefeatures.shared.Markdown
+import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.convert.WritingConverter

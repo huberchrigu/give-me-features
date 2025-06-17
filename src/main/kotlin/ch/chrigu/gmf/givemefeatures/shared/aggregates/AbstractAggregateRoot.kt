@@ -1,4 +1,4 @@
-package ch.chrigu.gmf.givemefeatures.shared
+package ch.chrigu.gmf.givemefeatures.shared.aggregates
 
 import org.springframework.data.annotation.Version
 import org.springframework.data.mongodb.core.mapping.FieldType

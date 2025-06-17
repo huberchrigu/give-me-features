@@ -2,7 +2,7 @@ package ch.chrigu.gmf.givemefeatures.features
 
 import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
 import ch.chrigu.gmf.givemefeatures.features.repository.FeatureRepository
-import ch.chrigu.gmf.givemefeatures.shared.Markdown
+import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
 import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery

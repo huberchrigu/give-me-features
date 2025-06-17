@@ -2,7 +2,7 @@ package ch.chrigu.gmf.givemefeatures.features.repository.mongo
 
 import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
 import ch.chrigu.gmf.givemefeatures.features.Feature
-import ch.chrigu.gmf.givemefeatures.shared.Markdown
+import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
 import ch.chrigu.gmf.givemefeatures.shared.mongo.MongoCustomConfiguration
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat

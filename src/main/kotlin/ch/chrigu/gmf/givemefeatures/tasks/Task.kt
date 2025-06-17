@@ -1,7 +1,7 @@
 package ch.chrigu.gmf.givemefeatures.tasks
 
-import ch.chrigu.gmf.givemefeatures.shared.AbstractAggregateRoot
-import ch.chrigu.gmf.givemefeatures.shared.Markdown
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AbstractAggregateRoot
+import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
 import java.util.*
 
 class Task(

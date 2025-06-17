@@ -1,4 +1,4 @@
-package ch.chrigu.gmf.givemefeatures.shared
+package ch.chrigu.gmf.givemefeatures.shared.aggregates
 
 interface AggregateRoot<ID> {
     val id: ID?

@@ -1,6 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.shared.history.merge
 
-import ch.chrigu.gmf.givemefeatures.shared.AbstractAggregateRoot
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AbstractAggregateRoot
 import ch.chrigu.gmf.givemefeatures.shared.history.AbstractMerger
 import io.mockk.coEvery
 import io.mockk.mockk

@@ -1,7 +1,7 @@
 package ch.chrigu.gmf.givemefeatures.shared.mongo
 
 import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
-import ch.chrigu.gmf.givemefeatures.shared.AggregateRoot
+import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateRoot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactor.awaitSingle
