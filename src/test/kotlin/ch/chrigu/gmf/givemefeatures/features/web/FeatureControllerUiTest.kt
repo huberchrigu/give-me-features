@@ -110,7 +110,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     @Test
     fun `should edit feature and merge with external change`() {
         withFeature()
-        coEvery { featureService.mergeDescription(featureId, Markdown(newDescription), 1L) } returns Markdown("$newDescription\n**bold**")
+        coEvery { featureService.mergeDescription(featureId, Markdown(newDescription), 0L, 1L) } returns Markdown("$newDescription\n**bold**")
         openFeaturesPage(featureId) {
             openEditView()
             fillInFeatureEditForm()

@@ -38,8 +38,12 @@ class FeatureService(private val featureRepository: FeatureRepository, private v
         return changes.listen(id).filter { it.description != feature?.description }
     }
 
-    suspend fun mergeDescription(id: FeatureId, newDescription: Markdown, compareWith: Long): Markdown {
-        return MarkdownDiff.diff(newDescription, featureRepository.findVersion(id, compareWith)?.description)
+    suspend fun mergeDescription(id: FeatureId, newDescription: Markdown, baseVersion: Long, compareWith: Long): Markdown {
+        return MarkdownDiff.merge3(
+            featureRepository.findVersion(id, baseVersion)!!.description,
+            newDescription,
+            featureRepository.findVersion(id, compareWith)?.description
+        )
     }
 
     private suspend fun update(

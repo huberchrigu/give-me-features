@@ -11,3 +11,5 @@ data class Markdown(private val markdownContent: String) {
 
     override fun toString(): String = markdownContent
 }
+
+fun String.toMarkdown() = Markdown(this)

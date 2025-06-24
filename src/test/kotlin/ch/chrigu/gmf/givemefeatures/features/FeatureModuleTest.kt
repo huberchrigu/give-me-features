@@ -29,7 +29,8 @@ class FeatureModuleTest(
     @BeforeEach
     fun resetDb() = runTest {
         featureRepository.deleteAll()
-        featureRepository.save(Feature(id, name, description, emptyList(), null))
+        val feature = featureRepository.save(Feature(id, name, description, emptyList(), null))
+        featureRepository.save(feature.copy(description = Markdown("description2")))
     }
 
     @Test
@@ -83,6 +84,13 @@ class FeatureModuleTest(
 
     @Test
     fun `should merge description`() = runTest {
-        TODO()
+        val result = featureService.mergeDescription(id, description + " + **bold**", 0L, 1L)
+        assertThat(result.toString()).isEqualTo("""
+            <<<<<<< OURS
+            $description + **bold**
+            =======
+            description2
+            >>>>>>> THEIRS
+        """.trimIndent())
     }
 }

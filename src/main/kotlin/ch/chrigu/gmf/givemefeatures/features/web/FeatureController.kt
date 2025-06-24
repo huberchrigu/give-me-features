@@ -70,7 +70,7 @@ class FeatureController(private val featureService: FeatureService, private val 
                     "atoms/updates", mapOf(
                         "fieldName" to "description",
                         "update" to FieldUpdate(
-                            "/features/$id/description", it.version!!,
+                            "/features/$id/description?version=$version", it.version!!,
                             it.description.toString()
                         )
                     )
@@ -80,13 +80,13 @@ class FeatureController(private val featureService: FeatureService, private val 
 
     @PutMapping("/{id}/description", headers = [Hx.HEADER])
     suspend // TODO: same for task-edit, should resolve conflict, too many "description" duplications
-    fun mergeDescription(@PathVariable id: FeatureId, featureDescription: FeatureDescription): Rendering {
+    fun mergeDescription(@PathVariable id: FeatureId, featureDescription: FeatureDescription, @RequestParam version: Long): Rendering {
         return Rendering.view("atoms/richtext")
             .model(
                 mapOf(
                     "fieldName" to "description",
                     "fieldTitle" to "Description",
-                    "fieldValue" to featureService.mergeDescription(id, featureDescription.description!!, featureDescription.newVersion)
+                    "fieldValue" to featureService.mergeDescription(id, featureDescription.description!!, version, featureDescription.newVersion)
                 )
             )
             .build()
