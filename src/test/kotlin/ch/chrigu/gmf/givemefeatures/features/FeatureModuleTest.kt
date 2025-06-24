@@ -80,4 +80,9 @@ class FeatureModuleTest(
         assertThat(persisted.name).isEqualTo(newName)
         assertThat(persisted.description).isEqualTo(newDescription)
     }
+
+    @Test
+    fun `should merge description`() = runTest {
+        TODO()
+    }
 }

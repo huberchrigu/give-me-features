@@ -5,7 +5,6 @@ import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.microsoft.playwright.*
-import com.microsoft.playwright.options.LoadState
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
 import io.mockk.every
@@ -111,7 +110,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     @Test
     fun `should edit feature and merge with external change`() {
         withFeature()
-
+        coEvery { featureService.mergeDescription(featureId, Markdown(newDescription), 1L) } returns Markdown("$newDescription\n**bold**")
         openFeaturesPage(featureId) {
             openEditView()
             fillInFeatureEditForm()
@@ -219,14 +218,12 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         assertThat(mergeButton).isNotNull.extracting { it.isHidden }.isEqualTo(false)
 
         mergeButton.click()
-        waitForLoadState(LoadState.NETWORKIDLE)
-        waitForCondition { querySelector("#description-updates button").isHidden }
+        waitForCondition { querySelector("#description-updates button")?.isHidden == true }
     }
 
     private fun Page.submitEditForm() {
         val submitButton = querySelector("button[hx-patch]")
         submitButton.click()
-        waitForLoadState(LoadState.NETWORKIDLE)
         waitForCondition { querySelector("button[hx-patch]") == null }
     }
 
