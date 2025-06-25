@@ -38,21 +38,21 @@ class FeatureService(private val featureRepository: FeatureRepository, private v
         return changes.listen(id).filter { it.description != feature?.description }
     }
 
-    suspend fun mergeDescription(id: FeatureId, newDescription: Markdown, baseVersion: Long, compareWith: Long): Markdown {
-        return MarkdownDiff.merge3(
+    suspend fun mergeDescription(id: FeatureId, newDescription: Markdown, baseVersion: Long, compareWith: Long): Feature { // TODO: Should be domain
+        val theirs = featureRepository.findVersion(id, compareWith)!!
+        val mergedDescription = MarkdownDiff.merge3(
             featureRepository.findVersion(id, baseVersion)!!.description,
             newDescription,
-            featureRepository.findVersion(id, compareWith)?.description
+            theirs.description
         )
+        return Feature(id, theirs.name, mergedDescription, theirs.tasks, theirs.version)
     }
 
     private suspend fun update(
         id: FeatureId,
         version: Long,
         applyChange: suspend Feature.() -> Feature
-    ): Feature = featureRepository.applyOn(id, version, applyChange)
-        ?: throw FeatureNotFoundException(id)
+    ): Feature = featureRepository.applyOn(id, version, applyChange) ?: throw FeatureNotFoundException(id)
 }
 
 class FeatureNotFoundException(id: FeatureId) : AggregateNotFoundException("Feature $id not found")
-

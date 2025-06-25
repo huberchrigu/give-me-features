@@ -22,6 +22,7 @@ class FeatureModuleTest(
     private val featureService: FeatureService, private val featureProviderService: FeatureProviderService,
     private val featureRepository: FeatureRepository, @MockkBean private val taskService: TaskService
 ) {
+    private lateinit var feature: Feature
     private val id = FeatureId("1")
     private val name = "name"
     private val description = Markdown("description")
@@ -29,8 +30,7 @@ class FeatureModuleTest(
     @BeforeEach
     fun resetDb() = runTest {
         featureRepository.deleteAll()
-        val feature = featureRepository.save(Feature(id, name, description, emptyList(), null))
-        featureRepository.save(feature.copy(description = Markdown("description2")))
+        feature = featureRepository.save(Feature(id, name, description, emptyList(), null))
     }
 
     @Test
@@ -84,13 +84,16 @@ class FeatureModuleTest(
 
     @Test
     fun `should merge description`() = runTest {
+        featureRepository.save(feature.copy(description = Markdown("description2")))
         val result = featureService.mergeDescription(id, description + " + **bold**", 0L, 1L)
-        assertThat(result.toString()).isEqualTo("""
+        assertThat(result.toString()).isEqualTo(
+            """
             <<<<<<< OURS
             $description + **bold**
             =======
             description2
             >>>>>>> THEIRS
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 }

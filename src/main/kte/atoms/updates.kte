@@ -6,7 +6,7 @@
 <div id="${fieldName}-updates" hx-swap-oob="true">
     @if(update != null)
         <button class="btn" hx-put="${update.mergeUri}" hx-vals='{"newVersion": ${update.newVersion}}'>Merge changes</button>
-        <a href="javascript:document.querySelector('#${fieldName}-updates-new').toggleAttribute('hidden')">Show new version</a>
+        <a href="#" onclick="document.querySelector('#${fieldName}-updates-new').toggleAttribute('hidden')">Show new version</a>
         <div id="${fieldName}-updates-new" hidden="hidden">${update.newValue}</div>
     @endif
 </div>

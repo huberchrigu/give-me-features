@@ -61,6 +61,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         every { featureService.getUpdates(any()) } answers { changes.filter { it.id == firstArg<FeatureId>() } }
         every { featureService.getAllUpdates() } returns changes.asSharedFlow()
         coEvery { featureService.getDescriptionUpdates(featureId, 0L) } returns changes.filter { it.id == featureId }
+        coEvery { featureService.getDescriptionUpdates(featureId, 1L) } returns emptyFlow()
     }
 
     @Test
@@ -109,13 +110,15 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
 
     @Test
     fun `should edit feature and merge with external change`() {
+        val featureNameVersion1 = "$featureName 2"
+        val featureDescriptionVersion1 = Markdown("$newDescription\n**bold**")
         withFeature()
-        coEvery { featureService.mergeDescription(featureId, Markdown(newDescription), 0L, 1L) } returns Markdown("$newDescription\n**bold**")
+        withMerge(featureNameVersion1, featureDescriptionVersion1)
         openFeaturesPage(featureId) {
             openEditView()
             fillInFeatureEditForm()
             runBlocking {
-                changes.emit(Feature(featureId, "$featureName 2", featureDescription + "\n**bold**", emptyList(), 1L))
+                changes.emit(Feature(featureId, featureNameVersion1, featureDescription + "\n**bold**", emptyList(), 1L))
             }
             waitForCondition { querySelector("#description-updates button") != null }
             clickMerge()
@@ -190,6 +193,12 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         coEvery { featureService.updateFeature(featureId, 0L, FeatureUpdate(newName, markdown)) } returns Feature(featureId, newName, markdown, emptyList(), 1L)
     }
 
+    private fun withMerge(mergedName: String, mergedDescription: Markdown) {
+        val feature = Feature(featureId, mergedName, mergedDescription, emptyList(), 1L)
+        coEvery { featureService.mergeDescription(featureId, Markdown(newDescription), 0L, 1L) } returns feature
+        coEvery { featureService.updateFeature(featureId, 1L, FeatureUpdate(mergedName, mergedDescription)) } returns feature
+    }
+
     private fun Page.withExternalChange() = runBlocking {
         changes.emit(Feature(featureId, newName, Markdown(newDescription), emptyList(), 1L))
         waitForCondition { querySelector("#feature h2").textContent() != featureName }
@@ -218,7 +227,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         assertThat(mergeButton).isNotNull.extracting { it.isHidden }.isEqualTo(false)
 
         mergeButton.click()
-        waitForCondition { querySelector("#description-updates button")?.isHidden == true }
+        waitForCondition { querySelector("#description-updates button") == null }
     }
 
     private fun Page.submitEditForm() {
