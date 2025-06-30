@@ -63,13 +63,13 @@ class FeatureController(private val featureService: FeatureService, private val 
         }
 
     @GetMapping("/{id}/fields", produces = [MediaType.TEXT_EVENT_STREAM_VALUE]) // TODO: same for task-edit
-    suspend fun getFeatureFormUpdates(@PathVariable id: FeatureId, @RequestParam version: Long) = featureService.getDescriptionUpdates(id, version)
+    suspend fun getFeatureFormUpdates(@PathVariable id: FeatureId, @RequestParam version: Long) = featureService.getUpdatesWithChangedValues(id, version)
         .map {
             ServerSentEvent.builder(
                 Fragment.create(
                     "atoms/updates", mapOf(
                         "fieldName" to "description",
-                        "update" to FieldUpdate(
+                        "update" to FieldUpdate(// TODO: Also show name changes
                             "/features/$id/description?version=$version", it.version!!,
                             it.description.toString()
                         )
@@ -79,18 +79,18 @@ class FeatureController(private val featureService: FeatureService, private val 
         }
 
     @PutMapping("/{id}/description", headers = [Hx.HEADER])
-    suspend // TODO: same for task-edit, too many "description" duplications, feature name should be provided too
+    suspend // TODO: same for task-edit, too many "description" duplications
     fun mergeDescription(@PathVariable id: FeatureId, featureDescription: FeatureDescription, @RequestParam version: Long): Rendering {
         return Rendering.view("blocks/feature-edit")
             .model(
                 mapOf(
-                    "feature" to featureService.mergeDescription(id, featureDescription.description!!, version, featureDescription.newVersion)
+                    "feature" to featureService.mergeDescription(id, featureDescription.name!!, featureDescription.description!!, version, featureDescription.newVersion)
                 )
             )
             .build()
     }
 
-    data class FeatureDescription(@field:NotNull val description: Markdown?, val newVersion: Long)
+    data class FeatureDescription(@field:NotNull val name: String?, @field:NotNull val description: Markdown?, val newVersion: Long)
 
     @GetMapping("/{id}", headers = [Hx.HEADER])
     suspend fun getFeature(@PathVariable id: FeatureId): FragmentsRendering {

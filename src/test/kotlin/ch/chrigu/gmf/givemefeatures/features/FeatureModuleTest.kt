@@ -85,8 +85,8 @@ class FeatureModuleTest(
     @Test
     fun `should merge description`() = runTest {
         featureRepository.save(feature.copy(description = Markdown("description2")))
-        val result = featureService.mergeDescription(id, description + " + **bold**", 0L, 1L)
-        assertThat(result.toString()).isEqualTo(
+        val result = featureService.mergeDescription(id, name, description + " + **bold**", 0L, 1L)
+        assertThat(result.description.toString()).isEqualTo(
             """
             <<<<<<< OURS
             $description + **bold**
@@ -95,5 +95,6 @@ class FeatureModuleTest(
             >>>>>>> THEIRS
         """.trimIndent()
         )
+        assertThat(result.name).isEqualTo(name)
     }
 }

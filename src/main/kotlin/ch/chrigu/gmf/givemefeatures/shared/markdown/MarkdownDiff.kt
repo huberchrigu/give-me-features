@@ -12,11 +12,26 @@ object MarkdownDiff {
         .newTag { f: Boolean? -> "**" } //introduce markdown style for bold
         .build()
 
+    /**
+     * For one-liners.
+     */
+    fun simpleMerge(base: String, ours: String, theirs: String) = when (base) {
+        ours -> theirs
+        theirs -> ours
+        else -> "OURS: $ours --- THEIRS: $theirs"
+    }
+
+    /**
+     * For multi-line merge, changes are marked as Markdown.
+     */
     fun diff(original: Markdown, revised: Markdown?): Markdown {
         val rows = generator.generateDiffRows(original.toString().lines(), revised.toString().lines())
         return Markdown(rows.joinToString("\n") { it.oldLine })
     }
 
+    /**
+     * For multi-line merge against the base version.
+     */
     fun merge3(base: Markdown, ours: Markdown, theirs: Markdown?): Markdown {
         val baseLines = base.toString().lines()
         val ourLines = ours.toString().lines()

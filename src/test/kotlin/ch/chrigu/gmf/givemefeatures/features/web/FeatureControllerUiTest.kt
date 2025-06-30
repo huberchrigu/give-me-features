@@ -60,8 +60,8 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         changes = MutableSharedFlow()
         every { featureService.getUpdates(any()) } answers { changes.filter { it.id == firstArg<FeatureId>() } }
         every { featureService.getAllUpdates() } returns changes.asSharedFlow()
-        coEvery { featureService.getDescriptionUpdates(featureId, 0L) } returns changes.filter { it.id == featureId }
-        coEvery { featureService.getDescriptionUpdates(featureId, 1L) } returns emptyFlow()
+        coEvery { featureService.getUpdatesWithChangedValues(featureId, 0L) } returns changes.filter { it.id == featureId }
+        coEvery { featureService.getUpdatesWithChangedValues(featureId, 1L) } returns emptyFlow()
     }
 
     @Test
@@ -123,7 +123,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
             waitForCondition { querySelector("#description-updates button") != null }
             clickMerge()
             submitEditForm()
-            assertFeatureDetails("Theirs: $featureName 2 --- Yours: $newName", "$newDescription\n**bold**")
+            assertFeatureDetails(featureNameVersion1, "$newDescription\nbold")
         }
     }
 
@@ -195,7 +195,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
 
     private fun withMerge(mergedName: String, mergedDescription: Markdown) {
         val feature = Feature(featureId, mergedName, mergedDescription, emptyList(), 1L)
-        coEvery { featureService.mergeDescription(featureId, Markdown(newDescription), 0L, 1L) } returns feature
+        coEvery { featureService.mergeDescription(featureId, newName, Markdown(newDescription), 0L, 1L) } returns feature
         coEvery { featureService.updateFeature(featureId, 1L, FeatureUpdate(mergedName, mergedDescription)) } returns feature
     }
 

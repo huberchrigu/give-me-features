@@ -33,19 +33,21 @@ class FeatureService(private val featureRepository: FeatureRepository, private v
     fun getUpdates(id: FeatureId) = changes.listen(id)
     fun getAllUpdates() = changes.listenToAll()
 
-    suspend fun getDescriptionUpdates(id: FeatureId, version: Long): Flow<Feature> {
+    suspend fun getUpdatesWithChangedValues(id: FeatureId, version: Long): Flow<Feature> {
         val feature = featureRepository.findVersion(id, version)
-        return changes.listen(id).filter { it.description != feature?.description }
+        return changes.listen(id).filter { it.description != feature?.description || it.name != feature.name }
     }
 
-    suspend fun mergeDescription(id: FeatureId, newDescription: Markdown, baseVersion: Long, compareWith: Long): Feature { // TODO: Should be domain
+    suspend fun mergeDescription(id: FeatureId, newName: String, newDescription: Markdown, baseVersion: Long, compareWith: Long): Feature { // TODO: Should be domain
         val theirs = featureRepository.findVersion(id, compareWith)!!
+        val base = featureRepository.findVersion(id, baseVersion)!!
+        val mergedName = MarkdownDiff.simpleMerge(base.name, newName, theirs.name)
         val mergedDescription = MarkdownDiff.merge3(
-            featureRepository.findVersion(id, baseVersion)!!.description,
+            base.description,
             newDescription,
             theirs.description
         )
-        return Feature(id, theirs.name, mergedDescription, theirs.tasks, theirs.version)
+        return Feature(id, mergedName, mergedDescription, theirs.tasks, theirs.version)
     }
 
     private suspend fun update(
