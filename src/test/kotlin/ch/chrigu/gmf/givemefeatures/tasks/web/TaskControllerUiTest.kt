@@ -5,7 +5,6 @@ import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.*
 import com.microsoft.playwright.Page
-import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.options.LoadState
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
@@ -29,6 +28,8 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private val newDescriptionMarkdown = Markdown(newDescription)
     private val featureName = "Feature"
     private val featureId = FeatureId("featureId")
+
+    private lateinit var page: Page
 
     private val taskUpdates = MutableSharedFlow<Task>()
 
@@ -202,14 +203,8 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun openTaskPage(test: Page.() -> Unit) {
-        Playwright.create().use { playwright ->
-            val browser = playwright.chromium().launch()
-            val page = browser.newPage()
-            page.navigate("http://localhost:$port/tasks/$taskId")
+        page.navigate("http://localhost:$port/tasks/$taskId")
 
-            test(page)
-
-            browser.close()
-        }
+        test(page)
     }
 }

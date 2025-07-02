@@ -4,26 +4,18 @@ import ch.chrigu.gmf.givemefeatures.features.*
 import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
 import ch.chrigu.gmf.givemefeatures.shared.web.UiTest
 import ch.chrigu.gmf.givemefeatures.tasks.*
-import com.microsoft.playwright.*
+import com.microsoft.playwright.Page
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
 import io.mockk.every
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
-import org.jetbrains.kotlin.incremental.createDirectory
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.extension.BeforeEachCallback
-import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.extension.ExtensionContext
-import org.junit.jupiter.api.extension.TestWatcher
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.server.LocalServerPort
-import java.io.File
-import java.nio.file.Paths
 
 @UiTest(FeatureController::class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(FeatureControllerUiTest.SaveArtifactsOnFailure::class)
 class FeatureControllerUiTest(@MockkBean private val featureService: FeatureService, @MockkBean private val taskService: TaskService) {
     private val featureName = "My new feature"
     private val newName = "Version 2.0"
@@ -33,27 +25,12 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     private val taskName = "New task"
     private val taskId = TaskId("99")
 
+    private lateinit var page: Page
+
     private lateinit var changes: MutableSharedFlow<Feature>
 
     @LocalServerPort
     private var port: Int = 0
-
-    lateinit var playwright: Playwright
-    lateinit var browser: Browser
-    lateinit var context: BrowserContext
-    lateinit var page: Page
-
-    @BeforeAll
-    fun setupAll() {
-        playwright = Playwright.create()
-        browser = playwright.chromium().launch()
-    }
-
-    @AfterAll
-    fun tearDownAll() {
-        browser.close()
-        playwright.close()
-    }
 
     @BeforeEach
     fun initChanges() {
@@ -293,26 +270,4 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         waitForCondition { querySelector("#feature h2") != null || querySelector("#error .error") != null }
     }
 
-    class SaveArtifactsOnFailure : TestWatcher, BeforeEachCallback { // TODO: Extract for all @UiTests
-        override fun beforeEach(ctx: ExtensionContext) {
-            val testInstance = ctx.requiredTestInstance as FeatureControllerUiTest
-            testInstance.context = testInstance.browser.newContext()
-            testInstance.context.tracing().start(Tracing.StartOptions().setScreenshots(true).setSnapshots(true))
-            testInstance.page = testInstance.context.newPage()
-        }
-
-        override fun testFailed(ctx: ExtensionContext, cause: Throwable) {
-            val test = ctx.requiredTestInstance as FeatureControllerUiTest
-            val name = ctx.requiredTestMethod.name.replace(' ', '_')
-            test.page.screenshot(Page.ScreenshotOptions().setPath(Paths.get("build/screenshots/$name.png")))
-            test.context.tracing().stop(Tracing.StopOptions().setPath(Paths.get("build/traces/$name.zip")))
-            File(File("build/html").also { it.createDirectory() }, "$name.html")
-                .writeText(test.page.content())
-            test.context.close()
-        }
-
-        override fun testSuccessful(ctx: ExtensionContext) {
-            (ctx.requiredTestInstance as FeatureControllerUiTest).context.close()
-        }
-    }
 }
