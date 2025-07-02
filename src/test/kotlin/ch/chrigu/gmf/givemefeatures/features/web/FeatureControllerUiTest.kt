@@ -195,7 +195,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
 
     private fun withMerge(mergedName: String, mergedDescription: Markdown) {
         val feature = Feature(featureId, mergedName, mergedDescription, emptyList(), 1L)
-        coEvery { featureService.mergeDescription(featureId, newName, Markdown(newDescription), 0L, 1L) } returns feature
+        coEvery { featureService.mergeWithVersion(featureId, newName, Markdown(newDescription), 0L, 1L) } returns feature
         coEvery { featureService.updateFeature(featureId, 1L, FeatureUpdate(mergedName, mergedDescription)) } returns feature
     }
 

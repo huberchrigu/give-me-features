@@ -84,7 +84,7 @@ class FeatureController(private val featureService: FeatureService, private val 
         return Rendering.view("blocks/feature-edit")
             .model(
                 mapOf(
-                    "feature" to featureService.mergeDescription(id, featureDescription.name!!, featureDescription.description!!, version, featureDescription.newVersion)
+                    "feature" to featureService.mergeWithVersion(id, featureDescription.name!!, featureDescription.description!!, version, featureDescription.newVersion)
                 )
             )
             .build()

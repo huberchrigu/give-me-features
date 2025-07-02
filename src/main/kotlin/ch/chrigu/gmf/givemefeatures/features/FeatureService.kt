@@ -1,10 +1,10 @@
 package ch.chrigu.gmf.givemefeatures.features
 
+import ch.chrigu.gmf.givemefeatures.features.domain.FeatureDomainService
 import ch.chrigu.gmf.givemefeatures.features.repository.FeatureRepository
 import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateChangesFactory
 import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateNotFoundException
 import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
-import ch.chrigu.gmf.givemefeatures.shared.markdown.MarkdownDiff
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class FeatureService(private val featureRepository: FeatureRepository, private val taskService: TaskService, aggregateChangesFactory: AggregateChangesFactory) {
+class FeatureService(private val featureRepository: FeatureRepository, private val taskService: TaskService, aggregateChangesFactory: AggregateChangesFactory,
+    private val featureDomainService: FeatureDomainService
+) {
     private val changes = aggregateChangesFactory.create(Feature::class.java)
 
     suspend fun newFeature(feature: Feature) = featureRepository.save(feature)
@@ -38,16 +40,8 @@ class FeatureService(private val featureRepository: FeatureRepository, private v
         return changes.listen(id).filter { it.description != feature?.description || it.name != feature.name }
     }
 
-    suspend fun mergeDescription(id: FeatureId, newName: String, newDescription: Markdown, baseVersion: Long, compareWith: Long): Feature { // TODO: Should be domain
-        val theirs = featureRepository.findVersion(id, compareWith)!!
-        val base = featureRepository.findVersion(id, baseVersion)!!
-        val mergedName = MarkdownDiff.simpleMerge(base.name, newName, theirs.name)
-        val mergedDescription = MarkdownDiff.merge3(
-            base.description,
-            newDescription,
-            theirs.description
-        )
-        return Feature(id, mergedName, mergedDescription, theirs.tasks, theirs.version)
+    suspend fun mergeWithVersion(id: FeatureId, newName: String, newDescription: Markdown, baseVersion: Long, mergeWithVersion: Long): Feature {
+        return featureDomainService.mergeWithVersion(id, newName, newDescription, baseVersion, mergeWithVersion)
     }
 
     private suspend fun update(
