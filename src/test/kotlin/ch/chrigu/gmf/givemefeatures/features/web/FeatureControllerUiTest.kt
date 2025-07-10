@@ -29,6 +29,8 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
 
     private lateinit var changes: MutableSharedFlow<Feature>
 
+    private val feature = Feature(featureId, featureName, featureDescription, emptyList(), 0)
+
     @LocalServerPort
     private var port: Int = 0
 
@@ -38,6 +40,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         every { featureService.getUpdates(any()) } answers { changes.filter { it.id == firstArg<FeatureId>() } }
         every { featureService.getAllUpdates() } returns changes.asSharedFlow()
         coEvery { featureService.getUpdatesWithChangedValues(featureId, 0L) } returns changes.filter { it.id == featureId }
+            .map { feature to it }
         coEvery { featureService.getUpdatesWithChangedValues(featureId, 1L) } returns emptyFlow()
     }
 
@@ -158,7 +161,6 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     }
 
     private fun withFeature(): Feature {
-        val feature = Feature(featureId, featureName, featureDescription, emptyList(), 0)
         every { featureService.getFeatures() } returns flowOf(feature)
         coEvery { featureService.getFeature(featureId) } returns feature
         every { taskService.resolve(emptyList()) } returns emptyFlow()

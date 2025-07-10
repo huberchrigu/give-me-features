@@ -7,6 +7,7 @@
 <form class="card" id="task" hx-swap-oob="true">
     <label for="name">Name: </label>
     <input class="form-input" id="name" name="name" value="${task.name}">
+    @template.atoms.updates("name")
     @template.atoms.richtext("description", "Description", task.description)
     <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
     <button class="btn btn-primary" hx-patch="/tasks/${task.id!!.toString()}?version=${task.version}">Submit</button>

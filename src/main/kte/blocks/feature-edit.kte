@@ -7,6 +7,7 @@
 <form class="card" id="feature" hx-swap-oob="true" sse-connect="/features/${feature.id!!.toString()}/fields?version=${feature.version}" sse-swap="message">
     <label for="name">Name: </label>
     <input class="form-input" id="name" name="name" value="${feature.name}">
+    @template.atoms.updates("name")
     @template.atoms.richtext("description", "Description", feature.description)
     <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
     <button class="btn btn-primary" hx-patch="/features/${feature.id!!.toString()}?version=${feature.version}">Submit</button>

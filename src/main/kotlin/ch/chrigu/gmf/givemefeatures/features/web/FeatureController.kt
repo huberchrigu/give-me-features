@@ -14,7 +14,10 @@ import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -26,6 +29,7 @@ import org.springframework.web.reactive.result.view.FragmentsRendering
 import org.springframework.web.reactive.result.view.Rendering
 import org.springframework.web.server.ResponseStatusException
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("SpringMVCViewInspection")
 @Controller
 @RequestMapping("/features")
@@ -64,19 +68,28 @@ class FeatureController(private val featureService: FeatureService, private val 
 
     @GetMapping("/{id}/fields", produces = [MediaType.TEXT_EVENT_STREAM_VALUE]) // TODO: same for task-edit
     suspend fun getFeatureFormUpdates(@PathVariable id: FeatureId, @RequestParam version: Long) = featureService.getUpdatesWithChangedValues(id, version)
-        .map {
-            ServerSentEvent.builder(
-                Fragment.create(
-                    "atoms/updates", mapOf(
-                        "fieldName" to "description",
-                        "update" to FieldUpdate(// TODO: Also show name changes
-                            "/features/$id/description?version=$version", it.version!!,
-                            it.description.toString()
-                        )
+        .flatMapConcat {
+            flowOf(
+                updateFragment("name", it.first, it.second) { name },
+                updateFragment("description", it.first, it.second) { description }
+            )
+        }
+
+    private fun updateFragment(fieldName: String, oldState: Feature, newState: Feature, getValue: Feature.() -> Any): ServerSentEvent<Fragment?> {
+        val newValue = newState.getValue().toString()
+        val oldValue = oldState.getValue().toString()
+        return ServerSentEvent.builder(
+            Fragment.create(
+                "atoms/updates", mapOf(
+                    "fieldName" to fieldName,
+                    "update" to if (newValue == oldValue) null else FieldUpdate(
+                        "/features/${oldState.id}/description?version=${oldState.version}", newState.version!!,
+                        newValue
                     )
                 )
-            ).build()
-        }
+            )
+        ).build()
+    }
 
     @PutMapping("/{id}/description", headers = [Hx.HEADER])
     suspend // TODO: same for task-edit, too many "description" duplications

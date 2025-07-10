@@ -9,11 +9,13 @@ import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Service
 
 
 @Service
-class FeatureService(private val featureRepository: FeatureRepository, private val taskService: TaskService, aggregateChangesFactory: AggregateChangesFactory,
+class FeatureService(
+    private val featureRepository: FeatureRepository, private val taskService: TaskService, aggregateChangesFactory: AggregateChangesFactory,
     private val featureDomainService: FeatureDomainService
 ) {
     private val changes = aggregateChangesFactory.create(Feature::class.java)
@@ -35,9 +37,13 @@ class FeatureService(private val featureRepository: FeatureRepository, private v
     fun getUpdates(id: FeatureId) = changes.listen(id)
     fun getAllUpdates() = changes.listenToAll()
 
-    suspend fun getUpdatesWithChangedValues(id: FeatureId, version: Long): Flow<Feature> {
-        val feature = featureRepository.findVersion(id, version)
-        return changes.listen(id).filter { it.description != feature?.description || it.name != feature.name }
+    /**
+     * @return Old version to new version
+     */
+    suspend fun getUpdatesWithChangedValues(id: FeatureId, version: Long): Flow<Pair<Feature, Feature>> {
+        val feature = featureRepository.findVersion(id, version)!!
+        return changes.listen(id).filter { it.description != feature.description || it.name != feature.name }
+            .map { feature to it }
     }
 
     suspend fun mergeWithVersion(id: FeatureId, newName: String, newDescription: Markdown, baseVersion: Long, mergeWithVersion: Long): Feature {
