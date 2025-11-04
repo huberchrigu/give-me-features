@@ -1,6 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.tasks.web
 
-import ch.chrigu.gmf.givemefeatures.features.web.Hx
+import ch.chrigu.gmf.givemefeatures.shared.web.Hx
 import ch.chrigu.gmf.givemefeatures.shared.security.SecurityConfiguration
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import gg.jte.springframework.boot.autoconfigure.ReactiveJteAutoConfiguration

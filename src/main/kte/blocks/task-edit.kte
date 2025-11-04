@@ -4,7 +4,7 @@
 @param csrf: CsrfToken
 @param task: Task
 
-<form class="card" id="task" hx-swap-oob="true">
+<form class="card" id="task" hx-swap-oob="true" sse-connect="/tasks/${task.id!!.toString()}/fields?version=${task.version}" sse-swap="message">
     <label for="name">Name: </label>
     <input class="form-input" id="name" name="name" value="${task.name}">
     @template.atoms.updates("name")

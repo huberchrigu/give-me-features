@@ -8,7 +8,8 @@ import ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureListItem
 import ch.chrigu.gmf.givemefeatures.features.web.ui.asDetailView
 import ch.chrigu.gmf.givemefeatures.features.web.ui.asListItem
 import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
-import ch.chrigu.gmf.givemefeatures.shared.web.FieldUpdate
+import ch.chrigu.gmf.givemefeatures.shared.web.Hx
+import ch.chrigu.gmf.givemefeatures.shared.web.UpdateFragmentBuilder
 import ch.chrigu.gmf.givemefeatures.tasks.Task
 import ch.chrigu.gmf.givemefeatures.tasks.TaskService
 import jakarta.validation.Valid
@@ -16,8 +17,8 @@ import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -34,6 +35,11 @@ import org.springframework.web.server.ResponseStatusException
 @Controller
 @RequestMapping("/features")
 class FeatureController(private val featureService: FeatureService, private val taskService: TaskService) {
+    private val updateFragmentBuilder = UpdateFragmentBuilder<Feature>(
+        "features",
+        "name" to { name },
+        "description" to { description })
+
     @GetMapping
     fun listFeatures() = Rendering.view("features")
         .withFeatures()
@@ -66,44 +72,17 @@ class FeatureController(private val featureService: FeatureService, private val 
             ServerSentEvent.builder(listFragment(current)).build()
         }
 
-    @GetMapping("/{id}/fields", produces = [MediaType.TEXT_EVENT_STREAM_VALUE]) // TODO: same for task-edit
+    /**
+     * Streams fragments of changed values.
+     */
+    @GetMapping("/{id}/fields", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     suspend fun getFeatureFormUpdates(@PathVariable id: FeatureId, @RequestParam version: Long) = featureService.getUpdatesWithChangedValues(id, version)
-        .flatMapConcat {
-            flowOf(
-                updateFragment("name", it.first, it.second) { name },
-                updateFragment("description", it.first, it.second) { description }
-            )
-        }
+        .flatMapConcat { updateFragmentBuilder.toFragments(it.first, it.second).asFlow() }
 
-    private fun updateFragment(fieldName: String, oldState: Feature, newState: Feature, getValue: Feature.() -> Any): ServerSentEvent<Fragment?> {
-        val newValue = newState.getValue().toString()
-        val oldValue = oldState.getValue().toString()
-        return ServerSentEvent.builder(
-            Fragment.create(
-                "atoms/updates", mapOf(
-                    "fieldName" to fieldName,
-                    "update" to if (newValue == oldValue) null else FieldUpdate(
-                        "/features/${oldState.id}/description?version=${oldState.version}", newState.version!!,
-                        newValue
-                    )
-                )
-            )
-        ).build()
-    }
-
-    @PutMapping("/{id}/description", headers = [Hx.HEADER])
-    suspend // TODO: same for task-edit, too many "description" duplications
-    fun mergeDescription(@PathVariable id: FeatureId, featureDescription: FeatureDescription, @RequestParam version: Long): Rendering {
-        return Rendering.view("blocks/feature-edit")
-            .model(
-                mapOf(
-                    "feature" to featureService.mergeWithVersion(id, featureDescription.name!!, featureDescription.description!!, version, featureDescription.newVersion)
-                )
-            )
-            .build()
-    }
-
-    data class FeatureDescription(@field:NotNull val name: String?, @field:NotNull val description: Markdown?, val newVersion: Long)
+    @PutMapping("/{id}${UpdateFragmentBuilder.MERGE_URI}", headers = [Hx.HEADER])
+    suspend fun mergeFeature(@PathVariable id: FeatureId, @Valid mergeFeatureBody: MergeFeatureBody, @RequestParam version: Long) = featureEditView(
+        featureService.mergeWithVersion(id, mergeFeatureBody.name!!, mergeFeatureBody.description!!, version, mergeFeatureBody.newVersion!!)
+    )
 
     @GetMapping("/{id}", headers = [Hx.HEADER])
     suspend fun getFeature(@PathVariable id: FeatureId): FragmentsRendering {
@@ -112,12 +91,10 @@ class FeatureController(private val featureService: FeatureService, private val 
     }
 
     @GetMapping("/{featureId}/edit", headers = [Hx.HEADER])
-    suspend fun getFeatureEditForm(@PathVariable featureId: FeatureId) = Rendering.view("blocks/feature-edit")
-        .modelAttribute("feature", featureService.getFeature(featureId))
-        .build()
+    suspend fun getFeatureEditForm(@PathVariable featureId: FeatureId) = featureEditView(featureService.getFeature(featureId))
 
     @PatchMapping("/{featureId}", headers = [Hx.HEADER])
-    suspend fun updateFeature(@PathVariable featureId: FeatureId, @RequestParam version: Long, @Valid updateFeature: UpdateFeatureDto) = Rendering.view("blocks/feature")
+    suspend fun updateFeature(@PathVariable featureId: FeatureId, @RequestParam version: Long, @Valid updateFeature: UpdateFeatureBody) = Rendering.view("blocks/feature")
         .modelAttribute("feature", featureService.updateFeature(featureId, version, updateFeature.toDomain()).asDetailView(taskService))
         .build()
 
@@ -128,6 +105,10 @@ class FeatureController(private val featureService: FeatureService, private val 
             .modelAttribute("feature", feature.asDetailView(taskService))
             .build()
     }
+
+    private fun featureEditView(feature: Feature) = Rendering.view("blocks/feature-edit")
+        .modelAttribute("feature", feature)
+        .build()
 
     /**
      * Creates both fragments with feature data for the feature list page.
@@ -152,11 +133,13 @@ class FeatureController(private val featureService: FeatureService, private val 
         fun toFeature() = Feature.describeNewFeature(name!!, Markdown(description!!))
     }
 
+    class UpdateFeatureBody(@field:NotEmpty private val name: String?, @field:NotNull private val description: Markdown?) {
+        fun toDomain() = FeatureUpdate(name!!, description!!)
+    }
+
+    data class MergeFeatureBody(@field:NotEmpty val name: String?, @field:NotNull val description: Markdown?, @field:NotNull val newVersion: Long?)
+
     class NewTaskBody(@field:NotEmpty private val name: String?) {
         fun toTask() = Task.describeNewTask(name!!)
     }
-}
-
-class UpdateFeatureDto(@field:NotEmpty private val name: String?, @field:NotNull private val description: Markdown?) {
-    fun toDomain() = FeatureUpdate(name!!, description!!)
 }

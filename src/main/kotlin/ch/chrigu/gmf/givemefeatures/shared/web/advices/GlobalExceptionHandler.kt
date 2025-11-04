@@ -1,6 +1,6 @@
 package ch.chrigu.gmf.givemefeatures.shared.web.advices
 
-import ch.chrigu.gmf.givemefeatures.features.web.Hx
+import ch.chrigu.gmf.givemefeatures.shared.web.Hx
 import ch.chrigu.gmf.givemefeatures.shared.aggregates.AggregateNotFoundException
 import ch.chrigu.gmf.givemefeatures.shared.history.VersionNotFoundException
 import org.slf4j.LoggerFactory

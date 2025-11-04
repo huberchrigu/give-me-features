@@ -1,4 +1,4 @@
-package ch.chrigu.gmf.givemefeatures.features.web
+package ch.chrigu.gmf.givemefeatures.shared.web
 
 object Hx {
     const val HEADER_NAME = "HX-Request"
