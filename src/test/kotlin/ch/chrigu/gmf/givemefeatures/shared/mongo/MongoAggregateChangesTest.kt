@@ -6,13 +6,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.test.runTest
-import org.awaitility.Awaitility.await
+import org.awaitility.kotlin.atMost
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.until
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
+import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.test.context.TestConstructor
-import java.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @DataMongoTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -30,12 +32,12 @@ class MongoAggregateChangesTest(private val mongoTemplate: ReactiveMongoTemplate
             (0 until 100).onEach { mongoTemplate.save(TestDocument(it)).awaitSingle() }
         }
 
-        await().atMost(Duration.ofSeconds(3)).until { check.contains(99) }
+        await atMost 3.seconds until { check.contains(99) }
         job.cancel()
     }
 
     class TestDocument(override val id: Int) : AggregateRoot<Int> {
-        override val version: Long?
+        override val version: Long
             get() = throw UnsupportedOperationException()
 
         override fun isNew(): Boolean {

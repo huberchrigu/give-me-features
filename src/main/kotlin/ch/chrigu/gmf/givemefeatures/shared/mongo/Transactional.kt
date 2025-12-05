@@ -7,6 +7,6 @@ import org.springframework.transaction.reactive.TransactionalOperator
 /**
  * Retry transaction if it does not work.
  */
-suspend fun <T> TransactionalOperator.transactional(dbOperations: suspend () -> T): T = transactional(mono { dbOperations() })
+suspend fun <T : Any> TransactionalOperator.transactional(dbOperations: suspend () -> T): T = transactional(mono { dbOperations() })
     .retry(3)
     .awaitSingle()

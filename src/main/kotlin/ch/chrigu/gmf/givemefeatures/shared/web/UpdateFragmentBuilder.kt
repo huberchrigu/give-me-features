@@ -21,13 +21,13 @@ class UpdateFragmentBuilder<T : AbstractAggregateRoot<*>>(private val aggregateN
         val oldValue = oldState.getValue().toString()
         return ServerSentEvent.builder(
             Fragment.create(
-                "atoms/updates", mapOf(
-                    "fieldName" to fieldName,
-                    "update" to if (newValue == oldValue) null else FieldUpdate(
-                        "/$aggregateName/${oldState.id}$MERGE_URI?version=${oldState.version}", newState.version!!,
-                        newValue
-                    )
-                )
+                "atoms/updates", mapOf("fieldName" to fieldName) +
+                        if (newValue == oldValue) emptyMap() else mapOf(
+                            "update" to FieldUpdate(
+                                "/$aggregateName/${oldState.id}$MERGE_URI?version=${oldState.version}", newState.version!!,
+                                newValue
+                            )
+                        )
             )
         ).build()
     }

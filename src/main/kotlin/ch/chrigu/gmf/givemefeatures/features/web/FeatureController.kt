@@ -114,7 +114,7 @@ class FeatureController(private val featureService: FeatureService, private val 
      * Creates both fragments with feature data for the feature list page.
      */
     private suspend fun updateForFeature(feature: Feature) = FragmentsRendering
-        .withCollection(listOf(listFragment(feature.id)))
+        .fragments(listOf(listFragment(feature.id)))
         .fragment(
             "blocks/feature",
             mapOf("feature" to feature.asDetailView(taskService))
@@ -127,7 +127,11 @@ class FeatureController(private val featureService: FeatureService, private val 
         "features", featureService.getFeatures()
             .map { it.asListItem() })
 
-    private fun listFragment(current: FeatureId?) = Fragment.create("blocks/features", mapOf("features" to getFeatureList(), "current" to current))
+    private fun listFragment(current: FeatureId?) = Fragment.create(
+        "blocks/features",
+        mapOf("features" to getFeatureList()) +
+                if (current == null) emptyMap() else mapOf("current" to current)
+    )
 
     class NewFeatureBody(@field:NotEmpty private val name: String?, @field:NotEmpty private val description: String?) {
         fun toFeature() = Feature.describeNewFeature(name!!, Markdown(description!!))

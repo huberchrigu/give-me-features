@@ -7,7 +7,7 @@ import ch.chrigu.gmf.givemefeatures.shared.mongo.MongoCustomConfiguration
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
+import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestConstructor
 

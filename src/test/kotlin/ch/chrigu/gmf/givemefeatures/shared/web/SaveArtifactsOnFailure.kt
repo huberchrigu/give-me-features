@@ -17,7 +17,7 @@ class SaveArtifactsOnFailure : TestWatcher, BeforeEachCallback, BeforeAllCallbac
         setupAll()
     }
 
-    override fun afterAll(context: ExtensionContext?) {
+    override fun afterAll(context: ExtensionContext) {
         tearDownAll()
     }
 
@@ -28,7 +28,7 @@ class SaveArtifactsOnFailure : TestWatcher, BeforeEachCallback, BeforeAllCallbac
         injectPage(ctx.requiredTestInstance)
     }
 
-    override fun testFailed(ctx: ExtensionContext, cause: Throwable) {
+    override fun testFailed(ctx: ExtensionContext, cause: Throwable?) {
         val name = ctx.requiredTestMethod.name.replace(' ', '_')
         page.screenshot(Page.ScreenshotOptions().setPath(Paths.get("build/screenshots/$name.png")))
         context.tracing().stop(Tracing.StopOptions().setPath(Paths.get("build/traces/$name.zip")))

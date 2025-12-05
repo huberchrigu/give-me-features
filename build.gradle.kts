@@ -1,11 +1,11 @@
 import kotlin.io.path.Path
 
 plugins {
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
-	id("org.springframework.boot") version "3.5.7"
+    kotlin("jvm") version "2.2.21"
+    kotlin("plugin.spring") version "2.2.21"
+    id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
-    id("gg.jte.gradle") version "3.1.16"
+    id("gg.jte.gradle") version "3.2.1"
 }
 
 group = "ch.chrigu.gmf"
@@ -27,7 +27,7 @@ repositories {
     mavenCentral()
 }
 
-extra["springModulithVersion"] = "1.4.4"
+extra["springModulithVersion"] = "2.0.0"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -35,28 +35,36 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("gg.jte:jte-kotlin:3.1.16")
-    implementation("gg.jte:jte-spring-boot-starter-3:3.1.16")
+    implementation("gg.jte:jte-spring-boot-starter-3:3.2.1")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("org.springframework.modulith:spring-modulith-starter-core")
+    implementation("tools.jackson.module:jackson-module-kotlin")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    testImplementation("org.springframework.boot:spring-boot-devtools") // because we use the Test... run config
     runtimeOnly("org.springframework.modulith:spring-modulith-actuator")
     runtimeOnly("org.springframework.modulith:spring-modulith-observability")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
     testImplementation("org.springframework.modulith:spring-modulith-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:mongodb")
+    testImplementation("org.testcontainers:testcontainers-junit-jupiter")
+    testImplementation("org.testcontainers:testcontainers-mongodb")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Spring custom
+    testImplementation("org.springframework.boot:spring-boot-devtools") // because we use the Test... run config
+    testImplementation("org.awaitility:awaitility")
+    testImplementation("org.awaitility:awaitility-kotlin")
+
+    // KTE
+    implementation("gg.jte:jte-kotlin:3.2.1")
 
     // Webjars
     runtimeOnly("org.webjars.npm:htmx.org:2.0.4")
@@ -85,7 +93,7 @@ dependencyManagement {
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.addAll("-Xjsr305=strict")
+        freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
     }
 }
 

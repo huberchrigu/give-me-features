@@ -4,21 +4,19 @@ import ch.chrigu.gmf.givemefeatures.TestcontainersConfiguration
 import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
 import ch.chrigu.gmf.givemefeatures.tasks.repository.TaskRepository
 import com.ninjasquad.springmockk.MockkBean
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
-import org.awaitility.Awaitility.await
+import org.awaitility.kotlin.atMost
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.until
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Import
 import org.springframework.modulith.test.ApplicationModuleTest
-import java.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @ApplicationModuleTest
 @Import(TestcontainersConfiguration::class)
@@ -95,12 +93,12 @@ class TaskModuleTest(private val taskService: TaskService, private val taskRepos
                 taskService.getTaskUpdates(tasks[i].id).collect {
                     logger.info("Received update $i")
                     assertThat(result[i]).isNull()
-                    result.put(i, it)
+                    result[i] = it
                 }
             }
         }
         updates.joinAll()
-        await().atMost(Duration.ofSeconds(10)).until { indices.all { i -> result[i] != null } }
+        await atMost 10.seconds until { indices.all { i -> result[i] != null } }
         indices.onEach { i ->
             assertThat(result[i]).isEqualTo(Task(tasks[i].id, 1L, "changed$i", Markdown(""), TaskStatus.OPEN))
         }
