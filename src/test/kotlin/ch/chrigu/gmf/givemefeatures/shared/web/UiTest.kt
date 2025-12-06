@@ -8,9 +8,9 @@ import org.springframework.core.annotation.AliasFor
 import org.springframework.test.context.TestConstructor
 import kotlin.reflect.KClass
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(WebFluxTestConfig::class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [WebFluxTestConfig::class])
+@Import
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SaveArtifactsOnFailure::class)
-annotation class UiTest(@get:AliasFor(attribute = "classes", annotation = SpringBootTest::class) val value: KClass<*>)
+annotation class UiTest(@get:AliasFor(annotation = Import::class) val value: KClass<*>)
