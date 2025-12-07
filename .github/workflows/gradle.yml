@@ -15,6 +15,11 @@ jobs:
         run: ./gradlew playwrightInstallDeps
       - name: Build with Gradle
         run: ./gradlew build
-      - name: Summarize tests results
-        uses: jeantessier/test-summary-action@v1
+      - name: Store reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
         if: ${{ always() }}
