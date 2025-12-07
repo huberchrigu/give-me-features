@@ -11,5 +11,7 @@ jobs:
           java-version: 21
           distribution: 'adopt'
           cache: gradle
+      - name: Install playwright dependencies
+        run: sudo ./gradlew playwrightInstallDeps
       - name: Build with Gradle
         run: ./gradlew build

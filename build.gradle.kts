@@ -106,3 +106,10 @@ jte {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+// Playwright
+tasks.register<JavaExec>("playwrightInstallDeps") {
+    mainClass = "com.microsoft.playwright.CLI"
+    classpath = sourceSets.test.get().runtimeClasspath
+    args = listOf("install-deps")
+}
