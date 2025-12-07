@@ -12,6 +12,6 @@ jobs:
           distribution: 'adopt'
           cache: gradle
       - name: Install playwright dependencies
-        run: sudo ./gradlew playwrightInstallDeps
+        run: ./gradlew playwrightInstallDeps
       - name: Build with Gradle
         run: ./gradlew build
