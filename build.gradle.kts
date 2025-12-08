@@ -62,6 +62,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-devtools") // because we use the Test... run config
     testImplementation("org.awaitility:awaitility")
     testImplementation("org.awaitility:awaitility-kotlin")
+    runtimeOnly("io.projectreactor:reactor-tools")
 
     // KTE
     implementation("gg.jte:jte-kotlin:3.2.1")

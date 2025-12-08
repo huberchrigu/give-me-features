@@ -195,8 +195,13 @@ form label {
 .progressbar-track {
     @apply w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700;
 }
+
 .progressbar-fill {
     @apply h-2.5 rounded-full bg-blue-600 shadow-lg;
     @apply transition-all duration-700 ease-out;
     width: var(--progress);
+}
+
+.progressbar-text {
+    @apply mt-1 mb-3 text-sm text-gray-700;
 }
