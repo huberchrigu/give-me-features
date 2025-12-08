@@ -1,0 +1,14 @@
+<div id="item-selector">
+    <input type="text" placeholder="Search for an item..." name="search" hx-get="/search-items" hx-trigger="input changed delay:300ms" hx-target="#item-list" hx-swap="innerHTML">
+
+    <ul id="item-list">
+        <% for (item in items) { %>
+        <li hx-put="/select-item/<%= item.id %>" hx-target="#selected-item">
+            <%= item.name %>
+        </li>
+        <% } %>
+    </ul>
+
+    <div id="selected-item">
+    </div>
+</div>

@@ -77,6 +77,11 @@ class TaskController(private val taskService: TaskService) {
         .modelAttribute("task", updateTaskStatus.applyOn(taskService, taskId, version).toDetails())
         .build()
 
+    @GetMapping("/{taskId}/link-feature", headers = [Hx.HEADER])
+    fun linkFeature(@PathVariable taskId: TaskId) = Rendering.view("blocks/task-link-feature")
+        .modelAttribute("taskId", taskId)
+        .build()
+
     private suspend fun taskEditView(task: Task): Rendering = Rendering.view("blocks/task-edit")
         .modelAttribute("task", task)
         .build()

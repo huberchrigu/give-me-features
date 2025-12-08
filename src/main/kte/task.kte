@@ -19,6 +19,7 @@
                     <a href="/features/${item.id.toString()}">${item.name}</a>
                 </li>
             @endfor
+            <li><button class="btn" hx-get="/tasks/${item.id.toString()}/link-feature">➕</button></li>
         </ul>
     </div>
 `, error = error)
