@@ -173,7 +173,7 @@ form label {
 }
 
 .richtext {
-    @apply border-hidden border border-green-600 px-5 py-2 rounded-md bg-green-50 leading-7
+    @apply border-hidden border border-green-600 px-5 py-2 mb-4 rounded-md bg-green-50 leading-7
 }
 
 .richtext blockquote {
@@ -190,4 +190,13 @@ form label {
 
 .richtext code {
     @apply bg-gray-200;
+}
+
+.progressbar-track {
+    @apply w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700;
+}
+.progressbar-fill {
+    @apply h-2.5 rounded-full bg-blue-600 shadow-lg;
+    @apply transition-all duration-700 ease-out;
+    width: var(--progress);
 }
