@@ -4,3 +4,7 @@ gg:
     use-precompiled-templates: false
 server:
   shutdown: immediate
+spring:
+  devtools:
+    livereload:
+      enabled: true

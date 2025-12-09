@@ -1,0 +1,19 @@
+@import ch.chrigu.gmf.tasks.TaskLinkedItem
+@import ch.chrigu.gmf.tasks.TaskId
+
+@param taskId: TaskId
+@param items : List<TaskLinkedItem<*>>
+
+<div class="card" id="linked-features" hx-swap-oob="true">
+    <h2>Linked Features</h2>
+    <ul>
+        @for(item in items)
+            <li>
+                <a href="/features/${item.id.toString()}">${item.name}</a><!-- TODO: Allow deletion -->
+            </li>
+        @endfor
+    </ul>
+    <div id="link-feature">
+        <button class="btn" hx-get="/tasks/${taskId.toString()}/link-feature" hx-target="#link-feature" hx-swap="innerHTML">➕</button>
+    </div>
+</div>

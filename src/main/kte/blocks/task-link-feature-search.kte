@@ -1,0 +1,14 @@
+@import ch.chrigu.gmf.tasks.TaskId
+@import ch.chrigu.gmf.tasks.TaskLinkedItem
+@import org.springframework.security.web.server.csrf.CsrfToken
+
+@param taskId: TaskId
+@param items: List<TaskLinkedItem<*>>
+@param csrf: CsrfToken
+
+<ul id="item-list"><!-- TODO: Styling -->
+    @for (item in items)
+        <li hx-put="/tasks/${taskId.toString()}/link-feature" hx-vals='{"item": "${item.id.toString()}", "version": ${item.version}, "${csrf.parameterName}": "${csrf.token}"}'
+            hx-target="#item-list">${item.name}</li>
+    @endfor
+</ul>

@@ -192,6 +192,7 @@ form label {
     @apply bg-gray-200;
 }
 
+/** Progress Bar */
 .progressbar-track {
     @apply w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700;
 }

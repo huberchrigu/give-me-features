@@ -1,4 +1,4 @@
-@import ch.chrigu.gmf.givemefeatures.shared.web.FieldUpdate
+@import ch.chrigu.gmf.shared.web.FieldUpdate
 
 @param fieldName: String
 @param update: FieldUpdate? = null

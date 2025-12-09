@@ -1,0 +1,9 @@
+@import ch.chrigu.gmf.tasks.TaskId
+
+@param taskId: TaskId
+
+<div id="item-selector"><!-- TODO: Implement ESC -->
+    <input type="text" placeholder="Search features..." name="name" hx-get="/tasks/${taskId.toString()}/link-feature/search"
+           hx-trigger="input changed delay:300ms" hx-target="#item-list" hx-swap="outerHTML">
+    <ul id="item-list"></ul>
+</div>

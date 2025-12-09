@@ -1,4 +1,4 @@
-@import ch.chrigu.gmf.givemefeatures.tasks.Task
+@import ch.chrigu.gmf.tasks.Task
 @import org.springframework.security.web.server.csrf.CsrfToken
 
 @param csrf: CsrfToken

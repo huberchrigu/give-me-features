@@ -1,4 +1,4 @@
-@import ch.chrigu.gmf.givemefeatures.features.Feature
+@import ch.chrigu.gmf.features.Feature
 @import org.springframework.security.web.server.csrf.CsrfToken
 
 @param csrf: CsrfToken

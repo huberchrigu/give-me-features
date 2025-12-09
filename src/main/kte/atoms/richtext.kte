@@ -1,4 +1,4 @@
-@import ch.chrigu.gmf.givemefeatures.shared.markdown.Markdown
+@import ch.chrigu.gmf.shared.markdown.Markdown
 
 @param fieldName: String
 @param fieldTitle: String

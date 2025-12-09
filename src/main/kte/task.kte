@@ -1,5 +1,5 @@
-@import ch.chrigu.gmf.givemefeatures.tasks.TaskLinkedItem
-@import ch.chrigu.gmf.givemefeatures.tasks.web.ui.TaskDetails
+@import ch.chrigu.gmf.tasks.TaskLinkedItem
+@import ch.chrigu.gmf.tasks.web.ui.TaskDetails
 @import org.springframework.security.web.server.csrf.CsrfToken
 
 @param task: TaskDetails
@@ -11,14 +11,5 @@
     <script src="/status-update.js"></script>
 `, body = @`
     @template.blocks.task(task = task, csrf = csrf)
-    <div class="card">
-        <h2>Linked Features</h2>
-        <ul>
-            @for(item in items)
-                <li>
-                    <a href="/features/${item.id.toString()}">${item.name}</a>
-                </li>
-            @endfor
-        </ul>
-    </div>
+    @template.blocks.linked-features(taskId = task.id, items = items)
 `, error = error)

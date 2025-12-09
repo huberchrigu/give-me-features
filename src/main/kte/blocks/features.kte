@@ -1,5 +1,5 @@
-@import ch.chrigu.gmf.givemefeatures.features.web.ui.FeatureListItem
-@import ch.chrigu.gmf.givemefeatures.features.FeatureId
+@import ch.chrigu.gmf.features.web.ui.FeatureListItem
+@import ch.chrigu.gmf.features.FeatureId
 
 @param features: List<FeatureListItem>
 @param current: FeatureId?
