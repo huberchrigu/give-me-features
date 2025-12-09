@@ -52,11 +52,12 @@ ul li a.right {
     @apply text-sm text-gray-800 font-bold;
 }
 
-.task-list {
+/* Task List, Dropdown List */
+ul.task-list, ul.dropdown {
     @apply bg-gray-50 rounded-md mb-5;
 }
 
-.task-list a:hover {
+ul.task-list a:hover, ul.dropdown a:hover {
     @apply bg-gray-100;
 }
 
@@ -128,7 +129,7 @@ ul li a.right {
 }
 
 /* Form Label */
-form label {
+label {
     @apply block mb-1 font-bold;
 }
 

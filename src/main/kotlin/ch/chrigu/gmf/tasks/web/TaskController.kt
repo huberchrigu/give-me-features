@@ -6,6 +6,7 @@ import ch.chrigu.gmf.shared.web.UpdateFragmentBuilder
 import ch.chrigu.gmf.tasks.Task
 import ch.chrigu.gmf.tasks.Task.TaskUpdate
 import ch.chrigu.gmf.tasks.TaskId
+import ch.chrigu.gmf.tasks.TaskLinkedItem
 import ch.chrigu.gmf.tasks.TaskService
 import ch.chrigu.gmf.tasks.TaskStatus
 import ch.chrigu.gmf.tasks.web.ui.TaskDetails
@@ -13,6 +14,7 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
@@ -83,6 +85,9 @@ class TaskController(private val taskService: TaskService) {
         .modelAttribute("taskId", taskId)
         .build()
 
+    @GetMapping("/{taskId}/link-feature/cancel", headers = [Hx.HEADER])
+    fun cancelLinkFeature(@PathVariable taskId: TaskId) = linkedFeaturesBlock(taskId, taskService.getLinkedItems(taskId))
+
     @GetMapping("/{taskId}/link-feature/search", headers = [Hx.HEADER])
     fun searchLinkableFeatures(@PathVariable taskId: TaskId, @RequestParam name: String) = Rendering.view("blocks/task-link-feature-search")
         .modelAttribute("taskId", taskId)
@@ -92,11 +97,16 @@ class TaskController(private val taskService: TaskService) {
     @PutMapping("/{taskId}/link-feature", headers = [Hx.HEADER])
     suspend fun linkFeature(@PathVariable taskId: TaskId, @Valid linkBody: LinkBody): Rendering {
         val items = taskService.linkTo(taskId, linkBody.item!!, linkBody.version!!)
-        return Rendering.view("blocks/linked-features")
-            .modelAttribute("taskId", taskId)
-            .modelAttribute("items", items)
-            .build()
+        return linkedFeaturesBlock(taskId, items)
     }
+
+    private fun linkedFeaturesBlock(
+        taskId: TaskId,
+        items: Flow<TaskLinkedItem<*>>
+    ): Rendering = Rendering.view("blocks/linked-features")
+        .modelAttribute("taskId", taskId)
+        .modelAttribute("items", items)
+        .build()
 
     private suspend fun taskEditView(task: Task): Rendering = Rendering.view("blocks/task-edit")
         .modelAttribute("task", task)

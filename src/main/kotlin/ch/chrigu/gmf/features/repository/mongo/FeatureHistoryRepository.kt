@@ -24,5 +24,5 @@ class FeatureHistoryRepository(
 ) {
     override fun findByTasksContains(taskId: List<TaskId>) = featureRepository.findByTasksContains(taskId)
 
-    override fun findByNameContainsAndTasksNotContains(name: String, taskId: List<TaskId>) = featureRepository.findByNameContainsAndTasksNotContains(name, taskId)
+    override fun findByNameContainsAndTasksNotContains(name: String, taskId: List<TaskId>) = featureRepository.findByNameContainsIgnoreCaseAndTasksNotContains(name, taskId)
 }

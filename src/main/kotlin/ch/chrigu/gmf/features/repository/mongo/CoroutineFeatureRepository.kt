@@ -7,5 +7,5 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 interface CoroutineFeatureRepository : CoroutineCrudRepository<Feature, String> {
     fun findByTasksContains(taskId: List<TaskId>): Flow<Feature>
-    fun findByNameContainsAndTasksNotContains(name: String, taskId: List<TaskId>): Flow<Feature> // TODO: Ignore case
+    fun findByNameContainsIgnoreCaseAndTasksNotContains(name: String, taskId: List<TaskId>): Flow<Feature>
 }

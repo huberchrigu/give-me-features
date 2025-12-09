@@ -2,8 +2,10 @@
 
 @param taskId: TaskId
 
-<div id="item-selector"><!-- TODO: Implement ESC -->
-    <input type="text" placeholder="Search features..." name="name" hx-get="/tasks/${taskId.toString()}/link-feature/search"
+<div id="item-selector">
+    <label for="name">Link Feature</label>
+    <input class="form-input" autocomplete="off" type="text" placeholder="Search..." name="name" hx-get="/tasks/${taskId.toString()}/link-feature/search"
            hx-trigger="input changed delay:300ms" hx-target="#item-list" hx-swap="outerHTML">
+    <button class="btn text-sm mb-4" hx-get="/tasks/${taskId.toString()}/link-feature/cancel">❌ Cancel</button>
     <ul id="item-list"></ul>
 </div>
