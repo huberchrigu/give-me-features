@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.server.LocalServerPort
 
-// TODO: Test progress bar
 @UiTest(FeatureController::class)
 class FeatureControllerUiTest(@MockkBean private val featureService: FeatureService, @MockkBean private val taskService: TaskService) {
     private val featureName = "My new feature"
@@ -244,6 +243,8 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     private fun Page.assertFeatureDetails(expectedName: String = featureName, expectedDescription: String = "Description") {
         val feature = querySelector("#feature")
         assertThat(feature.querySelector("h2").textContent()).isEqualTo(expectedName)
+        assertThat(feature.querySelector(".progressbar-fill").getAttribute("aria-valuenow")).isEqualTo("0")
+        assertThat(feature.querySelector(".progressbar-text").textContent().trim()).isEqualTo("Current Progress: 0%")
         assertThat(feature.querySelector("div.richtext p").textContent()).isEqualTo(expectedDescription)
     }
 
