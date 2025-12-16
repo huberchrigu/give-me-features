@@ -17,7 +17,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.server.LocalServerPort
 
-// TODO: Test linking features
 @UiTest(TaskController::class)
 class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private val taskId = TaskId("1")
@@ -29,6 +28,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private val newDescriptionMarkdown = Markdown(newDescription)
     private val featureName = "Feature"
     private val featureId = FeatureId("featureId")
+    private val linkableFeature = "Linkable feature"
 
     private lateinit var page: Page
 
@@ -97,6 +97,34 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     @Test
+    fun `should link feature`() {
+        withTask()
+        withLinkableFeature()
+
+        openTaskPage {
+            assertTask()
+            clickPlusButton()
+            searchFeature()
+            chooseFeature()
+            assertTask(linkedFeatures = listOf(featureName, linkableFeature))
+        }
+    }
+
+    @Test
+    fun `should cancel link feature`() {
+        withTask()
+        withLinkableFeature()
+
+        openTaskPage {
+            assertTask()
+            clickPlusButton()
+            searchFeature()
+            cancelLinkFeature()
+            assertTask(linkedFeatures = listOf(featureName))
+        }
+    }
+
+    @Test
     fun `cannot show task`() {
         withNoTask()
 
@@ -121,6 +149,26 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun Page.getButton() = querySelectorAll("#task button").first { it.textContent() == "Edit" }
+
+    private fun Page.clickPlusButton() {
+        querySelector(".btn[hx-target=\\#link-feature]").click()
+        waitForCondition { querySelector("#item-selector input") != null }
+    }
+
+    private fun Page.searchFeature() {
+        querySelector("#item-selector input").fill(linkableFeature.substring(1, 3))
+        waitForCondition { querySelector("#item-list li a") != null }
+    }
+
+    private fun Page.chooseFeature() {
+        querySelector("#item-list li a").click()
+        waitForCondition { querySelector("#item-list li") == null }
+    }
+
+    private fun Page.cancelLinkFeature() {
+        querySelector("#item-selector button").click()
+        waitForCondition { querySelector("#item-list li") == null }
+    }
 
     private fun Page.assertForm() {
         val nameInput = querySelector("#name")
@@ -156,9 +204,14 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         waitForCondition { querySelector("h1 .status-${status.name}") != null }
     }
 
-    private fun Page.assertTask(expectedName: String = name, expectedDescription: String = description, status: TaskStatus = TaskStatus.OPEN) {
+    private fun Page.assertTask(
+        expectedName: String = name,
+        expectedDescription: String = description,
+        status: TaskStatus = TaskStatus.OPEN,
+        linkedFeatures: List<String> = listOf(featureName)
+    ) {
         assertNameAndDescription(expectedName, expectedDescription, status)
-        assertLinks()
+        assertLinks(linkedFeatures)
         assertStatus(status)
     }
 
@@ -167,10 +220,12 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         assertThat(statusElement.textContent()).isEqualTo(status.name)
     }
 
-    private fun Page.assertLinks() {
+    private fun Page.assertLinks(features: List<String> = listOf(featureName)) {
         val links = querySelectorAll("ul li a")
-        assertThat(links).hasSize(1)
-        assertThat(links[0].textContent()).isEqualTo(featureName)
+        assertThat(links).hasSize(features.size)
+        features.forEachIndexed { index, feature ->
+            assertThat(links[index].textContent()).isEqualTo(feature)
+        }
     }
 
     private fun Page.assertNameAndDescription(expectedName: String, expectedDescription: String, expectedStatus: TaskStatus) {
@@ -207,5 +262,10 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         page.navigate("http://localhost:$port/tasks/$taskId")
 
         test(page)
+    }
+
+    private fun withLinkableFeature() {
+        every { taskService.getLinkableItems(taskId, linkableFeature.substring(1, 3)) } returns flowOf(TaskLinkedItem(linkableFeature, linkableFeature, 0))
+        coEvery { taskService.linkTo(taskId, linkableFeature, 0) } returns flowOf(TaskLinkedItem(featureId, featureName, 0), TaskLinkedItem(linkableFeature, linkableFeature, 0))
     }
 }
