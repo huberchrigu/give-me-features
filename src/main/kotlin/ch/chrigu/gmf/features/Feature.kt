@@ -17,6 +17,12 @@ class Feature(id: FeatureId, val name: String, val description: Markdown, val ta
      * Links an existing task to this feature (tasks may have relationships to multiple features).
      */
     fun linkTask(task: Task): Feature = Feature(id, name, description, tasks + task.id, version)
+    fun unlinkTask(task: Task): Feature {
+        val taskId = task.id
+        require(tasks.contains(taskId)) { "Task $taskId is not linked to feature $id" }
+        return Feature(id, name, description, tasks - taskId, version)
+    }
+
     fun update(featureUpdate: FeatureUpdate) = featureUpdate.apply(this)
 
     override fun equals(other: Any?): Boolean {

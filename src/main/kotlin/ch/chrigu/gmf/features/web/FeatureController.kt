@@ -41,7 +41,7 @@ class FeatureController(private val featureService: FeatureService, private val 
         "description" to { description })
 
     @GetMapping
-    fun listFeatures() = Rendering.view("features")
+    fun listFeatures(): Rendering = Rendering.view("features")
         .withFeatures()
         .build()
 
@@ -80,7 +80,7 @@ class FeatureController(private val featureService: FeatureService, private val 
         .flatMapConcat { updateFragmentBuilder.toFragments(it.first, it.second).asFlow() }
 
     @PutMapping("/{id}${UpdateFragmentBuilder.MERGE_URI}", headers = [Hx.HEADER])
-    suspend fun mergeFeature(@PathVariable id: FeatureId, @Valid mergeFeatureBody: MergeFeatureBody, @RequestParam version: Long) = featureEditView(
+    suspend fun mergeFeature(@PathVariable id: FeatureId, @Valid mergeFeatureBody: MergeFeatureBody, @RequestParam version: Long): Rendering = featureEditView(
         featureService.mergeWithVersion(id, mergeFeatureBody.name!!, mergeFeatureBody.description!!, version, mergeFeatureBody.newVersion!!)
     )
 
@@ -91,12 +91,13 @@ class FeatureController(private val featureService: FeatureService, private val 
     }
 
     @GetMapping("/{featureId}/edit", headers = [Hx.HEADER])
-    suspend fun getFeatureEditForm(@PathVariable featureId: FeatureId) = featureEditView(featureService.getFeature(featureId))
+    suspend fun getFeatureEditForm(@PathVariable featureId: FeatureId): Rendering = featureEditView(featureService.getFeature(featureId))
 
     @PatchMapping("/{featureId}", headers = [Hx.HEADER])
-    suspend fun updateFeature(@PathVariable featureId: FeatureId, @RequestParam version: Long, @Valid updateFeature: UpdateFeatureBody) = Rendering.view("blocks/feature")
-        .modelAttribute("feature", featureService.updateFeature(featureId, version, updateFeature.toDomain()).asDetailView(taskService))
-        .build()
+    suspend fun updateFeature(@PathVariable featureId: FeatureId, @RequestParam version: Long, @Valid updateFeature: UpdateFeatureBody): Rendering =
+        Rendering.view("blocks/feature")
+            .modelAttribute("feature", featureService.updateFeature(featureId, version, updateFeature.toDomain()).asDetailView(taskService))
+            .build()
 
     @GetMapping("/{id}")
     suspend fun getFeaturePage(@PathVariable id: FeatureId): Rendering {

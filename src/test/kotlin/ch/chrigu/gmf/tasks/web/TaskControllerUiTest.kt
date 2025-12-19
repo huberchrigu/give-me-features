@@ -97,7 +97,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     @Test
-    fun `should link feature`() {
+    fun `should link feature and unlink other feature`() {
         withTask()
         withLinkableFeature()
 
@@ -107,6 +107,8 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
             searchFeature()
             chooseFeature()
             assertTask(linkedFeatures = listOf(featureName, linkableFeature))
+            unlinkFeature()
+            assertTask(linkedFeatures = listOf(linkableFeature))
         }
     }
 
@@ -168,6 +170,11 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private fun Page.cancelLinkFeature() {
         querySelector("#item-selector button").click()
         waitForCondition { querySelector("#item-list li") == null }
+    }
+
+    private fun Page.unlinkFeature() {
+        querySelector("#linked-features button").click()
+        waitForCondition { querySelectorAll("#linked-features li").size == 1 }
     }
 
     private fun Page.assertForm() {

@@ -42,6 +42,7 @@ class TaskService(
     fun getLinkableItems(taskId: TaskId, name: String) = linkedItemProvider.search(name, taskId)
 
     suspend fun linkTo(taskId: TaskId, item: String, version: Long) = linkedItemProvider.link(item, getTask(taskId), version)
+    suspend fun unlink(taskId: TaskId, item: String, version: Long) = linkedItemProvider.unlink(item, getTask(taskId), version)
 
     private suspend fun update(id: TaskId, version: Long, applyChange: Task.() -> Task) = taskRepository.applyOn(id, version, applyChange)
         ?: throw TaskNotFoundException(id)
@@ -66,6 +67,7 @@ interface LinkedItemProvider {
      * @param version The linked item's version.
      */
     suspend fun link(from: String, to: Task, version: Long): Flow<TaskLinkedItem<*>>
+    suspend fun unlink(item: String, from: Task, version: Long): Flow<TaskLinkedItem<*>>
 }
 
 data class TaskLinkedItem<T>(
