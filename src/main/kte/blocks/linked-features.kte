@@ -1,15 +1,20 @@
 @import ch.chrigu.gmf.tasks.TaskLinkedItem
 @import ch.chrigu.gmf.tasks.TaskId
+@import org.springframework.security.web.server.csrf.CsrfToken
 
 @param taskId: TaskId
 @param items : List<TaskLinkedItem<*>>
+@param csrf: CsrfToken
 
 <div class="card" id="linked-features" hx-swap-oob="true">
     <h2>Linked Features</h2>
     <ul>
         @for(item in items)
             <li>
-                <a href="/features/${item.id.toString()}">${item.name}</a><!-- TODO: Allow deletion -->
+                <a href="/features/${item.id.toString()}">${item.name}</a>
+                @if(items.size > 1)
+                    <button class="btn" hx-post="/tasks/${taskId.toString()}/unlink-feature" hx-vals='{"item": "${item.id.toString()}", "version": ${item.version}, "${csrf.parameterName}": "${csrf.token}"}'>❌</button>
+                @endif
             </li>
         @endfor
     </ul>

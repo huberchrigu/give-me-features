@@ -100,10 +100,13 @@ class TaskController(private val taskService: TaskService) {
         return linkedFeaturesBlock(taskId, items)
     }
 
-    private fun linkedFeaturesBlock(
-        taskId: TaskId,
-        items: Flow<TaskLinkedItem<*>>
-    ): Rendering = Rendering.view("blocks/linked-features")
+    @PostMapping("/{taskId}/unlink-feature", headers = [Hx.HEADER])
+    suspend fun unlinkFeature(@PathVariable taskId: TaskId, @Valid linkBody: LinkBody): Rendering {
+        val items = taskService.unlink(taskId, linkBody.item!!, linkBody.version!!)
+        return linkedFeaturesBlock(taskId, items)
+    }
+
+    private fun linkedFeaturesBlock(taskId: TaskId, items: Flow<TaskLinkedItem<*>>): Rendering = Rendering.view("blocks/linked-features")
         .modelAttribute("taskId", taskId)
         .modelAttribute("items", items)
         .build()

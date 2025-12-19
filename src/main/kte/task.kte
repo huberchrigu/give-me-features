@@ -11,5 +11,5 @@
     <script src="/status-update.js"></script>
 `, body = @`
     @template.blocks.task(task = task, csrf = csrf)
-    @template.blocks.linked-features(taskId = task.id, items = items)
+    @template.blocks.linked-features(taskId = task.id, items = items, csrf = csrf)
 `, error = error)

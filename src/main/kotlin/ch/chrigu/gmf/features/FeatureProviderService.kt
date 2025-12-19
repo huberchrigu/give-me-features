@@ -18,11 +18,19 @@ class FeatureProviderService(private val featureRepository: FeatureRepository) :
         .toLinkedItems()
 
     override suspend fun link(from: String, to: Task, version: Long): Flow<TaskLinkedItem<*>> {
-        val featureId = FeatureId(from)
+        return modify(from, version, to) { linkTask(to) }
+    }
+
+    override suspend fun unlink(item: String, from: Task, version: Long): Flow<TaskLinkedItem<*>> {
+        return modify(item, version, from) { unlinkTask(from) }
+    }
+
+    private suspend fun modify(id: String, version: Long, task: Task, modifier: Feature.() -> Feature): Flow<TaskLinkedItem<FeatureId>> {
+        val featureId = FeatureId(id)
         featureRepository.applyOn(featureId, version) {
-                this.linkTask(to)
+            this.modifier()
         } ?: throw FeatureNotFoundException(featureId)
-        return getFor(to.id)
+        return getFor(task.id)
     }
 
     private fun Flow<Feature>.toLinkedItems() = map { TaskLinkedItem(it.id, it.name, it.version!!) }
