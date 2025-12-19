@@ -274,5 +274,6 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     private fun withLinkableFeature() {
         every { taskService.getLinkableItems(taskId, linkableFeature.substring(1, 3)) } returns flowOf(TaskLinkedItem(linkableFeature, linkableFeature, 0))
         coEvery { taskService.linkTo(taskId, linkableFeature, 0) } returns flowOf(TaskLinkedItem(featureId, featureName, 0), TaskLinkedItem(linkableFeature, linkableFeature, 0))
+        coEvery { taskService.unlink(taskId, featureId.toString(), 0) } returns flowOf(TaskLinkedItem(linkableFeature, linkableFeature, 0))
     }
 }
