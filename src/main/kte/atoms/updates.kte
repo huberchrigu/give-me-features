@@ -3,10 +3,22 @@
 @param fieldName: String
 @param update: FieldUpdate? = null
 
-<div id="${fieldName}-updates" hx-swap-oob="true">
+<div id="${fieldName}-updates" hx-swap-oob="true" class="mb-3">
     @if(update != null)
-        <button class="btn" hx-put="${update.mergeUri}" hx-vals='{"newVersion": ${update.newVersion}}'>Merge changes</button>
-        <a href="#" onclick="document.querySelector('#${fieldName}-updates-new').toggleAttribute('hidden')">Show new version</a>
-        <div id="${fieldName}-updates-new" hidden="hidden">${update.newValue}</div>
+        <div class="d-flex flex-column gap-2">
+            <button type="button" class="btn btn-sm btn-warning"
+                    hx-put="${update.mergeUri}"
+                    hx-vals='{"newVersion": ${update.newVersion}}'>
+                Merge changes
+            </button>
+
+            <a href="#" class="text-decoration-none" onclick="document.querySelector('#${fieldName}-updates-new').toggleAttribute('hidden'); return false;">
+                Show new version
+            </a>
+
+            <div id="${fieldName}-updates-new" hidden class="card card-body p-2">
+                ${update.newValue}
+            </div>
+        </div>
     @endif
 </div>

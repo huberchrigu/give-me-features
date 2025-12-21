@@ -8,16 +8,55 @@
 @param csrf: CsrfToken
 
 @template.page(title = "Features", body = @`
-    @template.blocks.features(features = features, current = feature?.id)
-    <div class="card">
-        <h2>New Feature</h2>
-        <form hx-post="/features">
-            <label for="name">Name: </label>
-            <input class="form-input" type="text" name="name" id="name"/>
-            @template.atoms.richtext("description", "Description", null)
-            <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
-            <button class="btn btn-primary" type="submit">Create</button>
-        </form>
+    <div class="c-app">
+        <!-- Sidebar -->
+        <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show">
+            <div class="c-sidebar-brand">
+                <h2>Features</h2>
+            </div>
+            <ul class="c-sidebar-nav">
+                @for(featureListItem in features)
+                    <li class="c-sidebar-nav-item">
+                        <a class="c-sidebar-nav-link ${if (featureListItem.id == feature?.id) "active" else ""}"
+                           hx-get="${featureListItem.link}"
+                           href="${featureListItem.link}">
+                            ${featureListItem.name}
+                        </a>
+                    </li>
+                @endfor
+            </ul>
+        </div>
+
+        <!-- Main wrapper -->
+        <div class="c-wrapper">
+            <header class="c-header c-header-light">
+                <h1>Features Dashboard</h1>
+            </header>
+
+            <div class="c-body">
+                <main class="c-main">
+                    <div class="container-fluid">
+                        <!-- New Feature Card -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h2>New Feature</h2>
+                            </div>
+                            <div class="card-body">
+                                <form hx-post="/features">
+                                    <label for="name">Name: </label>
+                                    <input class="form-control" type="text" name="name" id="name"/>
+                                    @template.atoms.richtext("description", "Description", null)
+                                    <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
+                                    <button class="btn btn-primary mt-3" type="submit">Create</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Feature Detail Card -->
+                        @template.blocks.feature(feature = feature, csrf = csrf)
+                    </div>
+                </main>
+            </div>
+        </div>
     </div>
-    @template.blocks.feature(feature = feature, csrf = csrf)
 `, error = error)

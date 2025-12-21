@@ -6,11 +6,15 @@
 @param items: List<TaskLinkedItem<*>>
 @param csrf: CsrfToken
 
-<ul id="item-list" class="dropdown">
+<ul id="item-list" class="list-group">
     @for (item in items)
-        <li>
-            <a hx-put="/tasks/${taskId.toString()}/link-feature" hx-vals='{"item": "${item.id.toString()}", "version": ${item.version}, "${csrf.parameterName}": "${csrf.token}"}'
-               hx-target="#item-list">${item.name}</a>
+        <li class="list-group-item">
+            <a class="text-decoration-none"
+               hx-put="/tasks/${taskId.toString()}/link-feature"
+               hx-vals='{"item": "${item.id.toString()}", "version": ${item.version}, "${csrf.parameterName}": "${csrf.token}"}'
+               hx-target="#item-list">
+                ${item.name}
+            </a>
         </li>
     @endfor
 </ul>

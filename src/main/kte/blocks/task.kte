@@ -4,18 +4,33 @@
 @param task: TaskDetails
 @param csrf: CsrfToken
 
-<div id="task" class="card" hx-swap-oob="true" sse-connect="${task.uri}" sse-swap="message">
-    <h1>${task.name} <span class="status-${task.status} status-actions-trigger" onclick="showStatusAction()">${task.status}</span></h1>
-    <div id="status-overlay" onclick="hideStatusAction()"></div>
-    <div id="status-actions">
+<div id="task" class="card mb-4 p-3" hx-swap-oob="true" sse-connect="${task.uri}" sse-swap="message">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h1 class="h5 mb-0">
+            ${task.name}
+            <span class="badge status-${task.status} status-actions-trigger ms-2" style="cursor:pointer;" onclick="showStatusAction()">
+                ${task.status}
+            </span>
+        </h1>
+    </div>
+
+    <!-- Status Actions Overlay -->
+    <div id="status-overlay" class="status-overlay" onclick="hideStatusAction()"></div>
+    <div id="status-actions" class="card p-3">
         @for(action in task.availableStatusActions)
-            <button class="status-${action.status}" hx-put="${task.uri}/status?version=${task.version}"
-                    hx-vals='{"status": "${action.status}", "${csrf.parameterName}": "${csrf.token}"}'>${action.label}</button>
+            <button class="btn btn-sm status-${action.status} mb-1 w-100"
+                    hx-put="${task.uri}/status?version=${task.version}"
+                    hx-vals='{"status": "${action.status}", "${csrf.parameterName}": "${csrf.token}"}'>
+                ${action.label}
+            </button>
         @endfor
-        <button class="btn" onclick="hideStatusAction()">Cancel</button>
+        <button class="btn btn-secondary btn-sm w-100 mt-2" onclick="hideStatusAction()">Cancel</button>
     </div>
-    <div class="richtext">
-        $unsafe{task.description}
+
+    <div class="card-body">
+        <div class="richtext mb-3">
+            $unsafe{task.description}
+        </div>
+        <button class="btn btn-primary" hx-get="${task.uri}/edit">Edit</button>
     </div>
-    <button class="btn" hx-get="${task.uri}/edit">Edit</button>
 </div>

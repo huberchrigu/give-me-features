@@ -71,6 +71,8 @@ dependencies {
     runtimeOnly("org.webjars.npm:htmx.org:2.0.4")
     runtimeOnly("org.webjars.npm:htmx-ext-sse:2.2.3")
     runtimeOnly("org.webjars.npm:htmx-ext-response-targets:2.0.3")
+    runtimeOnly("org.webjars.npm:coreui__coreui:5.4.3")
+    runtimeOnly("org.webjars.npm:coreui__icons:3.0.1")
     runtimeOnly("org.webjars:webjars-locator-lite")
 
     // HTML sanitizer

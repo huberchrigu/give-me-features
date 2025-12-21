@@ -3,22 +3,36 @@
 @import org.springframework.security.web.server.csrf.CsrfToken
 
 @param taskId: TaskId
-@param items : List<TaskLinkedItem<*>>
+@param items: List<TaskLinkedItem<*>>
 @param csrf: CsrfToken
 
-<div class="card" id="linked-features" hx-swap-oob="true">
-    <h2>Linked Features</h2>
-    <ul>
-        @for(item in items)
-            <li>
-                <a href="/features/${item.id.toString()}">${item.name}</a>
-                @if(items.size > 1)
-                    <button class="btn" hx-post="/tasks/${taskId.toString()}/unlink-feature" hx-vals='{"item": "${item.id.toString()}", "version": ${item.version}, "${csrf.parameterName}": "${csrf.token}"}'>❌</button>
-                @endif
-            </li>
-        @endfor
-    </ul>
-    <div id="link-feature">
-        <button class="btn" hx-get="/tasks/${taskId.toString()}/link-feature" hx-target="#link-feature" hx-swap="innerHTML">➕</button>
+<div class="card mb-4" id="linked-features" hx-swap-oob="true">
+    <div class="card-header">
+        <h2>Linked Features</h2>
+    </div>
+    <div class="card-body">
+        <ul class="list-group mb-3">
+            @for(item in items)
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="/features/${item.id.toString()}">${item.name}</a>
+                    @if(items.size > 1)
+                        <button class="btn btn-sm btn-outline-danger"
+                                hx-post="/tasks/${taskId.toString()}/unlink-feature"
+                                hx-vals='{"item": "${item.id.toString()}", "version": ${item.version}, "${csrf.parameterName}": "${csrf.token}"}'>
+                            ❌
+                        </button>
+                    @endif
+                </li>
+            @endfor
+        </ul>
+
+        <div id="link-feature">
+            <button class="btn btn-sm btn-outline-success"
+                    hx-get="/tasks/${taskId.toString()}/link-feature"
+                    hx-target="#link-feature"
+                    hx-swap="innerHTML">
+                ➕ Link Feature
+            </button>
+        </div>
     </div>
 </div>

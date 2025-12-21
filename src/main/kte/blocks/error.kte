@@ -2,9 +2,15 @@
 
 <div id="error" hx-swap-oob="true">
     @if(error != null)
-        <div class="error">
-            <p>${error}</p>
-            <button class="btn" onclick="htmx.find('#error .error').remove();">Close</button>
+        <div class="c-toast c-toast-danger show fixed-top m-3" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="c-toast-header">
+                <strong class="me-auto">Error</strong>
+                <button type="button" class="btn-close" onclick="htmx.find('#error .c-toast').remove();" aria-label="Close"></button>
+            </div>
+            <div class="c-toast-body">
+                <p>${error}</p>
+                <button class="btn btn-primary mt-2" onclick="history.back()">Back</button>
+            </div>
         </div>
     @endif
 </div>

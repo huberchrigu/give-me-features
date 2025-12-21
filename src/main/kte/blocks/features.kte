@@ -4,15 +4,26 @@
 @param features: List<FeatureListItem>
 @param current: FeatureId?
 
-<div id="features" class="card" hx-swap-oob="true" sse-connect="/features?current=${current?.toString()}" sse-swap="message">
-    <h1>Features</h1>
-    <ul>
+<div id="features"
+     class="card mb-4"
+     hx-swap-oob="true"
+     sse-connect="/features?current=${current?.toString()}"
+     sse-swap="message">
+
+    <div class="card-header">
+        <h5 class="mb-0">Features</h5>
+    </div>
+
+    <div class="list-group list-group-flush">
         @for(featureListItem in features)
-            <li>
-                <a class="${if (featureListItem.id == current) "current" else ""}" hx-get="${featureListItem.link}"
-                   href="${featureListItem.link}">${featureListItem.name}</a>
-                <a class="right" href="${featureListItem.link}">&rarr;</a>
-            </li>
+            <a class="list-group-item list-group-item-action
+                      ${if (featureListItem.id == current) "active" else ""}"
+               hx-get="${featureListItem.link}"
+               hx-target="#feature"
+               hx-push-url="true"
+               href="${featureListItem.link}">
+                ${featureListItem.name}
+            </a>
         @endfor
-    </ul>
+    </div>
 </div>
