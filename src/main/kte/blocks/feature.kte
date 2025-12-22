@@ -1,35 +1,72 @@
 @import ch.chrigu.gmf.features.web.ui.FeatureDetailView
+@import ch.chrigu.gmf.tasks.TaskStatus
 @import org.springframework.security.web.server.csrf.CsrfToken
 
 @param feature: FeatureDetailView?
 @param csrf: CsrfToken
 
-<div id="feature" hx-swap-oob="true" sse-connect="${if (feature != null) "/features/${feature.id}" else ""}" sse-swap="${if (feature != null) "message" else ""}">
+<div id="feature"
+     hx-swap-oob="true"
+     sse-connect="${if (feature != null) "/features/${feature.id}" else ""}"
+     sse-swap="${if (feature != null) "message" else ""}">
+
     @if(feature != null)
-        <div class="card">
-            <h2>${feature.name}</h2>
-            <div class="progressbar-track">
-                <div class="progressbar-fill" style="--progress: ${feature.progress}%;" role="progressbar" aria-valuenow="${feature.progress}" aria-valuemin="0" aria-valuemax="100"></div>
+        <div class="card mb-3">
+            <div class="card-header text-bg-info">
+                <h3 class="mb-0">${feature.name}</h3>
             </div>
-            <p class="progressbar-text">
-                Current Progress: <span class="font-bold">${feature.progress}%</span>
-            </p>
-            <div class="richtext">
-                $unsafe{feature.description}
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="progress mb-1">
+                        <div class="progress-bar"
+                             role="progressbar"
+                             style="width: ${feature.progress}%"
+                             aria-valuenow="${feature.progress}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        Current Progress: <strong>${feature.progress}%</strong>
+                    </small>
+                </div>
+                <div class="richtext mb-4">
+                    $unsafe{feature.description}
+                </div>
+                <h4 class="mb-2">Tasks</h4>
+                @if(feature.tasks.isEmpty())
+                    <div class="text-muted mb-3">
+                        No tasks yet.
+                    </div>
+                @else
+                    <div class="list-group mb-4">
+                        @for(task in feature.tasks)
+                            <a href="/tasks/${task.id?.toString()}" class="list-group-item list-group-item-action d-flex justify-content-between">
+                                <span>${task.name}</span>
+                                <span class="badge ${task.statusClass}">${task.status}</span>
+                            </a>
+                        @endfor
+                    </div>
+                @endif
+
+                <h4 class="mb-2">Add task</h4>
+
+                <form hx-post="/features/${feature.id?.toString()}/tasks?version=${feature.version}">
+                    <div class="mb-3">
+                        <label class="form-label" for="taskName">Name</label>
+                        <input class="form-control" type="text" name="name" id="taskName"/>
+                    </div>
+
+                    <input type="hidden"
+                           name="${csrf.parameterName}"
+                           value="${csrf.token}"/>
+
+                    <button class="btn btn-primary" type="submit">
+                        Create task
+                    </button>
+                </form>
+
             </div>
-            <h3>Tasks</h3>
-            <ul class="task-list">
-                @for(task in feature.tasks)
-                    <li><a href="/tasks/${task.id?.toString()}">${task.name} <span class="status-${task.status}">${task.status}</span></a></li>
-                @endfor
-            </ul>
-            <h3>Add task</h3>
-            <form hx-post="/features/${feature.id?.toString()}/tasks?version=${feature.version}">
-                <label for="taskName">Name: </label>
-                <input class="form-input" type="text" name="name" id="taskName"/>
-                <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
-                <button class="btn btn-primary" type="submit">Create</button>
-            </form>
         </div>
     @endif
 </div>

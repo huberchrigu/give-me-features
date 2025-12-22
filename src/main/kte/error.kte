@@ -1,17 +1,31 @@
 @param error: String?
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Error</title>
+
+    <link rel="stylesheet" href="/webjars/coreui__coreui/dist/css/coreui.css"/>
+    <link rel="stylesheet" href="/webjars/coreui__icons/css/all.css"/>
+    <link rel="stylesheet" href="/app.css"/>
+
     <script src="/webjars/htmx.org/dist/htmx.min.js"></script>
-    <link rel="stylesheet" href="/styles.css"/>
 </head>
 <body>
-<div class="card">
-    <h1>Error</h1>
-    <button class="btn btn-primary" onclick="history.back()">Back</button>
-</div>
+<div class="container">
+    <div class="card mb-3">
+        <div class="card-header text-bg-danger">
+            <h3 class="mb-0">Error</h3>
+        </div>
+        <div class="card-body">
+            <button class="btn btn-primary" onclick="history.back()">Back</button>
+        </div>
+    </div>
 
-@template.blocks.error(error)
+    @template.blocks.error(error)
+</div>
+<script src="/webjars/coreui__coreui/dist/js/coreui.bundle.js"></script>
 </body>
 </html>

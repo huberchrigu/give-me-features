@@ -5,8 +5,27 @@
 
 <div id="${fieldName}-updates" hx-swap-oob="true">
     @if(update != null)
-        <button class="btn" hx-put="${update.mergeUri}" hx-vals='{"newVersion": ${update.newVersion}}'>Merge changes</button>
-        <a href="#" onclick="document.querySelector('#${fieldName}-updates-new').toggleAttribute('hidden')">Show new version</a>
-        <div id="${fieldName}-updates-new" hidden="hidden">${update.newValue}</div>
+        <div class="callout callout-warning bg-light p-3 border-start-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <small class="text-medium-emphasis fw-bold text-uppercase">Update Available</small>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-warning"
+                            hx-put="${update.mergeUri}"
+                            hx-vals='{"newVersion": ${update.newVersion}}'>
+                        Merge changes
+                    </button>
+                    <button class="btn btn-sm btn-outline-warning"
+                            type="button"
+                            onclick="document.getElementById('${fieldName}-updates-new').classList.toggle('d-none')">
+                        View Version
+                    </button>
+                </div>
+            </div>
+
+            <div id="${fieldName}-updates-new" class="d-none mt-2 p-2 bg-white border rounded small">
+                <div class="text-muted mb-1 border-bottom pb-1">New Value:</div>
+                ${update.newValue}
+            </div>
+        </div>
     @endif
 </div>

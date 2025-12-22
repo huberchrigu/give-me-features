@@ -1,21 +1,44 @@
 @import ch.chrigu.gmf.tasks.web.ui.TaskDetails
+@import ch.chrigu.gmf.tasks.TaskStatus
 @import org.springframework.security.web.server.csrf.CsrfToken
 
 @param task: TaskDetails
 @param csrf: CsrfToken
 
-<div id="task" class="card" hx-swap-oob="true" sse-connect="${task.uri}" sse-swap="message">
-    <h1>${task.name} <span class="status-${task.status} status-actions-trigger" onclick="showStatusAction()">${task.status}</span></h1>
-    <div id="status-overlay" onclick="hideStatusAction()"></div>
-    <div id="status-actions">
-        @for(action in task.availableStatusActions)
-            <button class="status-${action.status}" hx-put="${task.uri}/status?version=${task.version}"
-                    hx-vals='{"status": "${action.status}", "${csrf.parameterName}": "${csrf.token}"}'>${action.label}</button>
-        @endfor
-        <button class="btn" onclick="hideStatusAction()">Cancel</button>
+<div id="task" class="card sm-3" hx-swap-oob="true" sse-connect="${task.uri}" sse-swap="message">
+    <div class="card-header text-bg-primary d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">${task.name}</h3>
+
+        <div class="dropdown bg-white">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-coreui-toggle="dropdown" aria-expanded="false">
+                <span class="badge rounded-pill ${task.statusClass} me-1">&nbsp;</span>
+                <span>${task.status}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li><h6 class="dropdown-header">Change Status to:</h6></li>
+                @for(action in task.availableStatusActions)
+                    <li>
+                        <button class="dropdown-item d-flex align-items-center"
+                                hx-put="${task.uri}/status?version=${task.version}"
+                                hx-vals='{"status": "${action.status}", "${csrf.parameterName}": "${csrf.token}"}'>
+                            <span class="badge rounded-pill ${action.statusClass} me-2">&nbsp;</span>
+                            <span>${action.label}</span>
+                        </button>
+                    </li>
+                @endfor
+            </ul>
+        </div>
     </div>
-    <div class="richtext">
-        $unsafe{task.description}
+
+    <div class="card-body">
+        <div class="richtext mb-4 p-3 bg-body-tertiary rounded border">
+            $unsafe{task.description}
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" hx-get="${task.uri}/edit">
+                <i class="cil-pencil me-1"></i><span>Edit Task</span>
+            </button>
+        </div>
     </div>
-    <button class="btn" hx-get="${task.uri}/edit">Edit</button>
 </div>

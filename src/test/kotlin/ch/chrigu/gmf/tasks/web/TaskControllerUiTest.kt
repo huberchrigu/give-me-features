@@ -141,7 +141,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun Page.assertError(prefix: String) {
-        val error = querySelector("#error p")
+        val error = querySelector("#error div:nth-child(2)")
         assertThat(error.textContent()).startsWith(prefix)
     }
 
@@ -150,7 +150,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         waitForLoadState(LoadState.NETWORKIDLE)
     }
 
-    private fun Page.getButton() = querySelectorAll("#task button").first { it.textContent() == "Edit" }
+    private fun Page.getButton() = querySelectorAll("#task button").first { it.textContent().contains("Edit Task") }
 
     private fun Page.clickPlusButton() {
         querySelector(".btn[hx-target=\\#link-feature]").click()
@@ -159,22 +159,22 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
 
     private fun Page.searchFeature() {
         querySelector("#item-selector input").fill(linkableFeature.substring(1, 3))
-        waitForCondition { querySelector("#item-list li a") != null }
+        waitForCondition { querySelector("#item-list a") != null }
     }
 
     private fun Page.chooseFeature() {
-        querySelector("#item-list li a").click()
-        waitForCondition { querySelector("#item-list li") == null }
+        querySelector("#item-list a").click()
+        waitForCondition { querySelector("#item-list a") == null }
     }
 
     private fun Page.cancelLinkFeature() {
         querySelector("#item-selector button").click()
-        waitForCondition { querySelector("#item-list li") == null }
+        waitForCondition { querySelector("#item-list a") == null }
     }
 
     private fun Page.unlinkFeature() {
         querySelector("#linked-features button").click()
-        waitForCondition { querySelectorAll("#linked-features li").size == 1 }
+        waitForCondition { querySelectorAll("#linked-features div.list-group-item").size == 1 }
     }
 
     private fun Page.assertForm() {
@@ -193,22 +193,20 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
         querySelector("#description").fill(newDescriptionMarkdown.toString())
         querySelector("#task button.btn").click()
         waitForLoadState(LoadState.NETWORKIDLE)
-        waitForCondition { querySelector("#task h1") != null }
+        waitForCondition { querySelector("form#task") == null }
     }
 
     private fun Page.changeStatus(status: TaskStatus = TaskStatus.OPEN, newStatus: TaskStatus) {
-        val statusElement = querySelector(".status-${status.name}")
+        val statusElement = querySelector("div.dropdown button.btn")
         statusElement.click()
-        val statusActions = querySelector("#status-actions")
-        waitForCondition { statusActions.getAttribute("class").contains("show") }
-        val newStatusElement = statusActions.querySelectorAll("button").first { it.textContent() == newStatus.name }
+        val newStatusElement = querySelectorAll("button.dropdown-item").first { it.textContent().contains(newStatus.name) }
         newStatusElement.click()
-        waitForCondition { querySelector("h1 .status-${newStatus.name}") != null }
+        waitForCondition { querySelector("div.dropdown span:nth-child(2)").textContent() == newStatus.name }
     }
 
     private fun Page.externalTaskChange(name: String, description: Markdown, status: TaskStatus) = runBlocking {
         taskUpdates.emit(Task(taskId, 1L, name, description, status))
-        waitForCondition { querySelector("h1 .status-${status.name}") != null }
+        waitForCondition { querySelector("#task div.dropdown span:nth-child(2)").textContent() == status.name }
     }
 
     private fun Page.assertTask(
@@ -223,12 +221,12 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun Page.assertStatus(status: TaskStatus) {
-        val statusElement = querySelector("h1 .status-${status.name}")
+        val statusElement = querySelector(".dropdown span:nth-child(2)")
         assertThat(statusElement.textContent()).isEqualTo(status.name)
     }
 
     private fun Page.assertLinks(features: List<String> = listOf(featureName)) {
-        val links = querySelectorAll("ul li a")
+        val links = querySelectorAll("#linked-features div.list-group-item a")
         assertThat(links).hasSize(features.size)
         features.forEachIndexed { index, feature ->
             assertThat(links[index].textContent()).isEqualTo(feature)
@@ -236,9 +234,11 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun Page.assertNameAndDescription(expectedName: String, expectedDescription: String, expectedStatus: TaskStatus) {
-        val title = querySelector("#task h1").textContent()
+        val title = querySelector("#task div.card-header h3").textContent()
+        val status = querySelector("#task button span:nth-child(2)").textContent()
         val description = querySelector("#task p").textContent()
-        assertThat(title).isEqualTo("$expectedName $expectedStatus")
+        assertThat(title).isEqualTo(expectedName)
+        assertThat(status).isEqualTo(expectedStatus.toString())
         assertThat(description).isEqualTo(expectedDescription)
     }
 
@@ -247,7 +247,7 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
     }
 
     private fun Page.clickFeature() {
-        querySelector("ul li a").click()
+        querySelector("#linked-features div.list-group-item a").click()
         waitForLoadState(LoadState.NETWORKIDLE)
     }
 

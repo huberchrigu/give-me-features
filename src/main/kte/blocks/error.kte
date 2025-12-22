@@ -1,10 +1,12 @@
 @param error: String?
 
-<div id="error" hx-swap-oob="true">
+<div id="error" hx-swap-oob="true" class="mt-3">
     @if(error != null)
-        <div class="error">
-            <p>${error}</p>
-            <button class="btn" onclick="htmx.find('#error .error').remove();">Close</button>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="fw-semibold">Error</div>
+            <div>${error}</div>
+            <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"
+                    onclick="htmx.find('#error .alert').remove();"></button>
         </div>
     @endif
 </div>

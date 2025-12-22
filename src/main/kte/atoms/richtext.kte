@@ -4,8 +4,8 @@
 @param fieldTitle: String
 @param fieldValue: Markdown?
 
-<div id="${fieldName}-richtext" hx-swap-oob="true">
-    <label for="${fieldName}">${fieldTitle}: </label>
-    <textarea class="form-input" name="${fieldName}" id="${fieldName}">$unsafe{fieldValue?.toString() ?: ""}</textarea>
+<div id="${fieldName}-richtext" hx-swap-oob="true" class="mb-3">
+    <label for="${fieldName}" class="form-label">${fieldTitle}:</label>
+    <textarea class="form-control" name="${fieldName}" id="${fieldName}" rows="5">$unsafe{fieldValue?.toString() ?: ""}</textarea>
     @template.atoms.updates(fieldName)
 </div>

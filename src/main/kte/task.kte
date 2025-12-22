@@ -3,13 +3,20 @@
 @import org.springframework.security.web.server.csrf.CsrfToken
 
 @param task: TaskDetails
-@param items : List<TaskLinkedItem<*>>
+@param items: List<TaskLinkedItem<*>>
 @param error: String?
 @param csrf: CsrfToken
 
-@template.page(title = "Task", head = @`
-    <script src="/status-update.js"></script>
-`, body = @`
-    @template.blocks.task(task = task, csrf = csrf)
-    @template.blocks.linked-features(taskId = task.id, items = items, csrf = csrf)
-`, error = error)
+@template.page(
+title = "Task",
+body = @`
+    <div class="row">
+        <div class="col-8">
+            @template.blocks.task(task = task, csrf = csrf)
+        </div>
+        <div class="col-4">
+            @template.blocks.linked-features(taskId = task.id, items = items, csrf = csrf)
+        </div>
+    </div>
+`, error = error
+)

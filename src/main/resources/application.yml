@@ -3,6 +3,9 @@ spring:
     name: give-me-features
   profiles:
     default: local
+  devtools:
+    livereload:
+      enabled: true
 gg:
   jte:
     templateLocation: src/main/kte

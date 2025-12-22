@@ -8,16 +8,28 @@
 @param csrf: CsrfToken
 
 @template.page(title = "Features", body = @`
-    @template.blocks.features(features = features, current = feature?.id)
-    <div class="card">
-        <h2>New Feature</h2>
-        <form hx-post="/features">
-            <label for="name">Name: </label>
-            <input class="form-input" type="text" name="name" id="name"/>
-            @template.atoms.richtext("description", "Description", null)
-            <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
-            <button class="btn btn-primary" type="submit">Create</button>
-        </form>
+    <div class="row">
+        <div class="col-8">
+            @template.blocks.features(features = features, current = feature?.id)
+            @template.blocks.feature(feature = feature, csrf = csrf)
+        </div>
+        <div class="col-4">
+            <div class="card mb-3">
+                <div class="card-header text-bg-primary">
+                    <h3 class="mb-0">New Feature</h3>
+                </div>
+                <div class="card-body">
+                    <form hx-post="/features">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name: </label>
+                            <input class="form-control" type="text" name="name" id="name"/>
+                        </div>
+                        @template.atoms.richtext("description", "Description", null)
+                        <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
+                        <button class="btn btn-primary" type="submit">Create</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    @template.blocks.feature(feature = feature, csrf = csrf)
 `, error = error)

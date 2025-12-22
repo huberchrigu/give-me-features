@@ -3,22 +3,14 @@ package ch.chrigu.gmf.tasks.web
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.shared.web.Hx
 import ch.chrigu.gmf.shared.web.UpdateFragmentBuilder
-import ch.chrigu.gmf.tasks.Task
+import ch.chrigu.gmf.tasks.*
 import ch.chrigu.gmf.tasks.Task.TaskUpdate
-import ch.chrigu.gmf.tasks.TaskId
-import ch.chrigu.gmf.tasks.TaskLinkedItem
-import ch.chrigu.gmf.tasks.TaskService
-import ch.chrigu.gmf.tasks.TaskStatus
-import ch.chrigu.gmf.tasks.web.ui.TaskDetails
+import ch.chrigu.gmf.tasks.web.ui.toDetails
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.*
 import org.springframework.http.MediaType
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.stereotype.Controller
@@ -36,7 +28,7 @@ class TaskController(private val taskService: TaskService) {
         "description" to { description })
 
     @GetMapping("/{taskId}")
-    suspend fun getTask(@PathVariable taskId: TaskId) = Rendering.view("task")
+    suspend fun getTask(@PathVariable taskId: TaskId): Rendering = Rendering.view("task")
         .modelAttribute("task", taskService.getTask(taskId).toDetails())
         .modelAttribute("items", taskService.getLinkedItems(taskId).toList())
         .build()
@@ -45,7 +37,7 @@ class TaskController(private val taskService: TaskService) {
     suspend fun getTaskEditForm(@PathVariable taskId: TaskId) = taskEditView(taskService.getTask(taskId))
 
     @GetMapping("/{taskId}", headers = [Hx.HEADER])
-    suspend fun getTaskSnippet(@PathVariable taskId: TaskId) = Rendering.view("blocks/task")
+    suspend fun getTaskSnippet(@PathVariable taskId: TaskId): Rendering = Rendering.view("blocks/task")
         .modelAttribute("task", taskService.getTask(taskId).toDetails())
         .build()
 
@@ -71,17 +63,17 @@ class TaskController(private val taskService: TaskService) {
     )
 
     @PatchMapping("/{taskId}", headers = [Hx.HEADER])
-    suspend fun updateTask(@PathVariable taskId: TaskId, @RequestParam version: Long, @Valid updateTask: UpdateTaskBody) = Rendering.view("blocks/task")
+    suspend fun updateTask(@PathVariable taskId: TaskId, @RequestParam version: Long, @Valid updateTask: UpdateTaskBody): Rendering = Rendering.view("blocks/task")
         .modelAttribute("task", taskService.updateTask(taskId, version, updateTask.toChange()).toDetails())
         .build()
 
     @PutMapping("/{taskId}/status", headers = [Hx.HEADER])
-    suspend fun updateStatus(@PathVariable taskId: TaskId, @RequestParam version: Long, @Valid updateTaskStatus: UpdateTaskStatus) = Rendering.view("blocks/task")
+    suspend fun updateStatus(@PathVariable taskId: TaskId, @RequestParam version: Long, @Valid updateTaskStatus: UpdateTaskStatus): Rendering = Rendering.view("blocks/task")
         .modelAttribute("task", updateTaskStatus.applyOn(taskService, taskId, version).toDetails())
         .build()
 
     @GetMapping("/{taskId}/link-feature", headers = [Hx.HEADER])
-    fun getLinkFeatureForm(@PathVariable taskId: TaskId) = Rendering.view("blocks/task-link-feature")
+    fun getLinkFeatureForm(@PathVariable taskId: TaskId): Rendering = Rendering.view("blocks/task-link-feature")
         .modelAttribute("taskId", taskId)
         .build()
 
@@ -89,7 +81,7 @@ class TaskController(private val taskService: TaskService) {
     fun cancelLinkFeature(@PathVariable taskId: TaskId) = linkedFeaturesBlock(taskId, taskService.getLinkedItems(taskId))
 
     @GetMapping("/{taskId}/link-feature/search", headers = [Hx.HEADER])
-    fun searchLinkableFeatures(@PathVariable taskId: TaskId, @RequestParam name: String) = Rendering.view("blocks/task-link-feature-search")
+    fun searchLinkableFeatures(@PathVariable taskId: TaskId, @RequestParam name: String): Rendering = Rendering.view("blocks/task-link-feature-search")
         .modelAttribute("taskId", taskId)
         .modelAttribute("items", taskService.getLinkableItems(taskId, name))
         .build()
@@ -129,6 +121,4 @@ class TaskController(private val taskService: TaskService) {
 
     data class MergeTaskBody(@field:NotEmpty val name: String?, @field:NotNull val description: Markdown?, @field:NotNull val newVersion: Long?)
     data class LinkBody(@field:NotNull val item: String?, @field:NotNull val version: Long?)
-
-    private fun Task.toDetails() = TaskDetails(id, name, description.toHtml(), status, getAvailableStatus(), version!!)
 }

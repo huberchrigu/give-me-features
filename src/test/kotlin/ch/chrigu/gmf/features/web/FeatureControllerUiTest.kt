@@ -157,7 +157,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         val task = Task.describeNewTask(taskName)
         val featureWithTask = feature.copy(tasks = listOf(taskId))
         coEvery { featureService.addTask(featureId, 0L, match { it == Task(it.id, null, taskName, Markdown(""), TaskStatus.OPEN) }) } returns featureWithTask
-        every { taskService.resolve(listOf(taskId)) } returns flowOf(task.copy(id = taskId))
+        every { taskService.resolve(listOf(taskId)) } returns flowOf(task.copy(id = taskId, version = 0L))
     }
 
     private fun withFeature(): Feature {
@@ -180,19 +180,19 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
 
     private fun Page.withExternalChange() = runBlocking {
         changes.emit(Feature(featureId, newName, Markdown(newDescription), emptyList(), 1L))
-        waitForCondition { querySelector("#feature h2").textContent() != featureName }
+        waitForCondition { querySelector("#feature h3").textContent() != featureName }
     }
 
     private fun Page.clickOnFeatureListItem() {
-        querySelector("#features li a").click()
-        waitForCondition { querySelector("#feature h2") != null }
+        querySelector("#features div.list-group-item a").click()
+        waitForCondition { querySelector("#feature h3") != null }
     }
 
     private fun Page.submitNewTaskForm() {
         val form = querySelector("#feature form")
         form.querySelector("#taskName").fill(taskName)
         form.querySelector("button[type='submit']").click()
-        waitForCondition { querySelector("#feature ul li") != null }
+        waitForCondition { querySelector("#feature a.list-group-item") != null }
     }
 
     private fun Page.editFeature() {
@@ -229,8 +229,9 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     }
 
     private fun Page.assertTask() {
-        val taskElement = querySelector("#feature ul li a")
-        assertThat(taskElement.textContent()).isEqualTo("$taskName OPEN")
+        val taskElement = querySelector("#feature a.list-group-item")
+        assertThat(taskElement.querySelector("span").textContent()).isEqualTo(taskName)
+        assertThat(taskElement.querySelector("span:nth-child(2)").textContent()).isEqualTo("OPEN")
     }
 
     private fun openFeaturesPage(selectFeature: FeatureId? = null, test: Page.() -> Unit) {
@@ -242,28 +243,28 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
 
     private fun Page.assertFeatureDetails(expectedName: String = featureName, expectedDescription: String = "Description") {
         val feature = querySelector("#feature")
-        assertThat(feature.querySelector("h2").textContent()).isEqualTo(expectedName)
-        assertThat(feature.querySelector(".progressbar-fill").getAttribute("aria-valuenow")).isEqualTo("0")
-        assertThat(feature.querySelector(".progressbar-text").textContent().trim()).isEqualTo("Current Progress: 0%")
+        assertThat(feature.querySelector("h3").textContent()).isEqualTo(expectedName)
+        assertThat(feature.querySelector(".progress-bar").getAttribute("aria-valuenow")).isEqualTo("0")
+        assertThat(feature.querySelector(".text-muted").textContent().trim()).isEqualTo("Current Progress: 0%")
         assertThat(feature.querySelector("div.richtext p").textContent()).isEqualTo(expectedDescription)
     }
 
     private fun Page.assertFeatureList(current: Boolean) {
-        val items = querySelectorAll("#features li")
+        val items = querySelectorAll("#features div.list-group-item")
         assertThat(items).hasSize(1)
         val link = items[0].querySelector("a")
-        assertThat(link.textContent()).isEqualTo(featureName)
+        assertThat(link.textContent().trim()).isEqualTo(featureName)
         assertThat(link.getAttribute("hx-get")).isEqualTo("/features/$featureId")
-        val clazz = link.getAttribute("class").split(" ")
+        val clazz = items[0].getAttribute("class").split(" ")
         if (current) {
-            assertThat(clazz).contains("current")
+            assertThat(clazz).contains("active")
         } else {
-            assertThat(clazz).doesNotContain("current")
+            assertThat(clazz).doesNotContain("active")
         }
     }
 
     private fun Page.assertError(prefix: String) {
-        val error = querySelector("#error p")
+        val error = querySelector("#error div div:nth-child(2)")
         assertThat(error.textContent()).startsWith(prefix)
     }
 
@@ -271,7 +272,6 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         querySelector("#name").fill(name)
         querySelector("#description").fill(featureDescription.toString())
         locator("button[type='submit']").click()
-        waitForCondition { querySelector("#feature h2") != null || querySelector("#error .error") != null }
+        waitForCondition { querySelector("#feature h3") != null || querySelector("#error div div:nth-child(2)") != null }
     }
-
 }

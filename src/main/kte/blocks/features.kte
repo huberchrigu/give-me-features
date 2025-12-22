@@ -4,15 +4,31 @@
 @param features: List<FeatureListItem>
 @param current: FeatureId?
 
-<div id="features" class="card" hx-swap-oob="true" sse-connect="/features?current=${current?.toString()}" sse-swap="message">
-    <h1>Features</h1>
-    <ul>
-        @for(featureListItem in features)
-            <li>
-                <a class="${if (featureListItem.id == current) "current" else ""}" hx-get="${featureListItem.link}"
-                   href="${featureListItem.link}">${featureListItem.name}</a>
-                <a class="right" href="${featureListItem.link}">&rarr;</a>
-            </li>
-        @endfor
-    </ul>
+<div id="features"
+     class="card mb-3"
+     hx-swap-oob="true"
+     sse-connect="/features?current=${current?.toString()}"
+     sse-swap="message">
+
+    <div class="card-header text-bg-primary">
+        <h3 class="mb-0">Features</h3>
+    </div>
+    <div class="card-body">
+        <div class="list-group mb-3">
+            @for(featureListItem in features)
+                <div class="list-group-item list-group-item-action p-0 d-flex align-items-stretch ${if (featureListItem.id == current) "active" else ""}">
+                    <a class="flex-grow-1 p-3 text-decoration-none text-reset"
+                       hx-get="${featureListItem.link}"
+                       href="${featureListItem.link}">
+                        ${featureListItem.name}
+                    </a>
+                    <a class="d-flex align-items-center justify-content-center bg-white border-start text-decoration-none"
+                       style="width: 50px;"
+                       href="${featureListItem.link}">
+                        <i class="cil-arrow-right text-dark"></i>
+                    </a>
+                </div>
+            @endfor
+        </div>
+    </div>
 </div>

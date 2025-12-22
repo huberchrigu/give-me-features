@@ -8,21 +8,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>${title}</title>
+
+    <link rel="stylesheet" href="/webjars/coreui__coreui/dist/css/coreui.css"/>
+    <link rel="stylesheet" href="/webjars/coreui__icons/css/all.css"/>
+    <link rel="stylesheet" href="/app.css"/>
+
     <script src="/webjars/htmx.org/dist/htmx.min.js"></script>
     <script src="/webjars/htmx-ext-response-targets/dist/response-targets.min.js"></script>
     <script src="/webjars/htmx-ext-sse/dist/sse.min.js"></script>
-    <link rel="stylesheet" href="/styles.css"/>
     @if(head != null)
         ${head}
     @endif
 </head>
 <body hx-ext="response-targets,sse" hx-target-error="#error" hx-swap="none" hx-indicator="#loading-overlay">
-${body}
-@template.blocks.error(error)
-<!-- Global Loading Spinner -->
-<div id="loading-overlay">
-    <div class="spinner"></div>
+<header class="header mb-5">
+    <a class="header-brand" href="#">GMF</a>
+    <ul class="header-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/features">Features</a>
+        </li>
+    </ul>
+</header>
+<div class="container">
+    ${body}
+    @template.blocks.error(error)
+    <div id="loading-overlay">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 </div>
+<script src="/webjars/coreui__coreui/dist/js/coreui.bundle.js"></script>
 </body>
 </html>
