@@ -1,5 +1,6 @@
 package ch.chrigu.gmf.shared.web
 
+import ch.chrigu.gmf.shared.security.AuthController
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
@@ -9,7 +10,7 @@ import org.springframework.test.context.TestConstructor
 import kotlin.reflect.KClass
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(WebFluxTestConfig::class)
+@Import(WebFluxTestConfig::class, AuthController::class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SaveArtifactsOnFailure::class)

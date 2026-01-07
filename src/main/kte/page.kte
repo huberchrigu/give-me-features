@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/webjars/coreui__coreui/dist/css/coreui.css"/>
     <link rel="stylesheet" href="/webjars/coreui__icons/css/all.css"/>
-    <link rel="stylesheet" href="/app.css"/>
+    <link rel="stylesheet" href="/styles/app.css"/>
 
     <script src="/webjars/htmx.org/dist/htmx.min.js"></script>
     <script src="/webjars/htmx-ext-response-targets/dist/response-targets.min.js"></script>
@@ -25,11 +25,11 @@
 </head>
 <body hx-ext="response-targets,sse" hx-target-error="#error" hx-swap="none" hx-indicator="#loading-overlay">
 <header class="header mb-5">
-    <a class="header-brand" href="#">GMF</a>
+    <a class="header-brand" href="/">GMF</a><%-- TODO: Create startpage that does not require login --%>
     <ul class="header-nav">
         <li class="nav-item">
-            <a class="nav-link" href="/features">Features</a>
-        </li>
+            <a class="nav-link" href="/features">Features</a><%-- TODO: Show only if logged in --%>
+        </li><%-- TODO: Add logout button (if logged in) --%>
     </ul>
 </header>
 <div class="container">

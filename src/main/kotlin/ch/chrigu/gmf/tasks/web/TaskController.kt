@@ -33,10 +33,10 @@ class TaskController(private val taskService: TaskService) {
         .modelAttribute("items", taskService.getLinkedItems(taskId).toList())
         .build()
 
-    @GetMapping("/{taskId}/edit", headers = [Hx.HEADER])
+    @GetMapping("/{taskId}/edit", headers = [Hx.REQUEST_EQ_TRUE])
     suspend fun getTaskEditForm(@PathVariable taskId: TaskId) = taskEditView(taskService.getTask(taskId))
 
-    @GetMapping("/{taskId}", headers = [Hx.HEADER])
+    @GetMapping("/{taskId}", headers = [Hx.REQUEST_EQ_TRUE])
     suspend fun getTaskSnippet(@PathVariable taskId: TaskId): Rendering = Rendering.view("blocks/task")
         .modelAttribute("task", taskService.getTask(taskId).toDetails())
         .build()
@@ -57,42 +57,42 @@ class TaskController(private val taskService: TaskService) {
     suspend fun getTaskFormUpdates(@PathVariable id: TaskId, @RequestParam version: Long) = taskService.getUpdatesWithChangedValues(id, version)
         .flatMapConcat { updateFragmentBuilder.toFragments(it.first, it.second).asFlow() }
 
-    @PutMapping("/{id}${UpdateFragmentBuilder.MERGE_URI}", headers = [Hx.HEADER])
+    @PutMapping("/{id}${UpdateFragmentBuilder.MERGE_URI}", headers = [Hx.REQUEST_EQ_TRUE])
     suspend fun mergeTask(@PathVariable id: TaskId, @Valid mergeTaskBody: MergeTaskBody, @RequestParam version: Long) = taskEditView(
         taskService.mergeWithVersion(id, mergeTaskBody.name!!, mergeTaskBody.description!!, version, mergeTaskBody.newVersion!!)
     )
 
-    @PatchMapping("/{taskId}", headers = [Hx.HEADER])
+    @PatchMapping("/{taskId}", headers = [Hx.REQUEST_EQ_TRUE])
     suspend fun updateTask(@PathVariable taskId: TaskId, @RequestParam version: Long, @Valid updateTask: UpdateTaskBody): Rendering = Rendering.view("blocks/task")
         .modelAttribute("task", taskService.updateTask(taskId, version, updateTask.toChange()).toDetails())
         .build()
 
-    @PutMapping("/{taskId}/status", headers = [Hx.HEADER])
+    @PutMapping("/{taskId}/status", headers = [Hx.REQUEST_EQ_TRUE])
     suspend fun updateStatus(@PathVariable taskId: TaskId, @RequestParam version: Long, @Valid updateTaskStatus: UpdateTaskStatus): Rendering = Rendering.view("blocks/task")
         .modelAttribute("task", updateTaskStatus.applyOn(taskService, taskId, version).toDetails())
         .build()
 
-    @GetMapping("/{taskId}/link-feature", headers = [Hx.HEADER])
+    @GetMapping("/{taskId}/link-feature", headers = [Hx.REQUEST_EQ_TRUE])
     fun getLinkFeatureForm(@PathVariable taskId: TaskId): Rendering = Rendering.view("blocks/task-link-feature")
         .modelAttribute("taskId", taskId)
         .build()
 
-    @GetMapping("/{taskId}/link-feature/cancel", headers = [Hx.HEADER])
+    @GetMapping("/{taskId}/link-feature/cancel", headers = [Hx.REQUEST_EQ_TRUE])
     fun cancelLinkFeature(@PathVariable taskId: TaskId) = linkedFeaturesBlock(taskId, taskService.getLinkedItems(taskId))
 
-    @GetMapping("/{taskId}/link-feature/search", headers = [Hx.HEADER])
+    @GetMapping("/{taskId}/link-feature/search", headers = [Hx.REQUEST_EQ_TRUE])
     fun searchLinkableFeatures(@PathVariable taskId: TaskId, @RequestParam name: String): Rendering = Rendering.view("blocks/task-link-feature-search")
         .modelAttribute("taskId", taskId)
         .modelAttribute("items", taskService.getLinkableItems(taskId, name))
         .build()
 
-    @PutMapping("/{taskId}/link-feature", headers = [Hx.HEADER])
+    @PutMapping("/{taskId}/link-feature", headers = [Hx.REQUEST_EQ_TRUE])
     suspend fun linkFeature(@PathVariable taskId: TaskId, @Valid linkBody: LinkBody): Rendering {
         val items = taskService.linkTo(taskId, linkBody.item!!, linkBody.version!!)
         return linkedFeaturesBlock(taskId, items)
     }
 
-    @PostMapping("/{taskId}/unlink-feature", headers = [Hx.HEADER])
+    @PostMapping("/{taskId}/unlink-feature", headers = [Hx.REQUEST_EQ_TRUE])
     suspend fun unlinkFeature(@PathVariable taskId: TaskId, @Valid linkBody: LinkBody): Rendering {
         val items = taskService.unlink(taskId, linkBody.item!!, linkBody.version!!)
         return linkedFeaturesBlock(taskId, items)

@@ -11,6 +11,7 @@ import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.context.bean.override.mockito.MockitoBean
@@ -26,12 +27,13 @@ class TaskControllerWebTest(
     @MockitoBean private val taskService: TaskService
 ) {
     @Test
+    @WithMockUser
     fun `should return client-friendly 400 error`() {
         webTestClient.mutateWith(csrf())
             .put().uri("/tasks/123/status?version=0")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .header(HttpHeaders.ACCEPT_LANGUAGE, "en")
-            .header(Hx.HEADER_NAME, "true")
+            .header(Hx.REQUEST, "true")
             .body(BodyInserters.empty<String>())
             .exchange()
             .expectStatus().isBadRequest

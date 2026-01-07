@@ -23,7 +23,8 @@ package Tasks {
 (Marking a task as blocked) as Blocked #yellow
 (Tackling blocking issues) as Tackling
 (Collaborating on a task) as CollabTask
-(Completing a task) as CompleteTask
+(Completing a task) as CompleteTask #yellow
+(Assigning a task) as AssignTask
 }
 
 package Interfaces {

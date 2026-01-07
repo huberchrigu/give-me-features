@@ -237,8 +237,14 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     private fun openFeaturesPage(selectFeature: FeatureId? = null, test: Page.() -> Unit) {
         val append = selectFeature?.let { "/$selectFeature" } ?: ""
         page.navigate("http://localhost:$port/features$append")
-
+        page.login()
         test(page)
+    }
+
+    private fun Page.login() {
+        querySelector("input[name='username']").fill("user")
+        querySelector("input[name='password']").fill("user")
+        querySelector("button[type='submit']").click()
     }
 
     private fun Page.assertFeatureDetails(expectedName: String = featureName, expectedDescription: String = "Description") {

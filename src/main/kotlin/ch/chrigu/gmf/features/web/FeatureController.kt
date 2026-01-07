@@ -45,14 +45,14 @@ class FeatureController(private val featureService: FeatureService, private val 
         .withFeatures()
         .build()
 
-    @PostMapping(headers = [Hx.HEADER])
+    @PostMapping(headers = [Hx.REQUEST_EQ_TRUE])
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun addFeature(@Valid newFeatureBody: NewFeatureBody): FragmentsRendering {
         val feature = featureService.newFeature(newFeatureBody.toFeature())
         return updateForFeature(feature)
     }
 
-    @PostMapping("/{id}/tasks", headers = [Hx.HEADER])
+    @PostMapping("/{id}/tasks", headers = [Hx.REQUEST_EQ_TRUE])
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun addTaskToFeature(@PathVariable id: FeatureId, @RequestParam version: Long, @Valid newTaskBody: NewTaskBody): FragmentsRendering {
         val feature = featureService.addTask(id, version, newTaskBody.toTask()) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
@@ -79,21 +79,21 @@ class FeatureController(private val featureService: FeatureService, private val 
     suspend fun getFeatureFormUpdates(@PathVariable id: FeatureId, @RequestParam version: Long) = featureService.getUpdatesWithChangedValues(id, version)
         .flatMapConcat { updateFragmentBuilder.toFragments(it.first, it.second).asFlow() }
 
-    @PutMapping("/{id}${UpdateFragmentBuilder.MERGE_URI}", headers = [Hx.HEADER])
+    @PutMapping("/{id}${UpdateFragmentBuilder.MERGE_URI}", headers = [Hx.REQUEST_EQ_TRUE])
     suspend fun mergeFeature(@PathVariable id: FeatureId, @Valid mergeFeatureBody: MergeFeatureBody, @RequestParam version: Long): Rendering = featureEditView(
         featureService.mergeWithVersion(id, mergeFeatureBody.name!!, mergeFeatureBody.description!!, version, mergeFeatureBody.newVersion!!)
     )
 
-    @GetMapping("/{id}", headers = [Hx.HEADER])
+    @GetMapping("/{id}", headers = [Hx.REQUEST_EQ_TRUE])
     suspend fun getFeature(@PathVariable id: FeatureId): FragmentsRendering {
         val feature = featureService.getFeature(id)
         return updateForFeature(feature)
     }
 
-    @GetMapping("/{featureId}/edit", headers = [Hx.HEADER])
+    @GetMapping("/{featureId}/edit", headers = [Hx.REQUEST_EQ_TRUE])
     suspend fun getFeatureEditForm(@PathVariable featureId: FeatureId): Rendering = featureEditView(featureService.getFeature(featureId))
 
-    @PatchMapping("/{featureId}", headers = [Hx.HEADER])
+    @PatchMapping("/{featureId}", headers = [Hx.REQUEST_EQ_TRUE])
     suspend fun updateFeature(@PathVariable featureId: FeatureId, @RequestParam version: Long, @Valid updateFeature: UpdateFeatureBody): Rendering =
         Rendering.view("blocks/feature")
             .modelAttribute("feature", featureService.updateFeature(featureId, version, updateFeature.toDomain()).asDetailView(taskService))

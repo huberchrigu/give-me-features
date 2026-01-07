@@ -267,8 +267,14 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
 
     private fun openTaskPage(test: Page.() -> Unit) {
         page.navigate("http://localhost:$port/tasks/$taskId")
-
+        page.login()
         test(page)
+    }
+
+    private fun Page.login() {
+        querySelector("input[name='username']").fill("user")
+        querySelector("input[name='password']").fill("user")
+        querySelector("button[type='submit']").click()
     }
 
     private fun withLinkableFeature() {

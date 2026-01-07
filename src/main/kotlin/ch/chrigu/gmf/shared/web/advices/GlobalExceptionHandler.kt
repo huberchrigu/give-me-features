@@ -35,7 +35,7 @@ class GlobalExceptionHandler {
 
     private fun renderError(e: Exception, exchange: ServerWebExchange, status: HttpStatusCode, message: String = e.message ?: "Unknown error happened"): Rendering {
         logger.error("Request ${exchange.request.uri} lead to error", e)
-        val view = if (exchange.request.headers[Hx.HEADER_NAME]?.get(0) == "true") {
+        val view = if (exchange.request.headers[Hx.REQUEST]?.get(0) == "true") {
             @Suppress("SpringMVCViewInspection")
             Rendering.view("blocks/error")
         } else
