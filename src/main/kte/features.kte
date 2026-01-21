@@ -1,17 +1,17 @@
 @import ch.chrigu.gmf.features.web.ui.FeatureListItem
 @import ch.chrigu.gmf.features.web.ui.FeatureDetailView
-@import org.springframework.security.web.server.csrf.CsrfToken
+@import ch.chrigu.gmf.shared.web.advices.GlobalModel
 
 @param error: String?
 @param feature: FeatureDetailView?
 @param features: List<FeatureListItem>
-@param csrf: CsrfToken
+@param global: GlobalModel
 
-@template.page(title = "Features", body = @`
+@template.page(title = "Features", global = global, body = @`
     <div class="row">
         <div class="col-8">
             @template.blocks.features(features = features, current = feature?.id)
-            @template.blocks.feature(feature = feature, csrf = csrf)
+            @template.blocks.feature(feature = feature, global = global)
         </div>
         <div class="col-4">
             <div class="card mb-3">
@@ -25,7 +25,7 @@
                             <input class="form-control" type="text" name="name" id="name"/>
                         </div>
                         @template.atoms.richtext("description", "Description", null)
-                        <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
+                        <input type="hidden" name="${global.csrf.parameterName}" value="${global.csrf.token}"/>
                         <button class="btn btn-primary" type="submit">Create</button>
                     </form>
                 </div>

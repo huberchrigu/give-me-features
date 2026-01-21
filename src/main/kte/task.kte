@@ -1,21 +1,22 @@
 @import ch.chrigu.gmf.tasks.TaskLinkedItem
 @import ch.chrigu.gmf.tasks.web.ui.TaskDetails
-@import org.springframework.security.web.server.csrf.CsrfToken
+@import ch.chrigu.gmf.shared.web.advices.GlobalModel
 
 @param task: TaskDetails
 @param items: List<TaskLinkedItem<*>>
 @param error: String?
-@param csrf: CsrfToken
+@param global: GlobalModel
 
 @template.page(
 title = "Task",
+global = global,
 body = @`
     <div class="row">
         <div class="col-8">
-            @template.blocks.task(task = task, csrf = csrf)
+            @template.blocks.task(task = task, global = global)
         </div>
         <div class="col-4">
-            @template.blocks.linked-features(taskId = task.id, items = items, csrf = csrf)
+            @template.blocks.linked-features(taskId = task.id, items = items, global = global)
         </div>
     </div>
 `, error = error

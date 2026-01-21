@@ -34,7 +34,7 @@ class SecurityConfiguration {
     @Bean
     fun userDetailsService() = MapReactiveUserDetailsService(user("user"), user("admin", "ADMIN"))
 
-    private fun user(name: String, vararg roles: String) = User.withDefaultPasswordEncoder()
+    private fun user(name: String, vararg roles: String) = User.withDefaultPasswordEncoder() // TODO: Real user management
         .username(name).password(name).roles(*(arrayOf("USER") + roles))
         .build()
 

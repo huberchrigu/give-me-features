@@ -1,7 +1,7 @@
 @import ch.chrigu.gmf.features.Feature
-@import org.springframework.security.web.server.csrf.CsrfToken
+@import ch.chrigu.gmf.shared.web.advices.GlobalModel
 
-@param csrf: CsrfToken
+@param global: GlobalModel
 @param feature: Feature
 
 <form class="card p-4 mb-4" id="feature"
@@ -20,7 +20,7 @@
 
         @template.atoms.richtext("description", "Description", feature.description)
 
-        <input type="hidden" name="${csrf.parameterName}" value="${csrf.token}"/>
+        <input type="hidden" name="${global.csrf.parameterName}" value="${global.csrf.token}"/>
 
         <div class="mt-3">
             <button type="submit" class="btn btn-primary"

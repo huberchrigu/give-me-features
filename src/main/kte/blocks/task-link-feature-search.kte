@@ -1,16 +1,16 @@
 @import ch.chrigu.gmf.tasks.TaskId
 @import ch.chrigu.gmf.tasks.TaskLinkedItem
-@import org.springframework.security.web.server.csrf.CsrfToken
+@import ch.chrigu.gmf.shared.web.advices.GlobalModel
 
 @param taskId: TaskId
 @param items: List<TaskLinkedItem<*>>
-@param csrf: CsrfToken
+@param global: GlobalModel
 
 <div id="item-list" class="list-group">
     @for (item in items)
         <a class="list-group-item list-group-item-action"
            hx-put="/tasks/${taskId.toString()}/link-feature"
-           hx-vals='{"item": "${item.id.toString()}", "version": ${item.version}, "${csrf.parameterName}": "${csrf.token}"}'
+           hx-vals='{"item": "${item.id.toString()}", "version": ${item.version}, "${global.csrf.parameterName}": "${global.csrf.token}"}'
            hx-target="#item-list"
            href="javascript:void(0)">
             ${item.name}

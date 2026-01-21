@@ -1,9 +1,9 @@
 @import ch.chrigu.gmf.features.web.ui.FeatureDetailView
 @import ch.chrigu.gmf.tasks.TaskStatus
-@import org.springframework.security.web.server.csrf.CsrfToken
+@import ch.chrigu.gmf.shared.web.advices.GlobalModel
 
 @param feature: FeatureDetailView?
-@param csrf: CsrfToken
+@param global: GlobalModel
 
 <div id="feature"
      hx-swap-oob="true"
@@ -58,8 +58,8 @@
                     </div>
 
                     <input type="hidden"
-                           name="${csrf.parameterName}"
-                           value="${csrf.token}"/>
+                           name="${global.csrf.parameterName}"
+                           value="${global.csrf.token}"/>
 
                     <button class="btn btn-primary" type="submit">
                         Create task

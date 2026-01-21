@@ -1,9 +1,11 @@
 @import gg.jte.Content
+@import ch.chrigu.gmf.shared.web.advices.GlobalModel
 
 @param head: Content? = null
 @param title: String
 @param body: Content
 @param error: String?
+@param global: GlobalModel
 
 <!DOCTYPE html>
 <html lang="en">
@@ -26,11 +28,21 @@
 <body hx-ext="response-targets,sse" hx-target-error="#error" hx-swap="none" hx-indicator="#loading-overlay">
 <header class="header mb-5">
     <a class="header-brand" href="/">GMF</a><%-- TODO: Create startpage that does not require login --%>
-    <ul class="header-nav">
-        <li class="nav-item">
-            <a class="nav-link" href="/features">Features</a><%-- TODO: Show only if logged in --%>
-        </li><%-- TODO: Add logout button (if logged in) --%>
-    </ul>
+    <div class="header-nav">
+        @if (global.auth == null)
+            <a type="button" class="btn btn-light" href="/login">
+                <span class="cil-lock-locked"></span> Login
+            </a>
+        @else
+            <a class="nav-link" href="/features">Features</a>
+            <form action="/logout" method="post">
+                <input type="hidden" name="${global.csrf.parameterName}" value="${global.csrf.token}"/>
+                <button type="submit" class="btn btn-light">
+                    <span class="cil-account-logout"></span> Logout
+                </button>
+            </form>
+        @endif
+    </div>
 </header>
 <div class="container">
     ${body}

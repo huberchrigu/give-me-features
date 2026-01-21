@@ -1,9 +1,9 @@
 @import ch.chrigu.gmf.tasks.web.ui.TaskDetails
 @import ch.chrigu.gmf.tasks.TaskStatus
-@import org.springframework.security.web.server.csrf.CsrfToken
+@import ch.chrigu.gmf.shared.web.advices.GlobalModel
 
 @param task: TaskDetails
-@param csrf: CsrfToken
+@param global: GlobalModel
 
 <div id="task" class="card sm-3" hx-swap-oob="true" sse-connect="${task.uri}" sse-swap="message">
     <div class="card-header text-bg-primary d-flex justify-content-between align-items-center">
@@ -20,7 +20,7 @@
                     <li>
                         <button class="dropdown-item d-flex align-items-center"
                                 hx-put="${task.uri}/status?version=${task.version}"
-                                hx-vals='{"status": "${action.status}", "${csrf.parameterName}": "${csrf.token}"}'>
+                                hx-vals='{"status": "${action.status}", "${global.csrf.parameterName}": "${global.csrf.token}"}'>
                             <span class="badge rounded-pill ${action.statusClass} me-2">&nbsp;</span>
                             <span>${action.label}</span>
                         </button>
