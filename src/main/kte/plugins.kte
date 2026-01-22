@@ -1,0 +1,22 @@
+@import ch.chrigu.gmf.plugins.PluginStatus
+@import ch.chrigu.gmf.shared.web.advices.GlobalModel
+
+@param plugins: List<PluginStatus>
+@param global: GlobalModel
+@param error: String?
+
+@template.page(title = feature.name, global = global, body = @`
+<%--    TODO: Make this page usable, deactive/activate plugins, write test--%>
+    <div class="card mb-3">
+        <div class="card-header text-bg-primary">
+            <h3 class="mb-0">Plugins</h3>
+        </div>
+        <div class="card-body">
+            <div class="list-group mb-3">
+                @for(plugin in plugins)
+                    <div class="list-group-item">${plugin.pluginId}</div>
+                @endfor
+            </div>
+        </div>
+    </div>
+`, error = error)

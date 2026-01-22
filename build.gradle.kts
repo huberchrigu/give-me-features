@@ -3,7 +3,7 @@ import kotlin.io.path.Path
 plugins {
     kotlin("jvm") version "2.2.21"
     kotlin("plugin.spring") version "2.2.21"
-	id("org.springframework.boot") version "4.0.1"
+    id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
     id("gg.jte.gradle") version "3.2.1"
 }
@@ -64,6 +64,9 @@ dependencies {
     testImplementation("org.awaitility:awaitility-kotlin")
     runtimeOnly("io.projectreactor:reactor-tools")
 
+    // Project dependencies
+    implementation(project(":plugin-api"))
+
     // KTE
     implementation("gg.jte:jte-kotlin:3.2.1")
 
@@ -76,7 +79,7 @@ dependencies {
     runtimeOnly("org.webjars:webjars-locator-lite")
 
     // HTML sanitizer
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260101.1")
 
     // Markdown
     implementation("org.jetbrains:markdown:0.7.3")
