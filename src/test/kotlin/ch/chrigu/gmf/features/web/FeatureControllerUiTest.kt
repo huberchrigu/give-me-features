@@ -1,6 +1,7 @@
 package ch.chrigu.gmf.features.web
 
 import ch.chrigu.gmf.features.*
+import ch.chrigu.gmf.features.shared.test.has
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.shared.web.UiTest
 import ch.chrigu.gmf.tasks.*
@@ -238,6 +239,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         val append = selectFeature?.let { "/$selectFeature" } ?: ""
         page.navigate("http://localhost:$port/features$append")
         page.login()
+        page.waitForCondition { page.has("h3") withText "New Feature" || page.has("a[href='/features']") withText "Back to list" }
         test(page)
     }
 
@@ -245,6 +247,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         querySelector("input[name='username']").fill("user")
         querySelector("input[name='password']").fill("user")
         querySelector("button[type='submit']").click()
+        waitForCondition { querySelector("input[name='username']") == null }
     }
 
     private fun Page.assertFeatureDetails(expectedName: String = featureName, expectedDescription: String = "Description") {
@@ -277,7 +280,7 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
     private fun Page.submitNewFeatureForm(name: String = featureName) {
         querySelector("#name").fill(name)
         querySelector("#description").fill(featureDescription.toString())
-        locator("button[type='submit']").click()
+        locator("button.btn-primary[type='submit']").click()
         waitForCondition { querySelector("#feature h3") != null || querySelector("#error div div:nth-child(2)") != null }
     }
 }
