@@ -5,7 +5,7 @@
 @param global: GlobalModel
 @param error: String?
 
-@template.page(title = feature.name, global = global, body = @`
+@template.page(title = "Plugins", global = global, body = @`
 <%--    TODO: Make this page usable, deactive/activate plugins, write test--%>
     <div class="card mb-3">
         <div class="card-header text-bg-primary">
@@ -14,7 +14,7 @@
         <div class="card-body">
             <div class="list-group mb-3">
                 @for(plugin in plugins)
-                    <div class="list-group-item">${plugin.pluginId}</div>
+                    <div class="list-group-item">${plugin.pluginId.toString()}</div>
                 @endfor
             </div>
         </div>
