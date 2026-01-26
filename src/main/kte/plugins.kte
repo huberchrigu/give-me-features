@@ -6,7 +6,7 @@
 @param error: String?
 
 @template.page(title = "Plugins", global = global, body = @`
-<%--    TODO: Make this page usable, deactive/activate plugins, write test--%>
+<%--    TODO: Make this page usable, write test, make plugin testeable --%>
     <div class="card mb-3">
         <div class="card-header text-bg-primary">
             <h3 class="mb-0">Plugins</h3>
@@ -14,7 +14,7 @@
         <div class="card-body">
             <div class="list-group mb-3">
                 @for(plugin in plugins)
-                    <div class="list-group-item">${plugin.pluginId.toString()}</div>
+                    @template.plugins/plugin(plugin = plugin, global = global)
                 @endfor
             </div>
         </div>

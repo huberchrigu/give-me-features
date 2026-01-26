@@ -1,0 +1,14 @@
+@import ch.chrigu.gmf.plugins.PluginStatus
+@import ch.chrigu.gmf.shared.web.advices.GlobalModel
+
+@param plugin: PluginStatus
+ @param global: GlobalModel
+
+<div class="list-group-item">
+    @if (plugin.active)
+        <input class="form-check-input me-1" type="checkbox" value="${plugin.id.toString()}" aria-label="Deactivate" hx-post="/plugins/${plugin.id.toString()}/deactivate" checked>
+    @else
+        <input class="form-check-input me-1" type="checkbox" value="${plugin.id.toString()}" aria-label="Activate" hx-post="/plugins/${plugin.id.toString()}/activate">
+    @endif
+    ${plugin.pluginId.toString()}
+</div>

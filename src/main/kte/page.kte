@@ -35,6 +35,9 @@
             </a>
         @else
             <a class="nav-link" href="/features">Features</a>
+            @if (global.hasRole("ADMIN"))
+                <a class="nav-link" href="/plugins">Plugins</a>
+            @endif
             <form action="/logout" method="post">
                 <input type="hidden" name="${global.csrf.parameterName}" value="${global.csrf.token}"/>
                 <button type="submit" class="btn btn-light">

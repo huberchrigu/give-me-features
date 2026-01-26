@@ -18,4 +18,6 @@ class GlobalControllerAdvice {
     )
 }
 
-class GlobalModel(val csrf: CsrfToken, val auth: UsernamePasswordAuthenticationToken?)
+class GlobalModel(val csrf: CsrfToken, val auth: UsernamePasswordAuthenticationToken?) {
+    fun hasRole(role: String) = auth?.authorities?.any { it.authority == "ROLE_$role" } == true
+}
