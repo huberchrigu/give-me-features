@@ -2,13 +2,15 @@
 @import ch.chrigu.gmf.shared.web.advices.GlobalModel
 
 @param plugin: PluginStatus
- @param global: GlobalModel
+@param global: GlobalModel
 
-<div class="list-group-item">
+<div class="list-group-item" hx-target="this" hx-swap="outerHTML" hx-vals='{"${global.csrf.parameterName}": "${global.csrf.token}"}'>
     @if (plugin.active)
-        <input class="form-check-input me-1" type="checkbox" value="${plugin.id.toString()}" aria-label="Deactivate" hx-post="/plugins/${plugin.id.toString()}/deactivate" checked>
+        <input class="form-check-input me-1" type="checkbox" value="${plugin.id.toString()}" aria-label="Deactivate"
+               hx-post="/plugins/${plugin.id.toString()}/deactivate?version=${plugin.version}" checked>
     @else
-        <input class="form-check-input me-1" type="checkbox" value="${plugin.id.toString()}" aria-label="Activate" hx-post="/plugins/${plugin.id.toString()}/activate">
+        <input class="form-check-input me-1" type="checkbox" value="${plugin.id.toString()}" aria-label="Activate"
+               hx-post="/plugins/${plugin.id.toString()}/activate?version=${plugin.version}">
     @endif
-    ${plugin.pluginId.toString()}
+    ${plugin.metadata.title}
 </div>

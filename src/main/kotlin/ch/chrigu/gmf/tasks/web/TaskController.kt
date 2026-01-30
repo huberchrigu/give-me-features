@@ -1,5 +1,10 @@
 package ch.chrigu.gmf.tasks.web
 
+import ch.chrigu.gfm.plugin.ItemDefinition
+import ch.chrigu.gfm.plugin.Plugin
+import ch.chrigu.gfm.plugin.TaskReference
+import ch.chrigu.gmf.plugins.PluginService
+import ch.chrigu.gmf.plugins.web.PluginFormController
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.shared.web.Hx
 import ch.chrigu.gmf.shared.web.UpdateFragmentBuilder
@@ -21,7 +26,7 @@ import org.springframework.web.reactive.result.view.Rendering
 @Controller
 @RequestMapping("/tasks")
 @Suppress("SpringMVCViewInspection")
-class TaskController(private val taskService: TaskService) {
+class TaskController(private val taskService: TaskService, override val pluginService: PluginService) : PluginFormController<TaskReference, TaskId> {
     private val updateFragmentBuilder = UpdateFragmentBuilder<Task>(
         "tasks",
         "name" to { name },
@@ -29,7 +34,7 @@ class TaskController(private val taskService: TaskService) {
 
     @GetMapping("/{taskId}")
     suspend fun getTask(@PathVariable taskId: TaskId): Rendering = Rendering.view("task")
-        .modelAttribute("task", taskService.getTask(taskId).toDetails())
+        .modelAttribute("task", taskService.getTask(taskId).toDetails().withPlugins { getPluginsFor(it) })
         .modelAttribute("items", taskService.getLinkedItems(taskId).toList())
         .build()
 
@@ -98,10 +103,20 @@ class TaskController(private val taskService: TaskService) {
         return linkedFeaturesBlock(taskId, items)
     }
 
+    override suspend fun resolve(id: TaskId): TaskReference {
+        return taskService.getTask(id).asReference()
+    }
+
+    override fun getItemDefinition(plugin: Plugin): ItemDefinition<TaskReference, *>? {
+        return plugin.touchpoints.taskItem
+    }
+
     private fun linkedFeaturesBlock(taskId: TaskId, items: Flow<TaskLinkedItem<*>>): Rendering = Rendering.view("blocks/linked-features")
         .modelAttribute("taskId", taskId)
         .modelAttribute("items", items)
         .build()
+
+    private fun Task.asReference() = PluginTask()
 
     private suspend fun taskEditView(task: Task): Rendering = Rendering.view("blocks/task-edit")
         .modelAttribute("task", task)

@@ -1,0 +1,23 @@
+@import ch.chrigu.gmf.plugins.PluginForm
+@import ch.chrigu.gmf.shared.web.advices.GlobalModel
+
+@param plugin: PluginForm<*>
+@param global: GlobalModel
+
+<form hx-put="${plugin.uri}">
+    @for(field in plugin.formFields)
+        @if(field.type == "checkbox")
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="${field.id}" required="${field.required}" readonly="${field.readOnly}">
+                <label class="form-check-label" for="${field.id}">${field.label}</label>
+            </div>
+        @else
+            <div class="mb-3">
+                <label for="${field.id}" class="form-label">${field.label}</label>
+                <input type="${field.type}" class="form-control" id="${field.id}" required="${field.required}" readonly="${field.readOnly}">
+            </div>
+        @endif
+    @endfor
+    <input type="hidden" name="${global.csrf.parameterName}" value="${global.csrf.token}"/>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>

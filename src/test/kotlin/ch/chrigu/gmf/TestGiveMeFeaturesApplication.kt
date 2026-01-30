@@ -5,5 +5,7 @@ import org.springframework.boot.with
 
 
 fun main(args: Array<String>) {
-    fromApplication<GiveMeFeaturesApplication>().with(TestcontainersConfiguration::class, TestDataGeneratorConfiguration::class).run(*args)
+    fromApplication<GiveMeFeaturesApplication>()
+        .with(TestcontainersConfiguration::class, TestDataGeneratorConfiguration::class, DummyPluginConfiguration::class)
+        .run(*args)
 }

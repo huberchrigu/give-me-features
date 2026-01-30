@@ -1,16 +1,20 @@
 @import ch.chrigu.gmf.features.web.ui.FeatureListItem
-@import ch.chrigu.gmf.features.web.ui.FeatureDetailView
+@import ch.chrigu.gmf.features.web.ui.FeatureDetailViewWithPlugins
 @import ch.chrigu.gmf.shared.web.advices.GlobalModel
 
 @param error: String?
-@param feature: FeatureDetailView
+@param feature: FeatureDetailViewWithPlugins
 @param global: GlobalModel
 
-@template.page(title = feature.name, global = global, body = @`
-    @template.blocks.feature(feature = feature, global = global)
+@template.page(title = feature.feature.name, global = global, body = @`
+    @template.blocks.feature(feature = feature.feature, global = global)
 
     <div class="mt-3 d-flex gap-2">
-        <button class="btn btn-primary" hx-get="/features/${feature.id.toString()}/edit">Edit</button>
+        <button class="btn btn-primary" hx-get="/features/${feature.feature.id.toString()}/edit">Edit</button>
         <a class="btn btn-secondary" href="/features">Back to list</a>
     </div>
+
+    @for(plugin in feature.plugins)
+        @template.plugins.plugin-form(plugin, global)
+    @endfor
 `, error = error)

@@ -1,5 +1,8 @@
 package ch.chrigu.gmf.features.web
 
+import ch.chrigu.gfm.plugin.FeatureReference
+import ch.chrigu.gfm.plugin.ItemDefinition
+import ch.chrigu.gfm.plugin.Plugin
 import ch.chrigu.gmf.features.Feature
 import ch.chrigu.gmf.features.FeatureId
 import ch.chrigu.gmf.features.FeatureService
@@ -7,6 +10,8 @@ import ch.chrigu.gmf.features.FeatureUpdate
 import ch.chrigu.gmf.features.web.ui.FeatureListItem
 import ch.chrigu.gmf.features.web.ui.asDetailView
 import ch.chrigu.gmf.features.web.ui.asListItem
+import ch.chrigu.gmf.plugins.PluginService
+import ch.chrigu.gmf.plugins.web.PluginFormController
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.shared.web.Hx
 import ch.chrigu.gmf.shared.web.UpdateFragmentBuilder
@@ -34,7 +39,8 @@ import org.springframework.web.server.ResponseStatusException
 @Suppress("SpringMVCViewInspection")
 @Controller
 @RequestMapping("/features")
-class FeatureController(private val featureService: FeatureService, private val taskService: TaskService) {
+class FeatureController(private val featureService: FeatureService, private val taskService: TaskService, override val pluginService: PluginService) :
+    PluginFormController<FeatureReference, FeatureId> {
     private val updateFragmentBuilder = UpdateFragmentBuilder<Feature>(
         "features",
         "name" to { name },
@@ -103,8 +109,16 @@ class FeatureController(private val featureService: FeatureService, private val 
     suspend fun getFeaturePage(@PathVariable id: FeatureId): Rendering {
         val feature = featureService.getFeature(id)
         return Rendering.view("feature")
-            .modelAttribute("feature", feature.asDetailView(taskService))
+            .modelAttribute("feature", feature.asDetailView(taskService).withPlugins { getPluginsFor(it) })
             .build()
+    }
+
+    override suspend fun resolve(id: FeatureId): FeatureReference {
+        return featureService.getFeature(id).asReference()
+    }
+
+    override fun getItemDefinition(plugin: Plugin): ItemDefinition<FeatureReference, *>? {
+        return plugin.touchpoints.featureItem
     }
 
     private fun featureEditView(feature: Feature) = Rendering.view("blocks/feature-edit")
@@ -133,6 +147,8 @@ class FeatureController(private val featureService: FeatureService, private val 
         mapOf("features" to getFeatureList()) +
                 if (current == null) emptyMap() else mapOf("current" to current)
     )
+
+    private fun Feature.asReference() = PluginFeature()
 
     class NewFeatureBody(@field:NotEmpty private val name: String?, @field:NotEmpty private val description: String?) {
         fun toFeature() = Feature.describeNewFeature(name!!, Markdown(description!!))

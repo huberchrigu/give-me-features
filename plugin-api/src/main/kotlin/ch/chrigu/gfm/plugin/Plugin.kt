@@ -2,18 +2,18 @@ package ch.chrigu.gfm.plugin
 
 data class Plugin(val id: PluginId, val title: String, val touchpoints: PluginTouchpoints)
 
-data class PluginTouchpoints(val featureItem: ItemDefinition<Feature>? = null, val taskItem: ItemDefinition<Task>? = null)
+data class PluginTouchpoints(val featureItem: ItemDefinition<FeatureReference, *>? = null, val taskItem: ItemDefinition<TaskReference, *>? = null)
 
-data class ItemDefinition<T>(val fields: List<ItemField>, val triggers: ItemTriggers<T>)
+data class ItemDefinition<PARENT, P>(val persistenceClass: Class<P>, val fields: List<ItemField<P>>, val triggers: ItemTriggers<PARENT>, val fromMap: Map<String, Any?>.() -> P)
 
-data class ItemField(val type: ItemType, val title: String, val required: Boolean = true, val readOnly: Boolean = false)
+data class ItemField<P>(val id: String, val type: ItemType, val title: String, val get: P.() -> Any, val required: Boolean = true, val readOnly: Boolean = false)
 
-data class ItemTriggers<T>(val onChange: (T) -> T = { it })
+data class ItemTriggers<PARENT>(val onChange: (PARENT) -> PARENT = { it })
 enum class ItemType { TEXT, BOOLEAN }
 
 data class PluginId(private val id: String) {
     override fun toString() = id
 }
 
-interface Feature
-interface Task
+interface FeatureReference
+interface TaskReference

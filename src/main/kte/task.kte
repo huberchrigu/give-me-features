@@ -1,8 +1,8 @@
 @import ch.chrigu.gmf.tasks.TaskLinkedItem
-@import ch.chrigu.gmf.tasks.web.ui.TaskDetails
+@import ch.chrigu.gmf.tasks.web.ui.TaskDetailsWithPlugins
 @import ch.chrigu.gmf.shared.web.advices.GlobalModel
 
-@param task: TaskDetails
+@param task: TaskDetailsWithPlugins
 @param items: List<TaskLinkedItem<*>>
 @param error: String?
 @param global: GlobalModel
@@ -13,11 +13,15 @@ global = global,
 body = @`
     <div class="row">
         <div class="col-8">
-            @template.blocks.task(task = task, global = global)
+            @template.blocks.task(task = task.task, global = global)
         </div>
         <div class="col-4">
-            @template.blocks.linked-features(taskId = task.id, items = items, global = global)
+            @template.blocks.linked-features(taskId = task.task.id, items = items, global = global)
         </div>
     </div>
+
+    @for(plugin in task.plugins)
+        @template.plugins.plugin-form(plugin, global)
+    @endfor
 `, error = error
 )
