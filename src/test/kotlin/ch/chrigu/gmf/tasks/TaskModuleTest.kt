@@ -1,6 +1,7 @@
 package ch.chrigu.gmf.tasks
 
 import ch.chrigu.gmf.TestcontainersConfiguration
+import ch.chrigu.gmf.plugins.PluginService
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.tasks.repository.TaskRepository
 import com.ninjasquad.springmockk.MockkBean
@@ -20,7 +21,10 @@ import kotlin.time.Duration.Companion.seconds
 
 @ApplicationModuleTest
 @Import(TestcontainersConfiguration::class)
-class TaskModuleTest(private val taskService: TaskService, private val taskRepository: TaskRepository, @MockkBean private val linkedItemProvider: LinkedItemProvider) {
+class TaskModuleTest(
+    private val taskService: TaskService, private val taskRepository: TaskRepository, @MockkBean private val linkedItemProvider: LinkedItemProvider,
+    @MockkBean private val pluginService: PluginService
+) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     @BeforeEach

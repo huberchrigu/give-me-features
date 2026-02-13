@@ -21,7 +21,9 @@ body = @`
     </div>
 
     @for(plugin in task.plugins)
-        @template.plugins.plugin-form(plugin, global)
+        <div class="mt-3">
+            @template.plugins.plugin-form(plugin, global)
+        </div>
     @endfor
 `, error = error
 )

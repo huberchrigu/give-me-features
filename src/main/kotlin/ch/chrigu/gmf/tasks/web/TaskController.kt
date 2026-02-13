@@ -1,15 +1,12 @@
 package ch.chrigu.gmf.tasks.web
 
-import ch.chrigu.gfm.plugin.ItemDefinition
-import ch.chrigu.gfm.plugin.Plugin
-import ch.chrigu.gfm.plugin.TaskReference
 import ch.chrigu.gmf.plugins.PluginService
-import ch.chrigu.gmf.plugins.web.PluginFormController
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.shared.web.Hx
 import ch.chrigu.gmf.shared.web.UpdateFragmentBuilder
 import ch.chrigu.gmf.tasks.*
 import ch.chrigu.gmf.tasks.Task.TaskUpdate
+import ch.chrigu.gmf.tasks.web.ui.TaskDetailsWithPlugins
 import ch.chrigu.gmf.tasks.web.ui.toDetails
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
@@ -26,17 +23,20 @@ import org.springframework.web.reactive.result.view.Rendering
 @Controller
 @RequestMapping("/tasks")
 @Suppress("SpringMVCViewInspection")
-class TaskController(private val taskService: TaskService, override val pluginService: PluginService) : PluginFormController<TaskReference, TaskId> {
+class TaskController(private val taskService: TaskService, private val pluginService: PluginService, private val taskDefinition: TaskDefinition) {
     private val updateFragmentBuilder = UpdateFragmentBuilder<Task>(
         "tasks",
         "name" to { name },
         "description" to { description })
 
     @GetMapping("/{taskId}")
-    suspend fun getTask(@PathVariable taskId: TaskId): Rendering = Rendering.view("task")
-        .modelAttribute("task", taskService.getTask(taskId).toDetails().withPlugins { getPluginsFor(it) })
-        .modelAttribute("items", taskService.getLinkedItems(taskId).toList())
-        .build()
+    suspend fun getTask(@PathVariable taskId: TaskId): Rendering {
+        val task = taskService.getTask(taskId)
+        return Rendering.view("task")
+            .modelAttribute("task", TaskDetailsWithPlugins(task.toDetails(), pluginService.getForms(task.asReference(), taskDefinition)))
+            .modelAttribute("items", taskService.getLinkedItems(taskId).toList())
+            .build()
+    }
 
     @GetMapping("/{taskId}/edit", headers = [Hx.REQUEST_EQ_TRUE])
     suspend fun getTaskEditForm(@PathVariable taskId: TaskId) = taskEditView(taskService.getTask(taskId))
@@ -103,20 +103,10 @@ class TaskController(private val taskService: TaskService, override val pluginSe
         return linkedFeaturesBlock(taskId, items)
     }
 
-    override suspend fun resolve(id: TaskId): TaskReference {
-        return taskService.getTask(id).asReference()
-    }
-
-    override fun getItemDefinition(plugin: Plugin): ItemDefinition<TaskReference, *>? {
-        return plugin.touchpoints.taskItem
-    }
-
     private fun linkedFeaturesBlock(taskId: TaskId, items: Flow<TaskLinkedItem<*>>): Rendering = Rendering.view("blocks/linked-features")
         .modelAttribute("taskId", taskId)
         .modelAttribute("items", items)
         .build()
-
-    private fun Task.asReference() = PluginTask()
 
     private suspend fun taskEditView(task: Task): Rendering = Rendering.view("blocks/task-edit")
         .modelAttribute("task", task)

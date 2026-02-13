@@ -2,6 +2,7 @@ package ch.chrigu.gmf.features
 
 import ch.chrigu.gmf.TestcontainersConfiguration
 import ch.chrigu.gmf.features.repository.FeatureRepository
+import ch.chrigu.gmf.plugins.PluginService
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.tasks.*
 import com.ninjasquad.springmockk.MockkBean
@@ -20,7 +21,8 @@ import org.springframework.modulith.test.ApplicationModuleTest
 @Import(TestcontainersConfiguration::class)
 class FeatureModuleTest(
     private val featureService: FeatureService, private val featureProviderService: FeatureProviderService,
-    private val featureRepository: FeatureRepository, @MockkBean private val taskService: TaskService
+    private val featureRepository: FeatureRepository, @MockkBean private val taskService: TaskService,
+    @MockkBean private val pluginService: PluginService
 ) {
     private lateinit var feature: Feature
     private val id = FeatureId("1")

@@ -3,8 +3,8 @@ package ch.chrigu.gmf.plugins
 import ch.chrigu.gfm.plugin.ItemField
 import ch.chrigu.gfm.plugin.ItemType
 
-data class PluginForm<T>(val formFields: List<PluginFormField<*>>, val uri: String) {
-    constructor(fields: List<ItemField<T>>, pluginData: T, uri: String) : this(fields.map { it.toFormField(pluginData) }, uri)
+data class PluginForm<T>(val title: String, val formFields: List<PluginFormField<*>>, val uri: String) {
+    constructor(title: String, fields: List<ItemField<T>>, pluginData: T, uri: String) : this(title, fields.map { it.toFormField(pluginData) }, uri)
 }
 
 data class PluginFormField<T>(

@@ -1,26 +1,31 @@
 package ch.chrigu.gmf.plugins.web
 
-import ch.chrigu.gfm.plugin.ItemDefinition
-import ch.chrigu.gfm.plugin.Plugin
+import ch.chrigu.gmf.plugins.ParentDefinition
 import ch.chrigu.gmf.plugins.PluginService
 import ch.chrigu.gmf.plugins.PluginStatusId
+import ch.chrigu.gmf.shared.aggregates.AggregateRoot
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.reactive.result.view.Rendering
+import org.springframework.web.server.ResponseStatusException
 
-interface PluginFormController<PARENT, ID> {
-    val pluginService: PluginService
+@Controller
+class PluginFormController(private val pluginService: PluginService, private val parentDefinitions: List<ParentDefinition<*>>) {
 
-    @PutMapping("{id}/plugins/{pluginId}")
-    suspend fun <P> updatePluginData(@PathVariable id: ID, @PathVariable pluginId: PluginStatusId, @RequestBody body: Map<String, Any?>): Rendering =
-        Rendering.view("plugins/plugin-form")
-            .modelAttribute("plugin", pluginService.update(resolve(id), pluginId, body, this::getItemDefinition))
+    @PutMapping("/{parent}/{id}/plugins/{pluginId}")
+    suspend fun <PARENT : AggregateRoot<*>> updatePluginData(
+        @PathVariable parent: String,
+        @PathVariable id: String,
+        @PathVariable pluginId: PluginStatusId,
+        body: Map<String, Any?>
+    ): Rendering {
+        val parentDefinition = find(parent) as ParentDefinition<PARENT>? ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        return Rendering.view("plugins/plugin-form")
+            .modelAttribute("plugin", pluginService.update(parentDefinition.resolve(id), pluginId, body, parentDefinition))
             .build()
+    }
 
-    suspend fun getPluginsFor(id: ID) = pluginService.getForms(resolve(id), this::getItemDefinition)
-
-    suspend fun resolve(id: ID): PARENT
-
-    fun getItemDefinition(plugin: Plugin): ItemDefinition<PARENT, *>?
+    private fun find(uriPrefix: String) = parentDefinitions.firstOrNull { it.uriPrefix == "/$uriPrefix" }
 }

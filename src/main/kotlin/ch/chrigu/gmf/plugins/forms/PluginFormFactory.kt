@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class PluginFormFactory {
-    fun <PARENT, P> create(itemDefinition: ItemDefinition<PARENT, P>, pluginData: Map<String, Any?>, uri: String): PluginForm<P> {
-        return PluginForm(itemDefinition.fields, itemDefinition.fromMap(pluginData), uri)
+    fun <PARENT, P> create(title: String, itemDefinition: ItemDefinition<PARENT, P>, pluginData: Map<String, Any?>, uri: String): PluginForm<P> {
+        return PluginForm(title, itemDefinition.fields, itemDefinition.fromMap(pluginData), uri)
     }
 }

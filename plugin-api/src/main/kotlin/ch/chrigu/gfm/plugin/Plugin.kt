@@ -1,5 +1,9 @@
 package ch.chrigu.gfm.plugin
 
+import ch.chrigu.gmf.features.FeatureId
+import ch.chrigu.gmf.shared.aggregates.AggregateRoot
+import ch.chrigu.gmf.tasks.TaskId
+
 data class Plugin(val id: PluginId, val title: String, val touchpoints: PluginTouchpoints)
 
 data class PluginTouchpoints(val featureItem: ItemDefinition<FeatureReference, *>? = null, val taskItem: ItemDefinition<TaskReference, *>? = null)
@@ -15,5 +19,5 @@ data class PluginId(private val id: String) {
     override fun toString() = id
 }
 
-interface FeatureReference
-interface TaskReference
+interface FeatureReference : AggregateRoot<FeatureId>
+interface TaskReference : AggregateRoot<TaskId>

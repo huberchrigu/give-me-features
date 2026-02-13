@@ -1,3 +1,3 @@
 rootProject.name = "give-me-features"
 
-include("plugin-api", "testing-plugin")
+include("shared-api", "plugin-api", "testing-plugin")

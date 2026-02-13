@@ -11,7 +11,3 @@ java {
 repositories {
     mavenCentral()
 }
-
-dependencies {
-    api(project(":shared-api"))
-}

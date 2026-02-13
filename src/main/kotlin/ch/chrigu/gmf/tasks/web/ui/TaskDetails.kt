@@ -15,8 +15,6 @@ class TaskDetails(val id: TaskId, val name: String, val description: String, val
         val label = status.name
         val statusClass = status.toCssClass()
     }
-
-    suspend fun withPlugins(plugins: suspend (TaskId) -> List<PluginForm<*>>) = TaskDetailsWithPlugins(this, plugins(id))
 }
 
 class TaskDetailsWithPlugins(val task: TaskDetails, val plugins: List<PluginForm<*>>)

@@ -1,5 +1,6 @@
 package ch.chrigu.gmf.tasks.web
 
+import ch.chrigu.gmf.plugins.PluginService
 import ch.chrigu.gmf.shared.web.Hx
 import ch.chrigu.gmf.shared.security.SecurityConfiguration
 import ch.chrigu.gmf.tasks.TaskService
@@ -24,7 +25,9 @@ import org.springframework.web.reactive.function.BodyInserters
 @Import(SecurityConfiguration::class, ReactiveJteAutoConfiguration::class)
 class TaskControllerWebTest(
     private val webTestClient: WebTestClient,
-    @MockitoBean private val taskService: TaskService
+    @MockitoBean private val taskService: TaskService,
+    @MockitoBean private val pluginService: PluginService,
+    @MockitoBean private val taskDefinition: TaskDefinition
 ) {
     @Test
     @WithMockUser

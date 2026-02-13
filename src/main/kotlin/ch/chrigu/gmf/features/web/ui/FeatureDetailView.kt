@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.toList
 
 class FeatureDetailView(val id: FeatureId, val name: String, val description: String, tasks: List<Task>, val version: Long, val progress: Int) {
     val tasks = tasks.map { it.toDetails() }
-    suspend fun withPlugins(getPlugins: suspend (FeatureId) -> List<PluginForm<*>>) = FeatureDetailViewWithPlugins(this, getPlugins(id))
 }
 
 class FeatureDetailViewWithPlugins(val feature: FeatureDetailView, val plugins: List<PluginForm<*>>)

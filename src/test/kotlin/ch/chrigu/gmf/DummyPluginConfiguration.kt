@@ -21,7 +21,7 @@ data class DummyTaskExtension(val description: String) {
             DummyTaskExtension::class.java,
             listOf(ItemField("description", ItemType.TEXT, "Dummy description", { description })),
             ItemTriggers() // TODO: Implement triggers
-        ) { DummyTaskExtension(get("description") as String) }
+        ) { DummyTaskExtension(get("description") as String? ?: "") }
     }
 }
 
@@ -31,6 +31,6 @@ data class DummyFeatureExtension(val activate: Boolean) {
             DummyFeatureExtension::class.java,
             listOf(ItemField("activate", ItemType.BOOLEAN, "Activate dummy feature", { activate })),
             ItemTriggers() // TODO: Implement triggers
-        ) { DummyFeatureExtension(get("activate") as Boolean) }
+        ) { DummyFeatureExtension(get("activate") as Boolean? ?: false) }
     }
 }

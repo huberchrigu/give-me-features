@@ -1,13 +1,12 @@
 package ch.chrigu.gmf.plugins
 
-import ch.chrigu.gfm.plugin.ItemDefinition
 import ch.chrigu.gfm.plugin.Plugin
 import ch.chrigu.gmf.plugins.forms.PluginFormFactory
 import ch.chrigu.gmf.plugins.mongo.PluginStatusRepository
 import ch.chrigu.gmf.shared.aggregates.AggregateNotFoundException
+import ch.chrigu.gmf.shared.aggregates.AggregateRoot
 import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.springframework.security.access.prepost.PreAuthorize
@@ -41,27 +40,29 @@ class PluginService(
     fun findAll(): Flow<PluginStatus> = pluginStatusRepository.findAll()
 
     @PreAuthorize("hasRole('USER')")
-    suspend fun <PARENT> update(
+    suspend fun <PARENT : AggregateRoot<*>> update(
         entity: PARENT,
         pluginId: PluginStatusId,
         pluginData: Map<String, Any?>,
-        getItemDefinition: (Plugin) -> ItemDefinition<PARENT, *>?
+        parentDefinition: ParentDefinition<PARENT>
     ): PluginForm<*> {
         val plugin = resolvePluginDefinition(pluginId)
-        val itemDefinition = getItemDefinition(plugin) ?: throw AggregateNotFoundException("Item definition for plugin $pluginId not found")
-        val form = pluginFormFactory.create(itemDefinition, pluginData, TODO())
+        val itemDefinition = parentDefinition.getItemDefinition(plugin) ?: throw AggregateNotFoundException("Item definition for plugin $pluginId not found")
+        val form = pluginFormFactory.create(plugin.title, itemDefinition, pluginData, parentDefinition.uriFor(entity, pluginId))
         // TODO: Persist
         return form
     }
 
     @PreAuthorize("hasRole('USER')")
-    suspend fun <PARENT> getForms(entity: PARENT, getItemDefinition: (Plugin) -> ItemDefinition<PARENT, *>?): List<PluginForm<*>> {
-        val activePlugins = pluginStatusRepository.findByActive(true).map { it.metadata.pluginId }.toList()
-        val resolvedPlugins = plugins.filter { activePlugins.contains(it.id) }
+    suspend fun <PARENT : AggregateRoot<*>> getForms(entity: PARENT, parentDefinition: ParentDefinition<PARENT>): List<PluginForm<*>> {
+        val activePlugins = pluginStatusRepository.findByActive(true).toList()
+        val activePluginIds = activePlugins.map { it.metadata.pluginId }
+        val resolvedPlugins = plugins.filter { activePluginIds.contains(it.id) }
         val forms = resolvedPlugins
-            .mapNotNull { getItemDefinition(it) }
-            .map {
-                pluginFormFactory.create(it, emptyMap(), TODO()) // TODO: Data form repository
+            .mapNotNull { plugin ->
+                val itemDefinition = parentDefinition.getItemDefinition(plugin) ?: return@mapNotNull null
+                val activePlugin = activePlugins.first { it.metadata.pluginId == plugin.id }
+                pluginFormFactory.create(plugin.title, itemDefinition, emptyMap(), parentDefinition.uriFor(entity, activePlugin.id)) // TODO: Data form repository
             }
         return forms
     }
@@ -69,7 +70,7 @@ class PluginService(
     private suspend fun resolvePluginDefinition(pluginId: PluginStatusId): Plugin {
         val status = pluginStatusRepository.findById(pluginId.toString()) ?: throw AggregateNotFoundException("Plugin $pluginId not found")
         require(status.active)
-        return plugins.first { it.id == pluginId } // TODO: Check conversion
+        return plugins.first { it.id == status.metadata.pluginId } // TODO: Check conversion
     }
 
     private suspend fun doWith(id: PluginStatusId, apply: PluginStatus.() -> PluginStatus) = pluginStatusRepository.findById(id.toString())?.apply()?.let {

@@ -1,6 +1,7 @@
 package ch.chrigu.gmf.tasks.web
 
 import ch.chrigu.gmf.features.FeatureId
+import ch.chrigu.gmf.plugins.PluginService
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.shared.web.UiTest
 import ch.chrigu.gmf.tasks.*
@@ -14,11 +15,16 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.server.LocalServerPort
 
 @UiTest(TaskController::class)
-class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
+class TaskControllerUiTest(
+    @MockkBean private val taskService: TaskService,
+    @MockkBean private val pluginService: PluginService,
+    @MockkBean private val taskDefinition: TaskDefinition
+) {
     private val taskId = TaskId("1")
     private val name = "My task"
     private val description = "desc"
@@ -36,6 +42,11 @@ class TaskControllerUiTest(@MockkBean private val taskService: TaskService) {
 
     @LocalServerPort
     private var port: Int = 0
+
+    @BeforeEach
+    fun initPlugins() {
+        coEvery { pluginService.getForms(any(), any()) } returns emptyList()
+    }
 
     @Test
     fun `should show and update task`() {

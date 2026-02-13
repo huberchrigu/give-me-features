@@ -2,7 +2,6 @@ package ch.chrigu.gmf.tasks
 
 import ch.chrigu.gmf.shared.aggregates.AbstractAggregateRoot
 import ch.chrigu.gmf.shared.markdown.Markdown
-import java.util.*
 
 class Task(
     id: TaskId, version: Long?, val name: String, val description: Markdown, val status: TaskStatus
@@ -69,7 +68,7 @@ class Task(
     }
 
     companion object {
-        fun describeNewTask(name: String,description: String = "") = Task(TaskId(), null, name, Markdown(description), TaskStatus.OPEN)
+        fun describeNewTask(name: String, description: String = "") = Task(TaskId(), null, name, Markdown(description), TaskStatus.OPEN)
     }
 
     data class TaskUpdate(val name: String, val description: Markdown) {
@@ -92,8 +91,4 @@ enum class TaskStatus {
      * Task is completed.
      */
     DONE
-}
-
-data class TaskId(private val id: String = UUID.randomUUID().toString()) {
-    override fun toString() = id
 }

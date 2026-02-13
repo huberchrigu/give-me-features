@@ -2,6 +2,7 @@ package ch.chrigu.gmf.features.web
 
 import ch.chrigu.gmf.features.*
 import ch.chrigu.gmf.features.shared.test.has
+import ch.chrigu.gmf.plugins.PluginService
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.shared.web.UiTest
 import ch.chrigu.gmf.tasks.*
@@ -17,7 +18,10 @@ import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.server.LocalServerPort
 
 @UiTest(FeatureController::class)
-class FeatureControllerUiTest(@MockkBean private val featureService: FeatureService, @MockkBean private val taskService: TaskService) {
+class FeatureControllerUiTest(
+    @MockkBean private val featureService: FeatureService, @MockkBean private val taskService: TaskService,
+    @MockkBean private val pluginService: PluginService, @MockkBean private val featureDefinition: FeatureDefinition
+) {
     private val featureName = "My new feature"
     private val newName = "Version 2.0"
     private val featureDescription = Markdown("Description")
@@ -43,6 +47,11 @@ class FeatureControllerUiTest(@MockkBean private val featureService: FeatureServ
         coEvery { featureService.getUpdatesWithChangedValues(featureId, 0L) } returns changes.filter { it.id == featureId }
             .map { feature to it }
         coEvery { featureService.getUpdatesWithChangedValues(featureId, 1L) } returns emptyFlow()
+    }
+
+    @BeforeEach
+    fun initPlugins() {
+        coEvery { pluginService.getForms(any(), any()) } returns emptyList()
     }
 
     @Test
