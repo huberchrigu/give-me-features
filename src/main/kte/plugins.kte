@@ -6,7 +6,6 @@
 @param error: String?
 
 @template.page(title = "Plugins", global = global, body = @`
-<%--    TODO: Write test --%>
     <div class="card mb-3">
         <div class="card-header text-bg-primary">
             <h3 class="mb-0">Plugins</h3>

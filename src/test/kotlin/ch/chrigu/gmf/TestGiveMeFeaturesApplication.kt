@@ -1,5 +1,6 @@
 package ch.chrigu.gmf
 
+import ch.chrigu.gmf.plugins.DummyPluginConfiguration
 import org.springframework.boot.fromApplication
 import org.springframework.boot.with
 

@@ -1,6 +1,6 @@
 package ch.chrigu.gmf.plugins.forms
 
-import ch.chrigu.gfm.plugin.ItemDefinition
+import ch.chrigu.gmf.plugins.ItemDefinition
 import ch.chrigu.gmf.plugins.PluginForm
 import org.springframework.stereotype.Service
 

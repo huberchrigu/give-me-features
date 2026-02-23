@@ -1,4 +1,4 @@
-package ch.chrigu.gmf.features.shared.test
+package ch.chrigu.gmf.shared.web
 
 import com.microsoft.playwright.ElementHandle
 import com.microsoft.playwright.Page

@@ -1,8 +1,8 @@
 package ch.chrigu.gmf.features.web
 
-import ch.chrigu.gfm.plugin.FeatureReference
-import ch.chrigu.gfm.plugin.ItemDefinition
-import ch.chrigu.gfm.plugin.Plugin
+import ch.chrigu.gmf.plugins.FeatureReference
+import ch.chrigu.gmf.plugins.ItemDefinition
+import ch.chrigu.gmf.plugins.Plugin
 import ch.chrigu.gmf.features.Feature
 import ch.chrigu.gmf.features.FeatureId
 import ch.chrigu.gmf.features.FeatureService

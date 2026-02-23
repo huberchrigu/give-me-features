@@ -1,9 +1,10 @@
 package ch.chrigu.gmf.features.web
 
 import ch.chrigu.gmf.features.*
-import ch.chrigu.gmf.features.shared.test.has
+import ch.chrigu.gmf.shared.web.has
 import ch.chrigu.gmf.plugins.PluginService
 import ch.chrigu.gmf.shared.markdown.Markdown
+import ch.chrigu.gmf.shared.web.SharedUiActions.login
 import ch.chrigu.gmf.shared.web.UiTest
 import ch.chrigu.gmf.tasks.*
 import com.microsoft.playwright.Page
@@ -247,16 +248,9 @@ class FeatureControllerUiTest(
     private fun openFeaturesPage(selectFeature: FeatureId? = null, test: Page.() -> Unit) {
         val append = selectFeature?.let { "/$selectFeature" } ?: ""
         page.navigate("http://localhost:$port/features$append")
-        page.login()
+        page.login("user")
         page.waitForCondition { page.has("h3") withText "New Feature" || page.has("a[href='/features']") withText "Back to list" }
         test(page)
-    }
-
-    private fun Page.login() {
-        querySelector("input[name='username']").fill("user")
-        querySelector("input[name='password']").fill("user")
-        querySelector("button[type='submit']").click()
-        waitForCondition { querySelector("input[name='username']") == null }
     }
 
     private fun Page.assertFeatureDetails(expectedName: String = featureName, expectedDescription: String = "Description") {

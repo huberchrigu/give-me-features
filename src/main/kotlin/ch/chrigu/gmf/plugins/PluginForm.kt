@@ -1,8 +1,5 @@
 package ch.chrigu.gmf.plugins
 
-import ch.chrigu.gfm.plugin.ItemField
-import ch.chrigu.gfm.plugin.ItemType
-
 data class PluginForm<T>(val title: String, val formFields: List<PluginFormField<*>>, val uri: String) {
     constructor(title: String, fields: List<ItemField<T>>, pluginData: T, uri: String) : this(title, fields.map { it.toFormField(pluginData) }, uri)
 }

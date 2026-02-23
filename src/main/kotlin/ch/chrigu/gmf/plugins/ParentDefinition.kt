@@ -1,7 +1,5 @@
 package ch.chrigu.gmf.plugins
 
-import ch.chrigu.gfm.plugin.ItemDefinition
-import ch.chrigu.gfm.plugin.Plugin
 import ch.chrigu.gmf.shared.aggregates.AggregateRoot
 
 /**

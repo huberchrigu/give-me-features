@@ -3,6 +3,7 @@ package ch.chrigu.gmf.tasks.web
 import ch.chrigu.gmf.features.FeatureId
 import ch.chrigu.gmf.plugins.PluginService
 import ch.chrigu.gmf.shared.markdown.Markdown
+import ch.chrigu.gmf.shared.web.SharedUiActions.login
 import ch.chrigu.gmf.shared.web.UiTest
 import ch.chrigu.gmf.tasks.*
 import com.microsoft.playwright.Page
@@ -278,14 +279,8 @@ class TaskControllerUiTest(
 
     private fun openTaskPage(test: Page.() -> Unit) {
         page.navigate("http://localhost:$port/tasks/$taskId")
-        page.login()
+        page.login("user")
         test(page)
-    }
-
-    private fun Page.login() {
-        querySelector("input[name='username']").fill("user")
-        querySelector("input[name='password']").fill("user")
-        querySelector("button[type='submit']").click()
     }
 
     private fun withLinkableFeature() {

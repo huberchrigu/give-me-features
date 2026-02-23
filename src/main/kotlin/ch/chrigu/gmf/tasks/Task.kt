@@ -1,7 +1,9 @@
 package ch.chrigu.gmf.tasks
 
+import ch.chrigu.gmf.plugins.TaskReferenceId
 import ch.chrigu.gmf.shared.aggregates.AbstractAggregateRoot
 import ch.chrigu.gmf.shared.markdown.Markdown
+import java.util.UUID
 
 class Task(
     id: TaskId, version: Long?, val name: String, val description: Markdown, val status: TaskStatus
@@ -91,4 +93,8 @@ enum class TaskStatus {
      * Task is completed.
      */
     DONE
+}
+
+data class TaskId(private val id: String = UUID.randomUUID().toString()) : TaskReferenceId {
+    override fun toString() = id
 }

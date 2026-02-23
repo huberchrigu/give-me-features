@@ -1,7 +1,5 @@
 package ch.chrigu.gmf.plugins
 
-import ch.chrigu.gfm.plugin.Plugin
-import ch.chrigu.gfm.plugin.PluginId
 import ch.chrigu.gmf.shared.aggregates.AbstractAggregateRoot
 import java.util.UUID
 

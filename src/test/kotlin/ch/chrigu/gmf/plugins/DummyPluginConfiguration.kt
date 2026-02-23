@@ -1,6 +1,5 @@
-package ch.chrigu.gmf
+package ch.chrigu.gmf.plugins
 
-import ch.chrigu.gfm.plugin.*
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 

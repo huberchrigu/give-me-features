@@ -1,9 +1,11 @@
 package ch.chrigu.gmf.features
 
+import ch.chrigu.gmf.plugins.FeatureReferenceId
 import ch.chrigu.gmf.shared.aggregates.AbstractAggregateRoot
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.tasks.Task
 import ch.chrigu.gmf.tasks.TaskId
+import java.util.UUID
 
 class Feature(id: FeatureId, val name: String, val description: Markdown, val tasks: List<TaskId>, version: Long?) :
     AbstractAggregateRoot<FeatureId>(id, version) {
@@ -52,4 +54,8 @@ class Feature(id: FeatureId, val name: String, val description: Markdown, val ta
 
 data class FeatureUpdate(private val name: String, private val description: Markdown) {
     fun apply(feature: Feature) = Feature(feature.id, name, description, feature.tasks, feature.version)
+}
+
+data class FeatureId(private val id: String = UUID.randomUUID().toString()) : FeatureReferenceId {
+    override fun toString(): String = id
 }

@@ -1,6 +1,5 @@
 package ch.chrigu.gmf.plugins
 
-import ch.chrigu.gfm.plugin.Plugin
 import ch.chrigu.gmf.plugins.forms.PluginFormFactory
 import ch.chrigu.gmf.plugins.mongo.PluginStatusRepository
 import ch.chrigu.gmf.shared.aggregates.AggregateNotFoundException

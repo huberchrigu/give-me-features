@@ -1,8 +1,8 @@
 package ch.chrigu.gmf.tasks.web
 
-import ch.chrigu.gfm.plugin.ItemDefinition
-import ch.chrigu.gfm.plugin.Plugin
-import ch.chrigu.gfm.plugin.TaskReference
+import ch.chrigu.gmf.plugins.ItemDefinition
+import ch.chrigu.gmf.plugins.Plugin
+import ch.chrigu.gmf.plugins.TaskReference
 import ch.chrigu.gmf.plugins.ParentDefinition
 import ch.chrigu.gmf.tasks.Task
 import ch.chrigu.gmf.tasks.TaskId
