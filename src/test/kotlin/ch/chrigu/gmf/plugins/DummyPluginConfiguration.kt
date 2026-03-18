@@ -1,8 +1,12 @@
 package ch.chrigu.gmf.plugins
 
+import ch.chrigu.gmf.features.FeatureId
 import ch.chrigu.gmf.plugins.mongo.toPluginRepository
+import ch.chrigu.gmf.tasks.TaskId
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import org.springframework.data.mongodb.core.mapping.FieldType
+import org.springframework.data.mongodb.core.mapping.MongoId
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 @TestConfiguration
@@ -19,20 +23,18 @@ class DummyPluginConfiguration {
     )
 }
 
-data class DummyTaskExtension(val id: TaskReferenceId, val description: String) {
+data class DummyTaskExtension(@MongoId(targetType = FieldType.STRING) val id: TaskId, val description: String) {
     companion object {
         fun itemDefinition(dummyTaskRepository: PluginRepository<DummyTaskExtension, TaskReferenceId>) = ItemDefinition<TaskReference, TaskReferenceId, DummyTaskExtension>(
             DummyTaskExtension::class.java,
             listOf(ItemField("description", ItemType.TEXT, "Dummy description", { description })),
             ItemTriggers(), // TODO: Implement triggers
             dummyTaskRepository
-        ) { DummyTaskExtension(get("id").toTaskId(), get("description") as String? ?: "") }
-
-        private fun Any?.toTaskId() = object : TaskReferenceId {}
+        ) { DummyTaskExtension(TaskId(it.id!!.toString()), string("description")) }
     }
 }
 
-data class DummyFeatureExtension(val id: FeatureReferenceId, val activate: Boolean) {
+data class DummyFeatureExtension(@MongoId(targetType = FieldType.STRING) val id: FeatureId, val activate: Boolean) {
     companion object {
         fun itemDefinition(dummyFeatureRepository: PluginRepository<DummyFeatureExtension, FeatureReferenceId>) =
             ItemDefinition<FeatureReference, FeatureReferenceId, DummyFeatureExtension>(
@@ -40,9 +42,7 @@ data class DummyFeatureExtension(val id: FeatureReferenceId, val activate: Boole
                 listOf(ItemField("activate", ItemType.BOOLEAN, "Activate dummy feature", { activate })),
                 ItemTriggers(), // TODO: Implement triggers
                 dummyFeatureRepository
-            ) { DummyFeatureExtension(get("id").toFeatureId(), get("activate") as Boolean? ?: false) }
-
-        private fun Any?.toFeatureId() = object : FeatureReferenceId {}
+            ) { DummyFeatureExtension(FeatureId(it.id!!.toString()), boolean("activate")) }
     }
 }
 

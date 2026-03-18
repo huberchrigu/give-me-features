@@ -9,7 +9,7 @@ class SpringPluginRepository<T : Any, ID : Any>(private val delegate: CoroutineC
         return delegate.save(pluginEntity)
     }
 
-    override suspend fun findById(id: ID): T? { // TODO: Usage makes no sense?
+    override suspend fun findById(id: ID): T? {
         return delegate.findById(id.toString())
     }
 }

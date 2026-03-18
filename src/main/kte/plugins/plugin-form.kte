@@ -13,13 +13,13 @@
             @for(field in plugin.formFields)
                 @if(field.type == "checkbox")
                     <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="${field.id}" required="${field.required}" readonly="${field.readOnly}">
+                        <input type="checkbox" class="form-check-input" id="${field.id}" name="${field.id}" required="${field.required}" readonly="${field.readOnly}" checked="${field.value as Boolean? ?: false}">
                         <label class="form-check-label" for="${field.id}">${field.label}</label>
                     </div>
                 @else
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">${field.label}</label>
-                        <input type="${field.type}" class="form-control" id="${field.id}" required="${field.required}" readonly="${field.readOnly}">
+                        <input type="${field.type}" class="form-control" id="${field.id}" name="${field.id}" required="${field.required}" readonly="${field.readOnly}" value="${field.value as String?}">
                     </div>
                 @endif
             @endfor

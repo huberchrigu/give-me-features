@@ -3,9 +3,9 @@ import kotlin.io.path.Path
 plugins {
     kotlin("jvm") version "2.2.21"
     kotlin("plugin.spring") version "2.2.21"
-    id("org.springframework.boot") version "4.0.1"
+	id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
-    id("gg.jte.gradle") version "3.2.1"
+	id("gg.jte.gradle") version "3.2.3"
 }
 
 group = "ch.chrigu.gmf"
@@ -27,7 +27,7 @@ repositories {
     mavenCentral()
 }
 
-extra["springModulithVersion"] = "2.0.1"
+extra["springModulithVersion"] = "2.0.3"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -35,7 +35,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("gg.jte:jte-spring-boot-starter-3:3.2.1")
+	implementation("gg.jte:jte-spring-boot-starter-4:3.2.3")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
@@ -68,7 +68,7 @@ dependencies {
     implementation(project(":plugin-api"))
 
     // KTE
-    implementation("gg.jte:jte-kotlin:3.2.1")
+    implementation("gg.jte:jte-kotlin:3.2.3")
 
     // Webjars
     runtimeOnly("org.webjars.npm:htmx.org:2.0.4")

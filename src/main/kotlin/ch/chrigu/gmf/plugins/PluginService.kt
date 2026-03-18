@@ -42,12 +42,12 @@ class PluginService(
     suspend fun <PARENT : AggregateRoot<ID>, ID> update(
         entity: PARENT,
         pluginId: PluginStatusId,
-        pluginData: Map<String, Any?>,
+        pluginData: FormValues,
         parentDefinition: ParentDefinition<PARENT, ID>
     ): PluginForm<*> {
         val plugin = resolvePluginDefinition(pluginId)
         val itemDefinition = parentDefinition.getItemDefinition(plugin) ?: throw AggregateNotFoundException("Item definition for plugin $pluginId not found")
-        return pluginFormFactory.save(plugin.title, itemDefinition, pluginData, parentDefinition.uriFor(entity, pluginId))
+        return pluginFormFactory.save(plugin.title, itemDefinition, pluginData, entity, parentDefinition.uriFor(entity, pluginId))
     }
 
     @PreAuthorize("hasRole('USER')")

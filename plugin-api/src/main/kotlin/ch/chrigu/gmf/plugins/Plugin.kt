@@ -14,7 +14,7 @@ data class ItemDefinition<PARENT, ID, P : Any>(
     val fields: List<ItemField<P>>,
     val triggers: ItemTriggers<PARENT>,
     val repository: PluginRepository<P, ID>,
-    val fromMap: Map<String, Any?>.() -> P
+    val fromMap: Map<String, List<String>>.(PARENT) -> P
 )
 
 data class ItemField<P>(val id: String, val type: ItemType, val title: String, val get: P.() -> Any, val required: Boolean = true, val readOnly: Boolean = false)
