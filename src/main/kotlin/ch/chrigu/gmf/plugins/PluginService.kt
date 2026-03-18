@@ -39,21 +39,19 @@ class PluginService(
     fun findAll(): Flow<PluginStatus> = pluginStatusRepository.findAll()
 
     @PreAuthorize("hasRole('USER')")
-    suspend fun <PARENT : AggregateRoot<*>> update(
+    suspend fun <PARENT : AggregateRoot<ID>, ID> update(
         entity: PARENT,
         pluginId: PluginStatusId,
         pluginData: Map<String, Any?>,
-        parentDefinition: ParentDefinition<PARENT>
+        parentDefinition: ParentDefinition<PARENT, ID>
     ): PluginForm<*> {
         val plugin = resolvePluginDefinition(pluginId)
         val itemDefinition = parentDefinition.getItemDefinition(plugin) ?: throw AggregateNotFoundException("Item definition for plugin $pluginId not found")
-        val form = pluginFormFactory.create(plugin.title, itemDefinition, pluginData, parentDefinition.uriFor(entity, pluginId))
-        // TODO: Persist
-        return form
+        return pluginFormFactory.save(plugin.title, itemDefinition, pluginData, parentDefinition.uriFor(entity, pluginId))
     }
 
     @PreAuthorize("hasRole('USER')")
-    suspend fun <PARENT : AggregateRoot<*>> getForms(entity: PARENT, parentDefinition: ParentDefinition<PARENT>): List<PluginForm<*>> {
+    suspend fun <PARENT : AggregateRoot<ID>, ID> getForms(entity: PARENT, parentDefinition: ParentDefinition<PARENT, ID>): List<PluginForm<*>> {
         val activePlugins = pluginStatusRepository.findByActive(true).toList()
         val activePluginIds = activePlugins.map { it.metadata.pluginId }
         val resolvedPlugins = plugins.filter { activePluginIds.contains(it.id) }
@@ -61,7 +59,7 @@ class PluginService(
             .mapNotNull { plugin ->
                 val itemDefinition = parentDefinition.getItemDefinition(plugin) ?: return@mapNotNull null
                 val activePlugin = activePlugins.first { it.metadata.pluginId == plugin.id }
-                pluginFormFactory.create(plugin.title, itemDefinition, emptyMap(), parentDefinition.uriFor(entity, activePlugin.id)) // TODO: Data form repository
+                pluginFormFactory.create(plugin.title, itemDefinition, entity, parentDefinition.uriFor(entity, activePlugin.id))
             }
         return forms
     }

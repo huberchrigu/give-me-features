@@ -2,6 +2,7 @@ package ch.chrigu.gmf.tasks.web
 
 import ch.chrigu.gmf.features.FeatureId
 import ch.chrigu.gmf.plugins.PluginService
+import ch.chrigu.gmf.plugins.TaskReference
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.shared.web.SharedUiActions.login
 import ch.chrigu.gmf.shared.web.UiTest
@@ -46,7 +47,7 @@ class TaskControllerUiTest(
 
     @BeforeEach
     fun initPlugins() {
-        coEvery { pluginService.getForms(any(), any()) } returns emptyList()
+        coEvery { pluginService.getForms(any<TaskReference>(), any()) } returns emptyList()
     }
 
     @Test

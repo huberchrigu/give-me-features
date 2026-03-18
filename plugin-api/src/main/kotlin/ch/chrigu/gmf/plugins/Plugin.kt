@@ -4,9 +4,18 @@ import ch.chrigu.gmf.shared.aggregates.AggregateRoot
 
 data class Plugin(val id: PluginId, val title: String, val touchpoints: PluginTouchpoints)
 
-data class PluginTouchpoints(val featureItem: ItemDefinition<FeatureReference, *>? = null, val taskItem: ItemDefinition<TaskReference, *>? = null)
+data class PluginTouchpoints(
+    val featureItem: ItemDefinition<FeatureReference, FeatureReferenceId, *>? = null,
+    val taskItem: ItemDefinition<TaskReference, TaskReferenceId, *>? = null
+)
 
-data class ItemDefinition<PARENT, P>(val persistenceClass: Class<P>, val fields: List<ItemField<P>>, val triggers: ItemTriggers<PARENT>, val fromMap: Map<String, Any?>.() -> P)
+data class ItemDefinition<PARENT, ID, P : Any>(
+    val persistenceClass: Class<P>,
+    val fields: List<ItemField<P>>,
+    val triggers: ItemTriggers<PARENT>,
+    val repository: PluginRepository<P, ID>,
+    val fromMap: Map<String, Any?>.() -> P
+)
 
 data class ItemField<P>(val id: String, val type: ItemType, val title: String, val get: P.() -> Any, val required: Boolean = true, val readOnly: Boolean = false)
 

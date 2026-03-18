@@ -1,6 +1,8 @@
 package ch.chrigu.gmf.tasks.web
 
+import ch.chrigu.gmf.plugins.ParentDefinition
 import ch.chrigu.gmf.plugins.PluginService
+import ch.chrigu.gmf.plugins.TaskReferenceId
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.shared.web.Hx
 import ch.chrigu.gmf.shared.web.UpdateFragmentBuilder
@@ -33,7 +35,9 @@ class TaskController(private val taskService: TaskService, private val pluginSer
     suspend fun getTask(@PathVariable taskId: TaskId): Rendering {
         val task = taskService.getTask(taskId)
         return Rendering.view("task")
-            .modelAttribute("task", TaskDetailsWithPlugins(task.toDetails(), pluginService.getForms(task.asReference(), taskDefinition)))
+            .modelAttribute("task", TaskDetailsWithPlugins(task.toDetails(), pluginService.getForms(task.asReference(),
+                taskDefinition as ParentDefinition<PluginTask, TaskReferenceId>
+            )))
             .modelAttribute("items", taskService.getLinkedItems(taskId).toList())
             .build()
     }

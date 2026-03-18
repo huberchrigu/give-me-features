@@ -1,6 +1,7 @@
 package ch.chrigu.gmf.features.web
 
 import ch.chrigu.gmf.features.*
+import ch.chrigu.gmf.plugins.FeatureReference
 import ch.chrigu.gmf.shared.web.has
 import ch.chrigu.gmf.plugins.PluginService
 import ch.chrigu.gmf.shared.markdown.Markdown
@@ -52,7 +53,7 @@ class FeatureControllerUiTest(
 
     @BeforeEach
     fun initPlugins() {
-        coEvery { pluginService.getForms(any(), any()) } returns emptyList()
+        coEvery { pluginService.getForms(any<FeatureReference>(), any()) } returns emptyList()
     }
 
     @Test

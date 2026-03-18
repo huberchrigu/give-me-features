@@ -4,16 +4,17 @@ import ch.chrigu.gmf.plugins.ItemDefinition
 import ch.chrigu.gmf.plugins.Plugin
 import ch.chrigu.gmf.plugins.TaskReference
 import ch.chrigu.gmf.plugins.ParentDefinition
+import ch.chrigu.gmf.plugins.TaskReferenceId
 import ch.chrigu.gmf.tasks.Task
 import ch.chrigu.gmf.tasks.TaskId
 import ch.chrigu.gmf.tasks.TaskService
 import org.springframework.stereotype.Component
 
 @Component
-class TaskDefinition(private val taskService: TaskService) : ParentDefinition<TaskReference> {
+class TaskDefinition(private val taskService: TaskService) : ParentDefinition<TaskReference, TaskReferenceId> {
     override val uriPrefix: String = "/tasks"
 
-    override fun getItemDefinition(plugin: Plugin): ItemDefinition<TaskReference, *>? {
+    override fun getItemDefinition(plugin: Plugin): ItemDefinition<TaskReference, TaskReferenceId, *>? {
         return plugin.touchpoints.taskItem
     }
 

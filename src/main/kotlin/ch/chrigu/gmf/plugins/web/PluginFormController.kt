@@ -12,16 +12,16 @@ import org.springframework.web.reactive.result.view.Rendering
 import org.springframework.web.server.ResponseStatusException
 
 @Controller
-class PluginFormController(private val pluginService: PluginService, private val parentDefinitions: List<ParentDefinition<*>>) {
+class PluginFormController(private val pluginService: PluginService, private val parentDefinitions: List<ParentDefinition<*, *>>) {
 
     @PutMapping("/{parent}/{id}/plugins/{pluginId}")
-    suspend fun <PARENT : AggregateRoot<*>> updatePluginData(
+    suspend fun <PARENT : AggregateRoot<ID>, ID> updatePluginData(
         @PathVariable parent: String,
         @PathVariable id: String,
         @PathVariable pluginId: PluginStatusId,
         body: Map<String, Any?>
     ): Rendering {
-        val parentDefinition = find(parent) as ParentDefinition<PARENT>? ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val parentDefinition = find(parent) as ParentDefinition<PARENT, ID>? ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         return Rendering.view("plugins/plugin-form")
             .modelAttribute("plugin", pluginService.update(parentDefinition.resolve(id), pluginId, body, parentDefinition))
             .build()

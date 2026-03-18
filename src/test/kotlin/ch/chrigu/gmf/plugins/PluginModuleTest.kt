@@ -21,8 +21,8 @@ import org.springframework.security.test.context.support.WithMockUser
 @Import(TestcontainersConfiguration::class, DummyPluginConfiguration::class)
 class PluginModuleTest(
     private val pluginService: PluginService,
-    @MockkBean private val featureDefinition: ParentDefinition<FeatureReference>,
-    @MockkBean private val taskDefinition: ParentDefinition<TaskReference>
+    @MockkBean private val featureDefinition: ParentDefinition<FeatureReference, FeatureReferenceId>,
+    @MockkBean private val taskDefinition: ParentDefinition<TaskReference, TaskReferenceId>
 ) {
 
     @Test
@@ -46,7 +46,10 @@ class PluginModuleTest(
     fun `should get forms`() = runTest {
         val pluginStatusId = fetchId()
         withDefinition(taskDefinition, "/tasks", pluginStatusId) { taskItem }
-        val task = mockk<TaskReference> {}
+        val taskId = mockk<TaskReferenceId>()
+        val task = mockk<TaskReference> {
+            every { id } returns taskId
+        }
         val forms = pluginService.getForms(task, taskDefinition)
         assertThat(forms).containsExactly(
             PluginForm<TaskReference>(
@@ -63,13 +66,13 @@ class PluginModuleTest(
         assertThrows<AccessDeniedException> { pluginService.findAll().toList() }
     }
 
-    private inline fun <reified T : AggregateRoot<*>> withDefinition(
-        definition: ParentDefinition<T>,
+    private inline fun <reified T : AggregateRoot<ID>, ID> withDefinition(
+        definition: ParentDefinition<T, ID>,
         uriPrefix: String,
         pluginStatusId: PluginStatusId,
-        crossinline getItem: PluginTouchpoints.() -> ItemDefinition<T, *>?
+        crossinline getItem: PluginTouchpoints.() -> ItemDefinition<T, ID, *>?
     ) {
-        every { definition.getItemDefinition(any()) } answers {
+        every<ItemDefinition<T, ID, *>?> { definition.getItemDefinition(any()) } answers {
             this.arg<Plugin>(0).touchpoints.getItem()
         }
         every { definition.uriFor(any(), any()) } returns "$uriPrefix/1/plugins/$pluginStatusId"
