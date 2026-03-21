@@ -4,9 +4,11 @@ import ch.chrigu.gmf.plugins.PluginService
 import ch.chrigu.gmf.shared.web.Hx
 import ch.chrigu.gmf.shared.security.SecurityConfiguration
 import ch.chrigu.gmf.tasks.TaskService
+import gg.jte.springframework.boot.autoconfigure.JteAutoConfiguration
 import gg.jte.springframework.boot.autoconfigure.ReactiveJteAutoConfiguration
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.context.annotation.Import
@@ -22,7 +24,8 @@ import org.springframework.web.reactive.function.BodyInserters
 @WebFluxTest(controllers = [TaskController::class])
 @AutoConfigureWebTestClient(timeout = "30s")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-@Import(SecurityConfiguration::class, ReactiveJteAutoConfiguration::class)
+@Import(SecurityConfiguration::class)
+@ImportAutoConfiguration(ReactiveJteAutoConfiguration::class, JteAutoConfiguration::class)
 class TaskControllerWebTest(
     private val webTestClient: WebTestClient,
     @MockitoBean private val taskService: TaskService,

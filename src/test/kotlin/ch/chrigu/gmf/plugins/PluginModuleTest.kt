@@ -30,7 +30,9 @@ class PluginModuleTest(
     fun `should update data`() = runTest {
         val pluginStatusId = fetchId()
         withDefinition(featureDefinition, "/features", pluginStatusId) { featureItem }
-        val feature = mockk<FeatureReference> {}
+        val feature = mockk<FeatureReference> {
+            every { id } returns mockk()
+        }
         val form = pluginService.update(feature, pluginStatusId, mapOf("activate" to listOf("on")), featureDefinition)
         assertThat(form).isEqualTo(
             PluginForm<FeatureReference>(
