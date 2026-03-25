@@ -27,6 +27,7 @@ class TaskService(
     suspend fun getTask(id: TaskId) = taskRepository.findById(id) ?: throw TaskNotFoundException(id)
 
     fun getTaskUpdates(id: TaskId): Flow<Task> = changes.listen(id)
+    fun getAllUpdates(conflated: Boolean = true) = changes.listenToAll(conflated)
 
     /**
      * @return Old version to new version

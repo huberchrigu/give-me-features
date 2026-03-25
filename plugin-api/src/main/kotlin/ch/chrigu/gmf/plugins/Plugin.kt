@@ -19,7 +19,9 @@ data class ItemDefinition<PARENT, ID, P : Any>(
 
 data class ItemField<P>(val id: String, val type: ItemType, val title: String, val get: P.() -> Any, val required: Boolean = true, val readOnly: Boolean = false)
 
-data class ItemTriggers<PARENT>(val onChange: (PARENT) -> PARENT = { it })
+data class ItemTriggers<PARENT>(val onChange: OnChangeTrigger<PARENT> = { })
+typealias OnChangeTrigger<PARENT> = suspend (PARENT) -> Unit
+
 enum class ItemType { TEXT, BOOLEAN }
 
 data class PluginId(private val id: String) {

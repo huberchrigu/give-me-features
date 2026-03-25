@@ -34,7 +34,7 @@ class FeatureService(
     }
 
     fun getUpdates(id: FeatureId) = changes.listen(id)
-    fun getAllUpdates() = changes.listenToAll()
+    fun getAllUpdates(conflated: Boolean = true) = changes.listenToAll(conflated)
 
     /**
      * @return Old version to new version

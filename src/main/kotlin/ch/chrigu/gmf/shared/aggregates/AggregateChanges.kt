@@ -10,5 +10,5 @@ interface AggregateChanges<T, ID> {
 }
 
 interface AllAggregateChanges<T : AggregateRoot<ID>, ID> : AggregateChanges<T, ID> {
-    fun listenToAll(): Flow<T>
+    fun listenToAll(conflated: Boolean = true): Flow<T>
 }

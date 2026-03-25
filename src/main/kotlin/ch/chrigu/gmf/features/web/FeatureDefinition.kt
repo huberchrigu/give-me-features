@@ -7,6 +7,8 @@ import ch.chrigu.gmf.plugins.FeatureReference
 import ch.chrigu.gmf.plugins.FeatureReferenceId
 import ch.chrigu.gmf.plugins.ParentDefinition
 import ch.chrigu.gmf.plugins.Plugin
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Component
 
 @Component
@@ -19,6 +21,8 @@ class FeatureDefinition(private val featureService: FeatureService) : ParentDefi
     override val uriPrefix: String = "/features"
 
     override fun getItemDefinition(plugin: Plugin) = plugin.touchpoints.featureItem
+
+    override val changes: Flow<FeatureReference> = featureService.getAllUpdates(false).map { it.asReference() }
 }
 
 fun Feature.asReference() = PluginFeature(id, version)

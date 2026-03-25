@@ -1,17 +1,23 @@
 package ch.chrigu.gmf.plugins
 
 import ch.chrigu.gmf.TestcontainersConfiguration
+import ch.chrigu.gmf.features.FeatureId
 import ch.chrigu.gmf.shared.aggregates.AggregateRoot
 import ch.chrigu.gmf.shared.security.runas.RunAs.runAs
-import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.modulith.test.ApplicationModuleTest
 import org.springframework.security.access.AccessDeniedException
@@ -21,10 +27,11 @@ import org.springframework.security.test.context.support.WithMockUser
 @Import(TestcontainersConfiguration::class, DummyPluginConfiguration::class)
 class PluginModuleTest(
     private val pluginService: PluginService,
-    @MockkBean private val featureDefinition: ParentDefinition<FeatureReference, FeatureReferenceId>,
-    @MockkBean private val taskDefinition: ParentDefinition<TaskReference, TaskReferenceId>
+    private val dummyFeatureRepository: DummyFeatureRepository,
+    private val featureDefinition: ParentDefinition<FeatureReference, FeatureReferenceId>,
+    private val taskDefinition: ParentDefinition<TaskReference, TaskReferenceId>,
+    private val featureFlow: MutableSharedFlow<FeatureReference>
 ) {
-
     @Test
     @WithMockUser(roles = ["USER"])
     fun `should update data`() = runTest {
@@ -68,6 +75,21 @@ class PluginModuleTest(
         assertThrows<AccessDeniedException> { pluginService.findAll().toList() }
     }
 
+    @Test
+    fun `should modify feature on update`() = runTest {
+        val featureId = FeatureId()
+        val feature = mockk<FeatureReference> {
+            every { id } returns featureId
+        }
+        dummyFeatureRepository.save(DummyFeatureExtension(featureId, true))
+        featureFlow.emit(feature)
+        await.until {
+            runBlocking {
+                dummyFeatureRepository.findById(featureId.toString())?.activate == false
+            }
+        }
+    }
+
     private inline fun <reified T : AggregateRoot<ID>, ID> withDefinition(
         definition: ParentDefinition<T, ID>,
         uriPrefix: String,
@@ -82,5 +104,23 @@ class PluginModuleTest(
 
     private suspend fun fetchId() = runAs("ADMIN") {
         pluginService.findAll().first().id
+    }
+
+    @TestConfiguration
+    class TestConfig {
+        @Bean
+        fun featureFlow() = MutableSharedFlow<FeatureReference>()
+
+        @Bean
+        fun featureDefinition(featureFlow: MutableSharedFlow<FeatureReference>): ParentDefinition<FeatureReference, FeatureReferenceId> = mockk {
+            every { changes } returns featureFlow
+            every { getItemDefinition(any()) } answers { arg<Plugin>(0).touchpoints.featureItem }
+        }
+
+        @Bean
+        fun taskDefinition(): ParentDefinition<TaskReference, TaskReferenceId> = mockk {
+            every { changes } returns emptyFlow()
+            every { getItemDefinition(any()) } answers { arg<Plugin>(0).touchpoints.taskItem }
+        }
     }
 }

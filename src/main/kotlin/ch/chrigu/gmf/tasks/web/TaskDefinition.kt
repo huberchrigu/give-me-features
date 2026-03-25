@@ -8,11 +8,15 @@ import ch.chrigu.gmf.plugins.TaskReferenceId
 import ch.chrigu.gmf.tasks.Task
 import ch.chrigu.gmf.tasks.TaskId
 import ch.chrigu.gmf.tasks.TaskService
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Component
 
 @Component
 class TaskDefinition(private val taskService: TaskService) : ParentDefinition<TaskReference, TaskReferenceId> {
     override val uriPrefix: String = "/tasks"
+
+    override val changes: Flow<TaskReference> = taskService.getAllUpdates(false).map { it.asReference() }
 
     override fun getItemDefinition(plugin: Plugin): ItemDefinition<TaskReference, TaskReferenceId, *>? {
         return plugin.touchpoints.taskItem

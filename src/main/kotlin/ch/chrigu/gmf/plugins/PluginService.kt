@@ -5,8 +5,11 @@ import ch.chrigu.gmf.plugins.mongo.PluginStatusRepository
 import ch.chrigu.gmf.shared.aggregates.AggregateNotFoundException
 import ch.chrigu.gmf.shared.aggregates.AggregateRoot
 import jakarta.annotation.PostConstruct
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -15,7 +18,9 @@ import org.springframework.stereotype.Service
 class PluginService(
     private val pluginStatusRepository: PluginStatusRepository,
     private val pluginFormFactory: PluginFormFactory,
-    private val plugins: List<Plugin> = emptyList()
+    private val plugins: List<Plugin> = emptyList(),
+    private val parentDefinitions: List<ParentDefinition<*, *>>,
+    private val backgroundScope: CoroutineScope
 ) {
     @PostConstruct
     fun init() {
@@ -26,6 +31,13 @@ class PluginService(
             val updatedStatus = current.mapNotNull { updatePluginData(it) }
             pluginStatusRepository.saveAll(newStatus + updatedStatus).toList()
             pluginStatusRepository.deleteAll(removed)
+        }
+    }
+
+    @PostConstruct
+    fun subscribeParentChanges() {
+        backgroundScope.launch {
+            parentDefinitions.forEach { definition -> handleTriggers(definition) }
         }
     }
 
@@ -64,6 +76,8 @@ class PluginService(
         return forms
     }
 
+    private fun PluginStatus.toPlugin() = plugins.first { it.id == metadata.pluginId }
+
     private suspend fun resolvePluginDefinition(pluginId: PluginStatusId): Plugin {
         val status = pluginStatusRepository.findById(pluginId.toString()) ?: throw AggregateNotFoundException("Plugin $pluginId not found")
         require(status.active)
@@ -86,4 +100,14 @@ class PluginService(
 
     private fun updatePluginData(status: PluginStatus) = plugins.firstOrNull { it.id == status.metadata.pluginId }
         ?.let { status.updateWith(it) }
+
+    private suspend fun <PARENT : AggregateRoot<ID>, ID> handleTriggers(definition: ParentDefinition<PARENT, ID>) {
+        definition.changes.collect { change ->
+            pluginStatusRepository.findByActive(true)
+                .map { it.toPlugin() }
+                .collect { plugin ->
+                    definition.getItemDefinition(plugin)?.triggers?.onChange(change)
+                }
+        }
+    }
 }

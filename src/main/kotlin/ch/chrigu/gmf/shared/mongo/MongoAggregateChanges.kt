@@ -18,7 +18,7 @@ class MongoAggregateChanges<T : AggregateRoot<ID>, ID>(mongoTemplate: ReactiveMo
     private val flow = MutableSharedFlow<T>()
 
     init {
-        mongoTemplate.changeStream<T>(clazz)
+        mongoTemplate.changeStream(clazz)
             .watchCollection(mongoTemplate.getCollectionName(clazz))
             .listen()
             .filter { it.body != null }
@@ -29,8 +29,8 @@ class MongoAggregateChanges<T : AggregateRoot<ID>, ID>(mongoTemplate: ReactiveMo
         return flow.filter { it.id == id }.conflate()
     }
 
-    override fun listenToAll(): Flow<T> {
-        return flow.conflate()
+    override fun listenToAll(conflated: Boolean): Flow<T> {
+        return if (conflated) flow.conflate() else flow
     }
 }
 
