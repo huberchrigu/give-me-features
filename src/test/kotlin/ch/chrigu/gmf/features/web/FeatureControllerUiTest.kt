@@ -260,6 +260,12 @@ class FeatureControllerUiTest(
         assertThat(feature.querySelector(".progress-bar").getAttribute("aria-valuenow")).isEqualTo("0")
         assertThat(feature.querySelector(".text-muted").textContent().trim()).isEqualTo("Current Progress: 0%")
         assertThat(feature.querySelector("div.richtext p").textContent()).isEqualTo(expectedDescription)
+        assertNoPlugins()
+    }
+
+    private fun Page.assertNoPlugins() {
+        val forms = querySelectorAll("form").filter { it.getAttribute("hx-put")?.contains("/plugins") == true }
+        assertThat(forms).isEmpty()
     }
 
     private fun Page.assertFeatureList(current: Boolean) {

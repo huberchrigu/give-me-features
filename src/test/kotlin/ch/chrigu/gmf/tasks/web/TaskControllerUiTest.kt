@@ -1,8 +1,8 @@
 package ch.chrigu.gmf.tasks.web
 
 import ch.chrigu.gmf.features.FeatureId
-import ch.chrigu.gmf.plugins.PluginService
-import ch.chrigu.gmf.plugins.TaskReference
+import ch.chrigu.gmf.plugins.*
+import ch.chrigu.gmf.plugins.web.PluginFormController
 import ch.chrigu.gmf.shared.markdown.Markdown
 import ch.chrigu.gmf.shared.web.SharedUiActions.login
 import ch.chrigu.gmf.shared.web.UiTest
@@ -12,6 +12,7 @@ import com.microsoft.playwright.options.LoadState
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flowOf
@@ -20,8 +21,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.context.annotation.Import
 
 @UiTest(TaskController::class)
+@Import(PluginFormController::class)
 class TaskControllerUiTest(
     @MockkBean private val taskService: TaskService,
     @MockkBean private val pluginService: PluginService,
@@ -38,6 +41,11 @@ class TaskControllerUiTest(
     private val featureId = FeatureId("featureId")
     private val linkableFeature = "Linkable feature"
 
+    private val pluginId = PluginStatusId("pluginId")
+    private val pluginField = "name"
+    private val pluginValue = "Test"
+    private val newPluginValue = "Changed value"
+
     private lateinit var page: Page
 
     private val taskUpdates = MutableSharedFlow<Task>()
@@ -47,7 +55,8 @@ class TaskControllerUiTest(
 
     @BeforeEach
     fun initPlugins() {
-        coEvery { pluginService.getForms(any<TaskReference>(), any()) } returns emptyList()
+        val form = pluginForm(this@TaskControllerUiTest.pluginValue)
+        coEvery { pluginService.getForms(any<TaskReference>(), any()) } returns listOf(form)
     }
 
     @Test
@@ -72,6 +81,18 @@ class TaskControllerUiTest(
             assertTask()
             externalTaskChange(newName, newDescriptionMarkdown, TaskStatus.BLOCKED)
             assertTask(newName, newDescription, TaskStatus.BLOCKED)
+        }
+    }
+
+    @Test
+    fun `should show and update plugin data`() {
+        withTask()
+
+        openTaskPage {
+            assertPlugin()
+            withPluginUpdate(querySelector("[name='_csrf']").inputValue())
+            changePluginData()
+            assertPlugin(newPluginValue)
         }
     }
 
@@ -146,6 +167,17 @@ class TaskControllerUiTest(
         openTaskPage {
             assertError("Task $taskId not found")
         }
+    }
+
+    private fun Page.assertPlugin(value: String = pluginValue) {
+        val field = querySelector("form input[name='$pluginField']")
+        assertThat(field.inputValue()).isEqualTo(value)
+    }
+
+    private fun Page.changePluginData() {
+        val field = querySelector("form input[name='$pluginField']")
+        field.fill(newPluginValue)
+        field.press("Enter")
     }
 
     private fun Page.cancelTaskForm() {
@@ -289,4 +321,18 @@ class TaskControllerUiTest(
         coEvery { taskService.linkTo(taskId, linkableFeature, 0) } returns flowOf(TaskLinkedItem(featureId, featureName, 0), TaskLinkedItem(linkableFeature, linkableFeature, 0))
         coEvery { taskService.unlink(taskId, featureId.toString(), 0) } returns flowOf(TaskLinkedItem(linkableFeature, linkableFeature, 0))
     }
+
+    private fun withPluginUpdate(csrfToken: String) {
+        every { taskDefinition.uriPrefix } returns "/tasks"
+        val mockedTask = mockk<TaskReference>()
+        coEvery { taskDefinition.resolve(taskId.toString()) } returns mockedTask
+        coEvery { pluginService.update(mockedTask, pluginId, mapOf(pluginField to listOf(newPluginValue), "_csrf" to listOf(csrfToken)), taskDefinition) } returns
+                pluginForm(newPluginValue)
+    }
+
+    private fun pluginForm(fieldValue: String): PluginForm<String> = PluginForm(
+        "Test Plugin",
+        listOf(PluginFormField(pluginField, "Name", "text", required = true, readOnly = false, value = fieldValue)),
+        "/tasks/$taskId/plugins/$pluginId"
+    )
 }

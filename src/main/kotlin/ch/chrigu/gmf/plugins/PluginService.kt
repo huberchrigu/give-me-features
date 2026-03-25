@@ -67,7 +67,7 @@ class PluginService(
     private suspend fun resolvePluginDefinition(pluginId: PluginStatusId): Plugin {
         val status = pluginStatusRepository.findById(pluginId.toString()) ?: throw AggregateNotFoundException("Plugin $pluginId not found")
         require(status.active)
-        return plugins.first { it.id == status.metadata.pluginId } // TODO: Check conversion
+        return plugins.first { it.id == status.metadata.pluginId }
     }
 
     private suspend fun doWith(id: PluginStatusId, apply: PluginStatus.() -> PluginStatus) = pluginStatusRepository.findById(id.toString())?.apply()?.let {
