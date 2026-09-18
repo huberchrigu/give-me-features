@@ -3,9 +3,9 @@ import kotlin.io.path.Path
 plugins {
     kotlin("jvm") version "2.2.21"
     kotlin("plugin.spring") version "2.2.21"
-	id("org.springframework.boot") version "4.0.3"
+    id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
-	id("gg.jte.gradle") version "3.2.3"
+    id("gg.jte.gradle") version "3.2.3"
 }
 
 group = "ch.chrigu.gmf"
@@ -35,7 +35,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-	implementation("gg.jte:jte-spring-boot-starter-4:3.2.3")
+    implementation("gg.jte:jte-spring-boot-starter-4:3.2.3")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
@@ -89,6 +89,9 @@ dependencies {
     testImplementation("com.microsoft.playwright:playwright:1.45.1")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("org.jsoup:jsoup:1.18.3")
+
+    // Plugins
+    testImplementation(project(":testing-plugin"))
 }
 
 dependencyManagement {
