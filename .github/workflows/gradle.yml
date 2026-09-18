@@ -23,6 +23,8 @@ jobs:
           cache: gradle
       - name: Setup Gradle (cache)
         uses: gradle/actions/setup-gradle@v4
+      - name: Verify specifications
+        run: bash scripts/verify-specs.sh
       - name: Install playwright dependencies
         run: ./gradlew playwrightInstallDeps
       - name: Build with Gradle

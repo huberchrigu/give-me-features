@@ -6,6 +6,7 @@ plugins {
     id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
     id("gg.jte.gradle") version "3.2.3"
+    kotlin("kapt") version "2.2.21"
 }
 
 group = "ch.chrigu.gmf"
@@ -44,7 +45,7 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.springframework.modulith:spring-modulith-actuator")
     runtimeOnly("org.springframework.modulith:spring-modulith-observability")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
     testImplementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive-test")
     testImplementation("org.springframework.boot:spring-boot-starter-security-test")
@@ -92,6 +93,7 @@ dependencies {
 
     // Plugins
     testImplementation(project(":testing-plugin"))
+    testImplementation(kotlin("test"))
 }
 
 dependencyManagement {
