@@ -6,13 +6,14 @@ import ch.chrigu.gmf.testing.persistence.TestDefinitionRepository
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoReactiveRepositoriesAutoConfiguration
 import org.springframework.context.annotation.Bean
 
-@AutoConfiguration
+@AutoConfiguration(after = [DataMongoReactiveRepositoriesAutoConfiguration::class])
 @ConditionalOnClass(Plugin::class)
-@ConditionalOnBean(TestDefinitionRepository::class)
 class TestingPluginAutoConfiguration {
     @Bean
+    @ConditionalOnBean(TestDefinitionRepository::class)
     fun testingPlugin(testDefinitionRepository: TestDefinitionRepository) = Plugin(
         PluginId("testing"), "Testing", TestingTouchpointFactory(testDefinitionRepository).create()
     )
